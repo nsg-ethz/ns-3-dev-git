@@ -3926,6 +3926,18 @@ TcpSocketBase::NotifyPacingPerformed (void)
   SendPendingData (m_connected);
 }
 
+Ipv4EndPoint*
+TcpSocketBase::GetEndPoint(void)
+{
+       return m_endPoint;
+}
+
+uint16_t 
+TcpSocketBase::GetLocalPort(void)
+{
+         return m_endPoint->GetLocalPort();
+}
+
 
 //RttHistory methods
 RttHistory::RttHistory (SequenceNumber32 s, uint32_t c, Time t)

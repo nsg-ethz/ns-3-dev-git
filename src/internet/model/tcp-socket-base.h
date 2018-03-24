@@ -541,6 +541,9 @@ public:
   virtual int GetPeerName (Address &address) const;
   virtual void BindToNetDevice (Ptr<NetDevice> netdevice); // NetDevice with my m_endPoint
 
+  Ipv4EndPoint* GetEndPoint(void);
+  uint16_t GetLocalPort(void);
+
   /**
    * TracedCallback signature for tcp packet transmission or reception events.
    *
