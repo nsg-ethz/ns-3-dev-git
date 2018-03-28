@@ -1,0 +1,4 @@
+#!/bin/bash
+cd backend/ns3
+git remote add upstream git@github.com:nsnam/ns-3-dev-git.git
+git checkout master
