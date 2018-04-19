@@ -277,7 +277,7 @@ GetNodeIp(Ptr<Node> node)
   ObjectVectorValue interfaces;
   NS_ASSERT(ip !=0);
   ip->GetAttribute("InterfaceList", interfaces);
-  for(ObjectVectorValue::Iterator j = interfaces.Begin(); j != interfaces.End (); j ++)
+  for(ObjectVectorValue::Iterator j = interfaces.Begin(); j != interfaces.End(); j ++)
   {
     Ptr<Ipv4Interface> ipIface = (*j).second->GetObject<Ipv4Interface> ();
     NS_ASSERT(ipIface != 0);

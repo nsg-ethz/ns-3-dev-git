@@ -53,7 +53,6 @@
 //+---+                                                 +---+
 
 
-
 using namespace ns3;
 
 std::string fileNameRoot = "swift-p4";    // base name for trace files, etc
