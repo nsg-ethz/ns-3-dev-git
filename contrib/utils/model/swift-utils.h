@@ -25,6 +25,14 @@ namespace ns3 {
         double rtt;
     };
 
+    struct flow_metadata_new {
+        std::string prefix;
+        uint32_t packets;
+        uint32_t duration;
+        uint64_t bytes;
+        double rtt;
+    };
+
     struct prefix_metadata {
         std::string prefix_ip;
         std::string prefix_mask;
@@ -45,8 +53,11 @@ namespace ns3 {
 
     //Reads a file with RTTs.
     std::vector<double> get_subnetwork_rtts(std::string rttsFile, std::string subnet_name, uint32_t max_lines = 50000);
+    std::unordered_map<std::string, std::string> getSimPrefixesToTracePrefixes(std::string prefixesFile, std::string subnetwork_name);
+    std::set<std::string> get_trace_prefixes_set(std::string prefixesFile, std::string subnetwork_name);
+    std::unordered_map<std::string, prefix_features> getPrefixFeatures(std::string prefixFeaturesFile, std::set<std::string> subnetwork_trace_prefixes);
 
-    std::vector<flow_size_metadata> getFlowSizes(std::string flowSizeFile, uint32_t max_lines = 5000000);
+        std::vector<flow_size_metadata> getFlowSizes(std::string flowSizeFile, uint32_t max_lines = 5000000);
 
     std::pair<Ptr<Node>, Ptr<Node>> rttToNodePair(std::unordered_map<uint64_t, std::vector<Ptr<Node>>> rtt_to_senders,
                                                   std::unordered_map<uint64_t, std::vector<Ptr<Node>>> rtt_to_receivers,

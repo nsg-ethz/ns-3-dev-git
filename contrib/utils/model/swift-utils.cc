@@ -153,7 +153,6 @@ namespace ns3 {
         return trace_prefixes_set;
     };
 
-    }
 
     std::unordered_map<std::string, std::string> getSimPrefixesToTracePrefixes(std::string prefixesFile, std::string subnetwork_name){
 
@@ -260,6 +259,40 @@ namespace ns3 {
         }
         prefixesFile.close();
         return prefixes_to_fail;
+    }
+
+    std::vector<flow_metadata_new> get_flows_per_prefix(std::string flows_per_prefix_file, std::unordered_map<std::string, std::set<std::string>> trace_to_sim_prefixes){
+
+        std::vector<flow_metadata> flows;
+        std::ifstream flowsDist(flows_per_prefix_file);
+        NS_ASSERT_MSG(flowsDist, "Please provide a valid prefixes dist file");
+
+        std::string line;
+        flow_metadata flow;
+
+        std::string current_prefix;
+        std::string strip_a, strip_b;
+
+        while(std::getline(flowsDist, line)){
+
+            //ignore empty lines
+            if (0== line.find(" ")){
+                continue;
+            }
+
+            else if (0== line.find("#")){
+                std::istringstream lineStream(line);
+                lineStream >> strip_a >> current_prefix >> strip_b;
+            }
+
+        }
+        while (flowsDist >> flow.prefix_ip >> flow.prefix_mask >> flow.packets >> flow.duration >> flow.bytes >> flow.rtt
+               and (count_limit < max_flows or max_flows == 0)){
+            flows.push_back(flow);
+            count_limit ++;
+        }
+        flowsDist.close();
+        return flows;
     }
 
     std::vector<flow_metadata> getPrefixesDistribution(std::string prefixesDistributionFile, uint32_t max_flows){
