@@ -81,8 +81,6 @@ main(int argc, char *argv[]) {
     std::string outputDir = "outputs/";
 
     std::string inputDir = "swift_datasets/test/";
-    std::string prefixes_failures_file = "";
-    std::string prefixes_features_file = "";
 
     uint16_t queue_size = 1000;
     uint64_t runStep = 1;
@@ -110,8 +108,6 @@ main(int argc, char *argv[]) {
     cmd.AddValue("OutputDir", "Set it to something if you want to store the simulation output "
             "in a particular folder inside outputs", outputDir);
     cmd.AddValue("InputDir", "Where to find all the input data", inputDir);
-    cmd.AddValue("PrefixFailures", "Where to find all the input data", prefixes_failures_file);
-    cmd.AddValue("PrefixFeatures", "Where to find all the input data", prefixes_features_file);
 
     //General
     //Links properties
@@ -161,14 +157,10 @@ main(int argc, char *argv[]) {
     system(("mkdir -p " + outputNameRoot).c_str());
 
     //copy input files that should go to output
-    system(("cp " + inputDir + "prefixes_stats.txt " + outputNameRoot + "prefixes_stats.txt").c_str());
-    system(("cp " + inputDir + "subnetwork_prefixes.txt " + outputNameRoot + "subnetwork_prefixes.txt").c_str());
-    system(("cp " + inputDir + "subnetwork_shares.txt " + outputNameRoot + "subnetwork_shares.txt").c_str());
+    system(("cp " + inputDir + "prefixes_real.txt " + outputNameRoot + "prefixes_real.txt").c_str());
+    system(("cp " + inputDir + "prefixes_to_loss.txt " + outputNameRoot + "prefixes_to_loss.txt").c_str());
+    system(("cp " + inputDir + "prefixes_real_to_fake.txt " + outputNameRoot + "prefixes_real_to_fake.txt").c_str());
     system(("cp " + inputDir + "rtt_cdfs.txt " + outputNameRoot + "rtt_cdfs.txt").c_str());
-
-    //Copy faliure files to output
-    system(("cp " + inputDir + prefixes_failures_file + " " + outputNameRoot + prefixes_failures_file).c_str());
-    system(("cp " + inputDir + prefixes_features_file + " " + outputNameRoot + prefixes_features_file).c_str());
 
     //TCP
     uint16_t rtt = 200;
