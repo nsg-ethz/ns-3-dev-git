@@ -185,7 +185,7 @@ namespace ns3 {
 
 
         //Load RTT File
-        std::vector<double> rtts = getRtts(rttFile);
+        std::vector<double> rtts ;//= getRtts(rttFile);
         std::vector<flow_size_metadata> flowSizes = getFlowSizes(flowSizeFile);
 
         //Usage object

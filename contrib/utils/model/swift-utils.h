@@ -32,6 +32,11 @@ namespace ns3 {
         std::vector<std::string> ips_to_allocate;
     };
 
+    struct prefix_features{
+        double loss;
+        double out_of_order;
+    };
+
     struct prefix_info {
         prefix_metadata metadata;
         Ptr<Node> server_dst;
@@ -39,7 +44,7 @@ namespace ns3 {
     };
 
     //Reads a file with RTTs.
-    std::vector<double> getRtts(std::string rttsFile, uint32_t max_lines = 5000000);
+    std::vector<double> get_subnetwork_rtts(std::string rttsFile, std::string subnet_name, uint32_t max_lines = 50000);
 
     std::vector<flow_size_metadata> getFlowSizes(std::string flowSizeFile, uint32_t max_lines = 5000000);
 
@@ -70,6 +75,7 @@ std::unordered_map<std::string, prefix_metadata> getPrefixes(std::string prefixe
     std::vector<std::string> getPrefixesToFail(std::string prefixesToFailFile);
     std::vector<flow_metadata> getPrefixesDistribution(std::string prefixesDistributionFile, uint32_t max_flows = 20000000);
     }
+
 
 #endif /* SWIFT_UTILS_H */
 

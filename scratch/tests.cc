@@ -54,11 +54,18 @@ NS_LOG_COMPONENT_DEFINE ("test");
 int
 main(int argc, char *argv[]) {
 
-    Ipv4AddressHelper address("10.0.0.0", "255.255.0.0");
-    for (int j=0; j < 1000; j++)
-    {
-        Ipv4Address host_addr = address.NewAddress();
-        std::cout << ipv4AddressToString(host_addr) << "\n";
+//    Ipv4AddressHelper address("10.0.0.0", "255.255.0.0");
+//    for (int j=0; j < 1000; j++)
+//    {
+//        Ipv4Address host_addr = address.NewAddress();
+//        std::cout << ipv4AddressToString(host_addr) << "\n";
+//    }
+
+    std::vector<double> src_rtts = get_subnetwork_rtts("/home/cedgar/traffic-generator/inputs/caida_dirA/rtt_cdfs.txt", "Subnetwork_2");
+
+    std::cout << "Rtt to src length: " << src_rtts.size() << "\n";
+    for (const auto &e : src_rtts) {
+        std::cout << "Rtt(s): " << e << " Link Delay(s): " << e / 2 << "\n";
     }
 
 //    for (int i=0; i < 1000; i++){

@@ -256,12 +256,15 @@ main(int argc, char *argv[]) {
         }
     }
 
+    //Load sim to trace and trace to sim prefixes
+
+
     //Load Real prefixes file
     std::unordered_map<std::string, prefix_metadata> prefixes = getPrefixes(inputDir + "prefixes_real.txt",
                                                                             inputDir + "prefixes_to_loss.txt");
 
     //Load prefixes to fail
-    std::vector<std::string> prefixes_to_fail = getPrefixesToFail(inputDir + "prefixes_to_fail.txt");
+    std::vector<std::string> prefixes_to_fail = getPrefixesToFail(inputDir + prefixes_failures_file);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     //Build Topology
