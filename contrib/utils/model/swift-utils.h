@@ -65,6 +65,7 @@ namespace ns3 {
     };
 
     //Reads a file with RTTs.
+    std::vector<flow_metadata_new> GetFlowsPerPrefix(std::string flows_per_prefix_file, std::unordered_map<std::string, std::set<std::string>> trace_to_sim_prefixes);
     std::unordered_map<std::string, std::vector<failure_event>> GetPrefixFailures(std::string prefix_failure_file, std::string subnetwork_name);
     std::vector<double> GetSubnetworkRtts(std::string rttsFile, std::string subnet_name);
     prefix_mappings GetSubnetworkPrefixMappings(std::string prefixesFile, std::string subnetwork_name);

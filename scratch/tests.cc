@@ -61,22 +61,37 @@ main(int argc, char *argv[]) {
 //        std::cout << ipv4AddressToString(host_addr) << "\n";
 //    }
 
-    std::vector<double> src_rtts = GetSubnetworkRtts("/home/cedgar/traffic-generator/inputs/caida_dirA/rtt_cdfs.txt", "Subnetwork_2");
+//    std::vector<double> src_rtts = GetSubnetworkRtts("/home/cedgar/traffic-generator/inputs/caida_dirA/rtt_cdfs.txt", "Subnetwork_2");
+//
+//    std::cout << "Rtt to src length: " << src_rtts.size() << "\n";
+//    for (const auto &e : src_rtts) {
+//        std::cout << "Rtt(s): " << e << " Link Delay(s): " << e / 2 << "\n";
+//    }
+//
+//    std::unordered_map<std::string, std::vector<failure_event>> events = GetPrefixFailures("/home/cedgar/traffic-generator/inputs/caida_dirA/prefixes_failure.txt", "Subnetwork 0");
+//
+//    for (auto it: events){
+//        std::cout << "Prefix: " << it.first << " " << it.second.size() << "\n";
+//
+//        for (const auto &e: it.second){
+//            std::cout << e.failure_time << " " << e.recovery_time <<" " << e.failure_intensity << "\n";
+//        }
+//    }
 
-    std::cout << "Rtt to src length: " << src_rtts.size() << "\n";
-    for (const auto &e : src_rtts) {
-        std::cout << "Rtt(s): " << e << " Link Delay(s): " << e / 2 << "\n";
-    }
+    prefix_mappings mappings = GetSubnetworkPrefixMappings("/home/cedgar/traffic-generator/inputs/caida_dirA/subnetwork_prefixes.txt", "Subnetwork_0");
+    std::vector<flow_metadata_new> flows = GetFlowsPerPrefix("/home/cedgar/traffic-generator/inputs/caida_dirA/caida_dirA_10_flows_per_prefix.txt", mappings.trace_to_sim);
+    std::cout << flows.size() << "\n";
+    int counter = 0;
+    for (auto element: flows){
+        std::cout << element.prefix << " "<< element.bytes << " "<< element.duration << " "<< element.packets << " "<< element.rtt << "\n";
+        counter++;
 
-    std::unordered_map<std::string, std::vector<failure_event>> events = GetPrefixFailures("/home/cedgar/traffic-generator/inputs/caida_dirA/prefixes_failure.txt", "Subnetwork 0");
-
-    for (auto it: events){
-        std::cout << "Prefix: " << it.first << " " << it.second.size() << "\n";
-
-        for (const auto &e: it.second){
-            std::cout << e.failure_time << " " << e.recovery_time <<" " << e.failure_intensity << "\n";
+        if (counter >10){
+            return 0;
         }
     }
+
+
 
 //    for (int i=0; i < 1000; i++){
 //        Ipv4Address addr = address.NewNetwork();

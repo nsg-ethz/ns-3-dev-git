@@ -322,17 +322,33 @@ namespace ns3 {
         std::string current_prefix;
         std::string strip_a, strip_b;
 
+        bool skip = false;
+
         while(std::getline(flowsDist, line)) {
 
             //skip blank lines
             if (line.empty()) {
                 continue;
-            } else if (0 == line.find("#")) {
+            }
+
+            if (0 == line.find("#")) {
                 std::istringstream lineStream(line);
                 lineStream >> strip_a >> current_prefix >> strip_b;
 
-            } else {
 
+                //Check if its a valid prefix
+                if (trace_to_sim_prefixes.count(current_prefix) == 0) {
+                    skip = true;
+                } else {
+                    skip = false;
+                    std::cout << current_prefix << "\n";
+
+                }
+            }
+            else if (skip){
+                    continue;
+            }
+            else {
                 std::istringstream lineStream(line);
                 lineStream >> flow.bytes >> flow.duration >> flow.packets >> flow.rtt;
                 for (auto it: trace_to_sim_prefixes[current_prefix]) {
