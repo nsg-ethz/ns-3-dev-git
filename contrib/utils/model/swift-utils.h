@@ -51,10 +51,16 @@ namespace ns3 {
         NetDeviceContainer link;
     };
 
+    struct prefix_mappings{
+        std::unordered_map<std::string, std::string> sim_to_trace;
+        std::unordered_map<std::string, std::set<std::string>> trace_to_sim;
+        std::set<std::string> trace_set;
+        std::set<std::string> sim_set;
+    };
+
     //Reads a file with RTTs.
     std::vector<double> get_subnetwork_rtts(std::string rttsFile, std::string subnet_name, uint32_t max_lines = 50000);
-    std::unordered_map<std::string, std::string> getSimPrefixesToTracePrefixes(std::string prefixesFile, std::string subnetwork_name);
-    std::set<std::string> get_trace_prefixes_set(std::string prefixesFile, std::string subnetwork_name);
+    prefix_mappings get_subnetwork_prefix_mappings(std::string prefixesFile, std::string subnetwork_name);
     std::unordered_map<std::string, prefix_features> getPrefixFeatures(std::string prefixFeaturesFile, std::set<std::string> subnetwork_trace_prefixes);
 
         std::vector<flow_size_metadata> getFlowSizes(std::string flowSizeFile, uint32_t max_lines = 5000000);

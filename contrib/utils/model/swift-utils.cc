@@ -160,6 +160,45 @@ namespace ns3 {
 
 
     //TODO:  Latest parsing methods (clean afterwards)
+    prefix_mappings get_subnetwork_prefix_mappings(std::string prefixesFile, std::string subnetwork_name){
+
+        //mapping
+        prefix_mappings mappings;
+
+        std::ifstream prefixes_file(prefixesFile);
+        NS_ASSERT_MSG(prefixes_file, "Please provide a valid prefixes file");
+
+        std::string line;
+        bool subnetwork_found = false;
+
+        std::string sim_prefix;
+        std::string trace_prefix;
+
+        while (std::getline(prefixes_file, line)){
+
+            if (0 == line.find("#")){
+                if (line.find(subnetwork_name) != std::string::npos){
+                    subnetwork_found = true;
+                }
+
+                else if (subnetwork_found == true){
+                    break;
+                }
+            }
+            else if (subnetwork_found == true){
+                std::istringstream lineStream(line);
+                lineStream >> sim_prefix >> trace_prefix;
+
+                //update all the structures
+                mappings.trace_set.insert(trace_prefix);
+                mappings.sim_set.insert(sim_prefix);
+                mappings.sim_to_trace[sim_prefix] = trace_prefix;
+                mappings.trace_to_sim[trace_prefix].insert(sim_prefix);
+            }
+        }
+        return mappings;
+    };
+
 
     //Reads a file with RTTs.
     std::vector<double> get_subnetwork_rtts(std::string rttsFile, std::string subnet_name, uint32_t max_lines) {
@@ -213,7 +252,6 @@ namespace ns3 {
             }
         }
         return trace_prefix_features;
-
     };
 
     std::vector<flow_metadata_new> get_flows_per_prefix(std::string flows_per_prefix_file, std::unordered_map<std::string, std::set<std::string>> trace_to_sim_prefixes){
@@ -250,71 +288,8 @@ namespace ns3 {
         return flows;
     }
 
-    std::set<std::string> get_trace_prefixes_set(std::string prefixesFile, std::string subnetwork_name){
 
-        std::set<std::string> trace_prefixes_set;
 
-        std::ifstream prefixes_file(prefixesFile);
-        NS_ASSERT_MSG(prefixes_file, "Please provide a valid prefixes file");
 
-        std::string line;
-        bool subnetwork_found = false;
-
-        std::string sim_prefix;
-        std::string trace_prefix;
-
-        while (std::getline(prefixes_file, line)){
-
-            if (0 == line.find("#")){
-                if (line.find(subnetwork_name) != std::string::npos){
-                    subnetwork_found = true;
-                }
-
-                else if (subnetwork_found == true){
-                    break;
-                }
-            }
-            else if (subnetwork_found == true){
-                std::istringstream lineStream(line);
-                lineStream >> sim_prefix >> trace_prefix;
-                trace_prefixes_set.insert(trace_prefix);
-            }
-        }
-        return trace_prefixes_set;
-    };
-
-    std::unordered_map<std::string, std::string> getSimPrefixesToTracePrefixes(std::string prefixesFile, std::string subnetwork_name){
-
-        //mapping
-        std::unordered_map<std::string, std::string> sim_prefix_to_trace_prefix;
-
-        std::ifstream prefixes_file(prefixesFile);
-        NS_ASSERT_MSG(prefixes_file, "Please provide a valid prefixes file");
-
-        std::string line;
-        bool subnetwork_found = false;
-
-        std::string sim_prefix;
-        std::string trace_prefix;
-
-        while (std::getline(prefixes_file, line)){
-
-            if (0 == line.find("#")){
-                if (line.find(subnetwork_name) != std::string::npos){
-                    subnetwork_found = true;
-                }
-
-                else if (subnetwork_found == true){
-                    break;
-                }
-            }
-            else if (subnetwork_found == true){
-                std::istringstream lineStream(line);
-                lineStream >> sim_prefix >> trace_prefix;
-                sim_prefix_to_trace_prefix[sim_prefix] = trace_prefix;
-            }
-        }
-        return sim_prefix_to_trace_prefix;
-    };
 
 }
