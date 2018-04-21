@@ -65,7 +65,8 @@ namespace ns3 {
     };
 
     //Reads a file with RTTs.
-    std::vector<double> GetSubnetowrkRtts(std::string rttsFile, std::string subnet_name, uint32_t max_lines = 50000);
+    std::unordered_map<std::string, std::vector<failure_event>> GetPrefixFailures(std::string prefix_failure_file, std::string subnetwork_name);
+    std::vector<double> GetSubnetworkRtts(std::string rttsFile, std::string subnet_name);
     prefix_mappings GetSubnetworkPrefixMappings(std::string prefixesFile, std::string subnetwork_name);
     std::unordered_map<std::string, prefix_features> GetPrefixFeatures(std::string prefixFeaturesFile, std::set<std::string> subnetwork_trace_prefixes);
 

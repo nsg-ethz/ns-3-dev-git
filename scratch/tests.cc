@@ -61,11 +61,21 @@ main(int argc, char *argv[]) {
 //        std::cout << ipv4AddressToString(host_addr) << "\n";
 //    }
 
-    std::vector<double> src_rtts = get_subnetwork_rtts("/home/cedgar/traffic-generator/inputs/caida_dirA/rtt_cdfs.txt", "Subnetwork_2");
+    std::vector<double> src_rtts = GetSubnetworkRtts("/home/cedgar/traffic-generator/inputs/caida_dirA/rtt_cdfs.txt", "Subnetwork_2");
 
     std::cout << "Rtt to src length: " << src_rtts.size() << "\n";
     for (const auto &e : src_rtts) {
         std::cout << "Rtt(s): " << e << " Link Delay(s): " << e / 2 << "\n";
+    }
+
+    std::unordered_map<std::string, std::vector<failure_event>> events = GetPrefixFailures("/home/cedgar/traffic-generator/inputs/caida_dirA/prefixes_failure.txt", "Subnetwork 0");
+
+    for (auto it: events){
+        std::cout << "Prefix: " << it.first << " " << it.second.size() << "\n";
+
+        for (const auto &e: it.second){
+            std::cout << e.failure_time << " " << e.recovery_time <<" " << e.failure_intensity << "\n";
+        }
     }
 
 //    for (int i=0; i < 1000; i++){

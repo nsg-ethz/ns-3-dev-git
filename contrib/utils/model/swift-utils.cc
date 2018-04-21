@@ -176,6 +176,11 @@ namespace ns3 {
 
         while (std::getline(prefixes_file, line)){
 
+            //skip blank lines
+            if (line.empty()){
+                continue;
+            }
+
             if (0 == line.find("#")){
                 if (line.find(subnetwork_name) != std::string::npos){
                     subnetwork_found = true;
@@ -211,6 +216,11 @@ namespace ns3 {
         bool subnetwork_found = false;
 
         while (getline(infile, line)) {
+
+            //skip blank lines
+            if (line.empty()){
+                continue;
+            }
 
             //Check if the line starts with #
             if (0 == line.find("#")){
@@ -265,6 +275,11 @@ namespace ns3 {
 
         while (getline(infile, line)) {
 
+            //skip blank lines
+            if (line.empty()){
+                continue;
+            }
+
             //Check if the line starts with #
             if (0 == line.find("#")){
                 if (line.find(subnetwork_name) != std::string::npos){
@@ -285,7 +300,7 @@ namespace ns3 {
                 prefix_to_events[prefix] = events_vector;
 
                 while (lineStream >> event.failure_time >> event.recovery_time >> event.failure_intensity){
-                    events_vector.push_back(event);
+                    prefix_to_events[prefix].push_back(event);
                 }
             }
         }
@@ -295,42 +310,38 @@ namespace ns3 {
 
     };
 
-    std::vector<flow_metadata_new> GetFlowsPerPrefix(std::string flows_per_prefix_file, std::unordered_map<std::string, std::set<std::string>> trace_to_sim_prefixes){
-
-        std::vector<flow_metadata> flows;
-        std::ifstream flowsDist(flows_per_prefix_file);
-        NS_ASSERT_MSG(flowsDist, "Please provide a valid prefixes dist file");
-
-        std::string line;
-        flow_metadata flow;
-
-        std::string current_prefix;
-        std::string strip_a, strip_b;
-
-        while(std::getline(flowsDist, line)){
-
-            //ignore empty lines
-            if (0== line.find(" ")){
-                continue;
-            }
-
-            else if (0== line.find("#")){
-                std::istringstream lineStream(line);
-                lineStream >> strip_a >> current_prefix >> strip_b;
-            }
-
-        }
-        while (flowsDist >> flow.prefix_ip >> flow.prefix_mask >> flow.packets >> flow.duration >> flow.bytes >> flow.rtt
-               and (count_limit < max_flows or max_flows == 0)){
-            flows.push_back(flow);
-            count_limit ++;
-        }
-        flowsDist.close();
-        return flows;
-    }
-
-
-
-
+//    std::vector<flow_metadata_new> GetFlowsPerPrefix(std::string flows_per_prefix_file, std::unordered_map<std::string, std::set<std::string>> trace_to_sim_prefixes){
+//
+//        std::vector<flow_metadata> flows;
+//        std::ifstream flowsDist(flows_per_prefix_file);
+//        NS_ASSERT_MSG(flowsDist, "Please provide a valid prefixes dist file");
+//
+//        std::string line;
+//        flow_metadata flow;
+//
+//        std::string current_prefix;
+//        std::string strip_a, strip_b;
+//
+//        while(std::getline(flowsDist, line)){
+//
+//    //skip blank lines
+//    if (line.empty()){
+//    continue;
+//}
+//
+//            else if (0== line.find("#")){
+//                std::istringstream lineStream(line);
+//                lineStream >> strip_a >> current_prefix >> strip_b;
+//            }
+//
+//        }
+//        while (flowsDist >> flow.prefix_ip >> flow.prefix_mask >> flow.packets >> flow.duration >> flow.bytes >> flow.rtt
+//               and (count_limit < max_flows or max_flows == 0)){
+//            flows.push_back(flow);
+//            count_limit ++;
+//        }
+//        flowsDist.close();
+//        return flows;
+//    }
 
 }
