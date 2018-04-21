@@ -201,7 +201,7 @@ namespace ns3 {
 
 
     //Reads a file with RTTs.
-    std::vector<double> get_subnetwork_rtts(std::string rttsFile, std::string subnet_name, uint32_t max_lines) {
+    std::vector<double> get_subnetwork_rtts(std::string rttsFile, std::string subnet_name) {
 
         std::vector<double> rttVector;
         std::ifstream infile(rttsFile);
@@ -209,10 +209,9 @@ namespace ns3 {
         NS_ASSERT_MSG(infile, "Please provide a valid file for reading RTT values");
         double rtt;
         std::string line;
-        uint32_t count_limit = 0;
         bool subnetwork_found = false;
 
-        while (getline(infile, line) and (count_limit < max_lines or max_lines == 0)) {
+        while (getline(infile, line)) {
 
             //Check if the line starts with #
             if (0 == line.find("#")){
