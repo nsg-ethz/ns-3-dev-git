@@ -160,7 +160,7 @@ namespace ns3 {
 
 
     //TODO:  Latest parsing methods (clean afterwards)
-    prefix_mappings get_subnetwork_prefix_mappings(std::string prefixesFile, std::string subnetwork_name){
+    prefix_mappings GetSubnetworkPrefixMappings(std::string prefixesFile, std::string subnetwork_name){
 
         //mapping
         prefix_mappings mappings;
@@ -199,9 +199,8 @@ namespace ns3 {
         return mappings;
     };
 
-
     //Reads a file with RTTs.
-    std::vector<double> get_subnetwork_rtts(std::string rttsFile, std::string subnet_name) {
+    std::vector<double> GetSubnetworkRtts(std::string rttsFile, std::string subnet_name) {
 
         std::vector<double> rttVector;
         std::ifstream infile(rttsFile);
@@ -226,7 +225,6 @@ namespace ns3 {
             else if (subnetwork_found == true){
                 rtt = atof(line.c_str());
                 rttVector.push_back(rtt);
-                count_limit++;
             }
         }
 
@@ -234,7 +232,7 @@ namespace ns3 {
         return rttVector;
     }
 
-    std::unordered_map<std::string, prefix_features> getPrefixFeatures(std::string prefixFeaturesFile, std::set<std::string> subnetwork_trace_prefixes){
+    std::unordered_map<std::string, prefix_features> GetPrefixFeatures(std::string prefixFeaturesFile, std::set<std::string> subnetwork_trace_prefixes){
 
         std::unordered_map<std::string, prefix_features> trace_prefix_features;
 
@@ -253,7 +251,51 @@ namespace ns3 {
         return trace_prefix_features;
     };
 
-    std::vector<flow_metadata_new> get_flows_per_prefix(std::string flows_per_prefix_file, std::unordered_map<std::string, std::set<std::string>> trace_to_sim_prefixes){
+    std::unordered_map<std::string, std::vector<failure_event>> GetPrefixFailures(std::string prefix_failure_file, std::string subnetwork_name){
+
+        // variables
+        std::unordered_map<std::string, std::vector<failure_event>> prefix_to_events;
+
+        std::ifstream infile(prefix_failure_file);
+
+        NS_ASSERT_MSG(infile, "Please provide a valid file for prefixes to fail");
+
+        std::string line;
+        bool subnetwork_found = false;
+
+        while (getline(infile, line)) {
+
+            //Check if the line starts with #
+            if (0 == line.find("#")){
+                if (line.find(subnetwork_name) != std::string::npos){
+                    subnetwork_found = true;
+                }
+                else if (subnetwork_found == true){
+                    break;
+                }
+            }
+
+            else if (subnetwork_found == true){
+
+                std::istringstream lineStream(line);
+                std::string prefix;
+                lineStream >> prefix;
+                failure_event event;
+                std::vector<failure_event> events_vector;
+                prefix_to_events[prefix] = events_vector;
+
+                while (lineStream >> event.failure_time >> event.recovery_time >> event.failure_intensity){
+                    events_vector.push_back(event);
+                }
+            }
+        }
+
+        infile.close();
+        return prefix_to_events;
+
+    };
+
+    std::vector<flow_metadata_new> GetFlowsPerPrefix(std::string flows_per_prefix_file, std::unordered_map<std::string, std::set<std::string>> trace_to_sim_prefixes){
 
         std::vector<flow_metadata> flows;
         std::ifstream flowsDist(flows_per_prefix_file);
