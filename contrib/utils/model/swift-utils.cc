@@ -8,41 +8,6 @@ NS_LOG_COMPONENT_DEFINE ("swift-utils");
 
 namespace ns3 {
 
-    //Reads a file with RTTs.
-    std::vector<double> get_subnetwork_rtts(std::string rttsFile, std::string subnet_name, uint32_t max_lines) {
-
-        std::vector<double> rttVector;
-        std::ifstream infile(rttsFile);
-
-        NS_ASSERT_MSG(infile, "Please provide a valid file for reading RTT values");
-        double rtt;
-        std::string line;
-        uint32_t count_limit = 0;
-        bool subnetwork_found = false;
-
-        while (getline(infile, line) and (count_limit < max_lines or max_lines == 0)) {
-
-            //Check if the line starts with #
-            if (0 == line.find("#")){
-                if (line.find(subnet_name) != std::string::npos){
-                    subnetwork_found = true;
-                }
-                else if (subnetwork_found == true){
-                    break;
-                }
-            }
-
-            else if (subnetwork_found == true){
-                rtt = atof(line.c_str());
-                rttVector.push_back(rtt);
-                count_limit++;
-            }
-        }
-
-        infile.close();
-        return rttVector;
-    }
-
     std::vector<flow_size_metadata> getFlowSizes(std::string flowSizeFile, uint32_t max_lines) {
         std::vector<flow_size_metadata> flows;
 
@@ -100,93 +65,6 @@ namespace ns3 {
     }
 
 
-    std::unordered_map<std::string, prefix_features> getPrefixFeatures(std::string prefixFeaturesFile, std::set<std::string> subnetwork_trace_prefixes){
-
-        std::unordered_map<std::string, prefix_features> trace_prefix_features;
-
-        std::ifstream prefix_features_file(prefixFeaturesFile);
-        NS_ASSERT_MSG(prefix_features_file, "Please provide a valid prefixes file");
-
-        std::string prefix;
-
-        prefix_features features;
-
-        while (prefix_features_file >> prefix >> features.loss){
-            if (subnetwork_trace_prefixes.find(prefix) != subnetwork_trace_prefixes.end()){
-                trace_prefix_features[prefix] = features;
-            }
-        }
-        return trace_prefix_features;
-
-    };
-
-    std::set<std::string> get_trace_prefixes_set(std::string prefixesFile, std::string subnetwork_name){
-
-        std::set<std::string> trace_prefixes_set;
-
-        std::ifstream prefixes_file(prefixesFile);
-        NS_ASSERT_MSG(prefixes_file, "Please provide a valid prefixes file");
-
-        std::string line;
-        bool subnetwork_found = false;
-
-        std::string sim_prefix;
-        std::string trace_prefix;
-
-        while (std::getline(prefixes_file, line)){
-
-            if (0 == line.find("#")){
-                if (line.find(subnetwork_name) != std::string::npos){
-                    subnetwork_found = true;
-                }
-
-                else if (subnetwork_found == true){
-                    break;
-                }
-            }
-            else if (subnetwork_found == true){
-                std::istringstream lineStream(line);
-                lineStream >> sim_prefix >> trace_prefix;
-                trace_prefixes_set.insert(trace_prefix);
-            }
-        }
-        return trace_prefixes_set;
-    };
-
-
-    std::unordered_map<std::string, std::string> getSimPrefixesToTracePrefixes(std::string prefixesFile, std::string subnetwork_name){
-
-        //mapping
-        std::unordered_map<std::string, std::string> sim_prefix_to_trace_prefix;
-
-        std::ifstream prefixes_file(prefixesFile);
-        NS_ASSERT_MSG(prefixes_file, "Please provide a valid prefixes file");
-
-        std::string line;
-        bool subnetwork_found = false;
-
-        std::string sim_prefix;
-        std::string trace_prefix;
-
-        while (std::getline(prefixes_file, line)){
-
-            if (0 == line.find("#")){
-                if (line.find(subnetwork_name) != std::string::npos){
-                    subnetwork_found = true;
-                }
-
-                else if (subnetwork_found == true){
-                    break;
-                }
-            }
-            else if (subnetwork_found == true){
-                std::istringstream lineStream(line);
-                lineStream >> sim_prefix >> trace_prefix;
-                sim_prefix_to_trace_prefix[sim_prefix] = trace_prefix;
-            }
-        }
-        return sim_prefix_to_trace_prefix;
-    };
 
     //NEW VERSION
     std::unordered_map<std::string, prefix_metadata> getPrefixes(std::string prefixesFile, std::string prefixesLossFile,
@@ -261,6 +139,83 @@ namespace ns3 {
         return prefixes_to_fail;
     }
 
+
+
+    std::vector<flow_metadata> getPrefixesDistribution(std::string prefixesDistributionFile, uint32_t max_flows){
+        std::vector<flow_metadata> flows;
+        std::ifstream flowsDist(prefixesDistributionFile);
+        NS_ASSERT_MSG(flowsDist, "Please provide a valid prefixes dist file");
+
+        flow_metadata flow;
+        uint32_t count_limit;
+        while (flowsDist >> flow.prefix_ip >> flow.prefix_mask >> flow.packets >> flow.duration >> flow.bytes >> flow.rtt
+                and (count_limit < max_flows or max_flows == 0)){
+            flows.push_back(flow);
+            count_limit ++;
+        }
+        flowsDist.close();
+        return flows;
+    }
+
+
+
+    //TODO:  Latest parsing methods (clean afterwards)
+
+    //Reads a file with RTTs.
+    std::vector<double> get_subnetwork_rtts(std::string rttsFile, std::string subnet_name, uint32_t max_lines) {
+
+        std::vector<double> rttVector;
+        std::ifstream infile(rttsFile);
+
+        NS_ASSERT_MSG(infile, "Please provide a valid file for reading RTT values");
+        double rtt;
+        std::string line;
+        uint32_t count_limit = 0;
+        bool subnetwork_found = false;
+
+        while (getline(infile, line) and (count_limit < max_lines or max_lines == 0)) {
+
+            //Check if the line starts with #
+            if (0 == line.find("#")){
+                if (line.find(subnet_name) != std::string::npos){
+                    subnetwork_found = true;
+                }
+                else if (subnetwork_found == true){
+                    break;
+                }
+            }
+
+            else if (subnetwork_found == true){
+                rtt = atof(line.c_str());
+                rttVector.push_back(rtt);
+                count_limit++;
+            }
+        }
+
+        infile.close();
+        return rttVector;
+    }
+
+    std::unordered_map<std::string, prefix_features> getPrefixFeatures(std::string prefixFeaturesFile, std::set<std::string> subnetwork_trace_prefixes){
+
+        std::unordered_map<std::string, prefix_features> trace_prefix_features;
+
+        std::ifstream prefix_features_file(prefixFeaturesFile);
+        NS_ASSERT_MSG(prefix_features_file, "Please provide a valid prefixes file");
+
+        std::string prefix;
+
+        prefix_features features;
+
+        while (prefix_features_file >> prefix >> features.loss){
+            if (subnetwork_trace_prefixes.find(prefix) != subnetwork_trace_prefixes.end()){
+                trace_prefix_features[prefix] = features;
+            }
+        }
+        return trace_prefix_features;
+
+    };
+
     std::vector<flow_metadata_new> get_flows_per_prefix(std::string flows_per_prefix_file, std::unordered_map<std::string, std::set<std::string>> trace_to_sim_prefixes){
 
         std::vector<flow_metadata> flows;
@@ -295,19 +250,71 @@ namespace ns3 {
         return flows;
     }
 
-    std::vector<flow_metadata> getPrefixesDistribution(std::string prefixesDistributionFile, uint32_t max_flows){
-        std::vector<flow_metadata> flows;
-        std::ifstream flowsDist(prefixesDistributionFile);
-        NS_ASSERT_MSG(flowsDist, "Please provide a valid prefixes dist file");
+    std::set<std::string> get_trace_prefixes_set(std::string prefixesFile, std::string subnetwork_name){
 
-        flow_metadata flow;
-        uint32_t count_limit;
-        while (flowsDist >> flow.prefix_ip >> flow.prefix_mask >> flow.packets >> flow.duration >> flow.bytes >> flow.rtt
-                and (count_limit < max_flows or max_flows == 0)){
-            flows.push_back(flow);
-            count_limit ++;
+        std::set<std::string> trace_prefixes_set;
+
+        std::ifstream prefixes_file(prefixesFile);
+        NS_ASSERT_MSG(prefixes_file, "Please provide a valid prefixes file");
+
+        std::string line;
+        bool subnetwork_found = false;
+
+        std::string sim_prefix;
+        std::string trace_prefix;
+
+        while (std::getline(prefixes_file, line)){
+
+            if (0 == line.find("#")){
+                if (line.find(subnetwork_name) != std::string::npos){
+                    subnetwork_found = true;
+                }
+
+                else if (subnetwork_found == true){
+                    break;
+                }
+            }
+            else if (subnetwork_found == true){
+                std::istringstream lineStream(line);
+                lineStream >> sim_prefix >> trace_prefix;
+                trace_prefixes_set.insert(trace_prefix);
+            }
         }
-        flowsDist.close();
-        return flows;
-    }
+        return trace_prefixes_set;
+    };
+
+    std::unordered_map<std::string, std::string> getSimPrefixesToTracePrefixes(std::string prefixesFile, std::string subnetwork_name){
+
+        //mapping
+        std::unordered_map<std::string, std::string> sim_prefix_to_trace_prefix;
+
+        std::ifstream prefixes_file(prefixesFile);
+        NS_ASSERT_MSG(prefixes_file, "Please provide a valid prefixes file");
+
+        std::string line;
+        bool subnetwork_found = false;
+
+        std::string sim_prefix;
+        std::string trace_prefix;
+
+        while (std::getline(prefixes_file, line)){
+
+            if (0 == line.find("#")){
+                if (line.find(subnetwork_name) != std::string::npos){
+                    subnetwork_found = true;
+                }
+
+                else if (subnetwork_found == true){
+                    break;
+                }
+            }
+            else if (subnetwork_found == true){
+                std::istringstream lineStream(line);
+                lineStream >> sim_prefix >> trace_prefix;
+                sim_prefix_to_trace_prefix[sim_prefix] = trace_prefix;
+            }
+        }
+        return sim_prefix_to_trace_prefix;
+    };
+
 }
