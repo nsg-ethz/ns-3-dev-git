@@ -27,7 +27,7 @@ namespace ns3 {
 
 
         //Load flow distribution
-        std::vector<flow_metadata> flowDist = GetFlowsPerPrefix(flowDistFile, , mapping.trace_to_sim);
+        std::vector<flow_metadata> flowDist = GetFlowsPerPrefix(flowDistFile, mapping.trace_to_sim);
 
         //Usage object
         NodesUsage nodes_usage = NodesUsage();
@@ -59,7 +59,7 @@ namespace ns3 {
 
 
             //Get Destination
-            Ptr<Node> dst = prefix_to_dst[flow.prefix_ip + "/" + flow.prefix_mask];
+            Ptr<Node> dst = prefixes[flow.prefix].server;
 
             NS_LOG_DEBUG(
                     "Flow Features:" << "          Real_rtt: " << flow.rtt

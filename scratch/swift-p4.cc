@@ -404,9 +404,6 @@ main(int argc, char *argv[]) {
     }
 
     //Receivers
-    std::unordered_map<std::string, prefix_info> prefixes_info;
-    std::unordered_map<std::string, Ptr<Node>>   prefix_to_dst_node;
-
     int dst_index = 0;
     for (auto it = prefixes.begin(); it != prefixes.end(); it++) {
 
@@ -632,10 +629,10 @@ main(int argc, char *argv[]) {
         else{
             for (auto prefix_to_fail: prefix_failures) {
 
-                NetDeviceContainer link = prefix_to_fail.link;
-                NS_LOG_DEBUG("Scheduling prefix fail: " << prefix_to_fail);
+                NetDeviceContainer link = prefixes[prefix_to_fail->first].link;
+                NS_LOG_DEBUG("Scheduling prefix fail: " << prefix_to_fail->first);
 
-                *(prefixes_failed_file->GetStream()) << prefix_to_fail << "\n";
+                *(prefixes_failed_file->GetStream()) << prefix_to_fail->first << "\n";
                 prefixes_failed_file->GetStream()->flush();
 
                 for (auto failure: prefix_to_fail->second){
@@ -643,7 +640,8 @@ main(int argc, char *argv[]) {
                     Simulator::Schedule(Seconds(failure.failure_time), &ChangeLinkDropRate, link, failure.failure_intensity);
                     if (failure.failure_recovery_time > 0) {
                         //set back to loss level
-                        Simulator::Schedule(Seconds(failure.failure_time), &ChangeLinkDropRate, link, prefixes[prefix_to_fail].features.loss);
+                        Simulator::Schedule(Seconds(failure.failure_time), &ChangeLinkDropRate, link,
+                                            prefixes[prefix_to_fail->first].features.loss);
                     }
                 }
             }
