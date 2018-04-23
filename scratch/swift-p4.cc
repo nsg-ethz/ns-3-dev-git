@@ -261,17 +261,22 @@ main(int argc, char *argv[]) {
     //Load Subnetwork Prefix mappings
     prefix_mappings mappings = GetSubnetworkPrefixMappings(inputDir + "subnetwork_prefixes.txt", simulationName);
 
-
     //Load Trace Prefix Features
-    std::unordered_map<std::string, prefix_features> features = GetPrefixFeatures(inputDir + "prefix_features.txt", mappings.trace_set);
+    std::unordered_map<std::string, prefix_features> features = GetPrefixFeatures(prefixes_features_file, mappings.trace_set);
+
+    //Load prefix failures
+    std::unordered_map<std::string, std::vector<failure_event>> prefix_failures =  GetPrefixFailures(prefixes_failures_file, simulationName);
 
 
-    //Load Real prefixes file
-    std::unordered_map<std::string, prefix_metadata> prefixes = getPrefixes(inputDir + "prefixes_real.txt",
-                                                                            inputDir + "prefixes_to_loss.txt");
+    //TODO REMOVE
+//    //Load Real prefixes file
+//    std::unordered_map<std::string, prefix_metadata> prefixes = getPrefixes(inputDir + "prefixes_real.txt",
+//                                                                            inputDir + "prefixes_to_loss.txt");
+//
+//    //Load prefixes to fail
+//    std::vector<std::string> prefixes_to_fail = getPrefixesToFail(inputDir + prefixes_failures_file);
 
-    //Load prefixes to fail
-    std::vector<std::string> prefixes_to_fail = getPrefixesToFail(inputDir + prefixes_failures_file);
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     //Build Topology
@@ -279,6 +284,7 @@ main(int argc, char *argv[]) {
 
     //Number of senders and receivers
     int num_senders = src_rtts.size() * num_hosts_per_rtt;
+    //TODO: add multiple receivers per prefix
     int num_receivers = prefixes.size();
 
     //Senders
@@ -289,7 +295,7 @@ main(int argc, char *argv[]) {
     NodeContainer receivers;
     receivers.Create(num_receivers);
 
-    //Switches
+    //Single link Switches
     Ptr<Node> sw1 = CreateObject<Node>();
     Ptr<Node> sw2 = CreateObject<Node>();
 
@@ -339,8 +345,8 @@ main(int argc, char *argv[]) {
     int host_count = 0;
     uint32_t rtt_cdf_index = 0;
 
+    //Saves senders to delay for debugging
     Ptr<OutputStreamWrapper> sender_to_delay_file = asciiTraceHelper.CreateFileStream(outputNameRoot + "sender_to_delay.txt");
-
 
     for (NodeContainer::Iterator host = senders.Begin(); host != senders.End(); host++) {
 
@@ -472,7 +478,6 @@ main(int argc, char *argv[]) {
 
         //Assign some failure rate if (enabled to the interface)
         if (enable_errors) {
-            //TODO: this fails both directions maybe it is too much
             if (prefixes_loss != 0){
                 ChangeLinkDropRate(links[GetNodeName(sw2) + "->" + host_name.str()], prefixes_loss);
             }
@@ -491,12 +496,12 @@ main(int argc, char *argv[]) {
     //Assign IPS
     //Uninstall FIFO queue //  //uninstall qdiscs
     TrafficControlHelper tch;
-
     for (auto it : links) {
         tch.Uninstall(it.second);
     }
 
-    //Create a ip to node mapping
+    //DEBUG FEATURE
+    //Create a ip to node mapping, saves the ip to name for debugging
     std::unordered_map<std::string, Ptr<Node>> ipToNode;
 
     for (uint32_t host_i = 0; host_i < senders.GetN(); host_i++) {
@@ -570,15 +575,6 @@ main(int argc, char *argv[]) {
 //    for(auto it = senders_latency_to_node.begin(); it != senders_latency_to_node.end(); it++){
 //        std::cout << "rtt: " << it->first << " " << it->second.size() << "\n";
 //    }
-
-//    nodes_usage = sendTestTraffic(senders_latency_to_node,
-//                                   src_rtts,
-//                                   prefix_to_dst_node,
-//                                   hostToPort,
-//                                   inputDir + "prefixes_flow_dist.txt",
-//                                   flowsPersec,
-//                                   duration,
-//                                   rtt_shift);
 
     nodes_usage = sendSwiftTraffic(senders_latency_to_node,
                                    src_rtts,
