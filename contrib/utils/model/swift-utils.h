@@ -23,13 +23,22 @@ namespace ns3 {
         double out_of_order;
     };
 
+// Possible structure when using multiple server at the receivers side
+//    struct prefix_metadata {
+//        std::string trace_prefix;
+//        prefix_features features;
+//        NetDeviceContainer main_link;
+//        std::vector<Ptr<Node>> servers;
+//        std::unordered_map<std::string, NetDeviceContainer> server_links;
+//    };
+
     struct prefix_metadata {
         std::string trace_prefix;
         prefix_features features;
-        NetDeviceContainer main_link;
-        std::vector<Ptr<Node>> servers;
-        std::unordered_map<std::string, NetDeviceContainer> server_links;
+        NetDeviceContainer link;
+        Ptr<Node> server;
     };
+
 
     struct failure_event {
         double failure_time;
