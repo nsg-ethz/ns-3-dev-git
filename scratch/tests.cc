@@ -89,6 +89,9 @@ main(int argc, char *argv[]) {
 //    std::cout << test_prefixes_coun << "\n";
 //    return 0;
 
+    std::unordered_map<std::string, prefix_features> features =  GetPrefixFeatures("/home/cedgar/traffic-generator/inputs/caida_dirA/prefix_loss.txt", mappings.trace_set);
+    std::cout << features.size() << "\n";
+
     std::vector<flow_metadata_new> flows = GetFlowsPerPrefix("/home/cedgar/traffic-generator/inputs/caida_dirA/caida_dirA_10_flows_per_prefix.txt", mappings.trace_to_sim);
     std::cout << flows.size() << "\n";
 //    int counter = 0;

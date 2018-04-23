@@ -238,8 +238,10 @@ main(int argc, char *argv[]) {
 
     std::clock_t begin_time = std::clock();
 
+    //Load Input files
+
     //Load RTT CDF
-    std::vector<double> src_rtts = read_lines<double>(inputDir + "rtt_cdf.txt");
+    std::vector<double> src_rtts = GetSubnetworkRtts(inputDir + "rtt_cdfs.txt", simulationName);
 
     //Modify RTT CDF to scale it to the shift we want
     if (rtt_shift != double(1)){
@@ -256,7 +258,14 @@ main(int argc, char *argv[]) {
         }
     }
 
-    //Load sim to trace and trace to sim prefixes
+    return 0;
+
+    //Load Subnetwork Prefix mappings
+    prefix_mappings mappings = GetSubnetowkrPrefixMappings(inputDir + "subnetwork_prefixes.txt");
+
+
+    //Load Trace Prefix Features
+    std::unordered_map<std::string, prefix_features> GetPrefixFeatures(inputDir + "prefix_features.txt", mappings.trace_set);
 
 
     //Load Real prefixes file
