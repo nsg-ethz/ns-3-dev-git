@@ -264,14 +264,13 @@ main(int argc, char *argv[]) {
     prefix_mappings prefixes_mappings = GetSubnetworkPrefixMappings(inputDir + "subnetwork_prefixes.txt", simulationName);
 
     //Load Trace Prefix Features
-    std::unordered_map<std::string, prefix_features> trace_prefixes_features = GetPrefixFeatures(prefixes_features_file, mappings.trace_set);
+    std::unordered_map<std::string, prefix_features> trace_prefixes_features = GetPrefixFeatures(prefixes_features_file, prefixes_mappings.trace_set);
 
     //Load prefix failures
     std::unordered_map<std::string, std::vector<failure_event>> prefix_failures =  GetPrefixFailures(prefixes_failures_file, simulationName);
 
     //Populate Prefixes Object
-    std::unordered_map<std::string, prefix_metadata> prefixes = LoadPrefixesMetadata
-            (prefixes_mappings, prefix_features);
+    std::unordered_map<std::string, prefix_metadata> prefixes = LoadPrefixesMetadata(prefixes_mappings, trace_prefixes_features);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     //Build Topology
@@ -521,7 +520,7 @@ main(int argc, char *argv[]) {
     *(metadata_file->GetStream()) << "num_senders " << num_senders << "\n";
     *(metadata_file->GetStream()) << "num_receivers " << num_receivers << "\n";
     *(metadata_file->GetStream()) << "prefixes " << prefixes.size() << "\n";
-    *(metadata_file->GetStream()) << "prefixes_failed " << prefixes_to_fail.size() << "\n";
+    *(metadata_file->GetStream()) << "prefixes_failed " << prefix_failures.size() << "\n";
     *(metadata_file->GetStream()) << "rtt_shift " << rtt_shift << "\n";
     metadata_file->GetStream()->flush();
 
@@ -610,43 +609,43 @@ main(int argc, char *argv[]) {
     Ptr<OutputStreamWrapper> prefixes_failed_file = asciiTraceHelper.CreateFileStream(
             outputNameRoot + "failed_prefixes.txt");
 
-    if (failure_time > 0) {
-
-        if (fail_all_prefixes){
-
-            for (auto it : prefixes) {
-                NetDeviceContainer link = it->second.link;
-
-                NS_LOG_DEBUG("Scheduling prefix fail: " << it->first);
-
-                *(prefixes_failed_file->GetStream()) << it->first << "\n";
-                prefixes_failed_file->GetStream()->flush();
-
-                Simulator::Schedule(Seconds(failure_time), &FailLink, link);
-            }
-
-        }
-        else{
-            for (auto prefix_to_fail: prefix_failures) {
-
-                NetDeviceContainer link = prefixes[prefix_to_fail->first].link;
-                NS_LOG_DEBUG("Scheduling prefix fail: " << prefix_to_fail->first);
-
-                *(prefixes_failed_file->GetStream()) << prefix_to_fail->first << "\n";
-                prefixes_failed_file->GetStream()->flush();
-
-                for (auto failure: prefix_to_fail->second){
-
-                    Simulator::Schedule(Seconds(failure.failure_time), &ChangeLinkDropRate, link, failure.failure_intensity);
-                    if (failure.failure_recovery_time > 0) {
-                        //set back to loss level
-                        Simulator::Schedule(Seconds(failure.failure_time), &ChangeLinkDropRate, link,
-                                            prefixes[prefix_to_fail->first].features.loss);
-                    }
-                }
-            }
-        }
-    }
+//    if (failure_time > 0) {
+//
+//        if (fail_all_prefixes){
+//
+//            for (auto it : prefixes) {
+//                NetDeviceContainer link = it->second.link;
+//
+//                NS_LOG_DEBUG("Scheduling prefix fail: " << it->first);
+//
+//                *(prefixes_failed_file->GetStream()) << it->first << "\n";
+//                prefixes_failed_file->GetStream()->flush();
+//
+//                Simulator::Schedule(Seconds(failure_time), &FailLink, link);
+//            }
+//
+//        }
+//        else{
+//            for (auto prefix_to_fail: prefix_failures) {
+//
+//                NetDeviceContainer link = prefixes[prefix_to_fail->first].link;
+//                NS_LOG_DEBUG("Scheduling prefix fail: " << prefix_to_fail->first);
+//
+//                *(prefixes_failed_file->GetStream()) << prefix_to_fail->first << "\n";
+//                prefixes_failed_file->GetStream()->flush();
+//
+//                for (auto failure: prefix_to_fail->second){
+//
+//                    Simulator::Schedule(Seconds(failure.failure_time), &ChangeLinkDropRate, link, failure.failure_intensity);
+//                    if (failure.failure_recovery_time > 0) {
+//                        //set back to loss level
+//                        Simulator::Schedule(Seconds(failure.failure_time), &ChangeLinkDropRate, link,
+//                                            prefixes[prefix_to_fail->first].features.loss);
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     //Simulation Starts
 
