@@ -563,7 +563,8 @@ main(int argc, char *argv[]) {
 
     nodes_usage = sendSwiftTraffic(senders_latency_to_node,
                                    src_rtts,
-                                   prefix_to_dst_node,
+                                   prefixes,
+                                   prefixes_mappings,
                                    hostToPort,
                                    inputDir + "prefixes_flow_dist.txt",
                                    runStep,
@@ -606,7 +607,7 @@ main(int argc, char *argv[]) {
 
 
 
-    //TODO:
+    //TODO: DO this better and cleaner
     //Schedule Prefixes to fail
 
     Ptr<OutputStreamWrapper> prefixes_failed_file = asciiTraceHelper.CreateFileStream(
@@ -645,8 +646,6 @@ main(int argc, char *argv[]) {
                         Simulator::Schedule(Seconds(failure.failure_time), &ChangeLinkDropRate, link, prefixes[prefix_to_fail].features.loss);
                     }
                 }
-
-                //Simulator::Schedule(Seconds(4), &RecoverLink, links[GetNodeName(sw2)+"->"+dst_name]);
             }
         }
     }

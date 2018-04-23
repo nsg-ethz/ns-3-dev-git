@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
 #include <random>
+#include <utils/model/swift-utils.h>
 #include "traffic-generation.h"
 #include "swift-generation.h"
 #include "ns3/custom-applications-module.h"
@@ -16,7 +17,8 @@ namespace ns3 {
 
     NodesUsage  sendSwiftTraffic(std::unordered_map<double, std::vector<Ptr<Node>>> rtt_to_senders,
                                  std::vector<double> rtt_cdf,
-                                 std::unordered_map<std::string, Ptr<Node>> prefix_to_dst,
+                                 std::unordered_map<std::string, prefix_metadata> prefixes,
+                                 prefix_mappings mapping,
                                  std::unordered_map<std::string, std::vector<uint16_t>> hostsToPorts,
                                  std::string flowDistFile,
                                  uint32_t seed,
@@ -25,7 +27,7 @@ namespace ns3 {
 
 
         //Load flow distribution
-        std::vector<flow_metadata> flowDist;// = getPrefixesDistribution(flowDistFile);
+        std::vector<flow_metadata> flowDist = GetFlowsPerPrefix(flowDistFile, , mapping.trace_to_sim);
 
         //Usage object
         NodesUsage nodes_usage = NodesUsage();
