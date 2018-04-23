@@ -92,6 +92,7 @@ main(int argc, char *argv[]) {
     double prefixes_loss = 0;
     uint64_t network_delay = 1; //ns?
     uint16_t num_hosts_per_rtt = 1;
+    uint16_t num_servers_per_prefix = 1;
     uint32_t flowsPersec = 100;
     double duration = 5;
     double failure_time = 0;
@@ -126,6 +127,7 @@ main(int argc, char *argv[]) {
     cmd.AddValue("QueueSize", "Interfaces Queue length", queue_size);
     cmd.AddValue("RunStep", "Random generator starts at", runStep);
     cmd.AddValue("NumHostsPerRtt", "Number of hosts in each side", num_hosts_per_rtt);
+    cmd.AddValue("NumServersPerPrefix", "Number of prefixes a Prefix has", num_servers_per_prefix);
     cmd.AddValue("FlowsPerSec", "Number of hosts in each side", flowsPersec);
     cmd.AddValue("Duration", "", duration);
     cmd.AddValue("FailureTime", "Time when all prefixes will be lost", failure_time);
@@ -259,24 +261,17 @@ main(int argc, char *argv[]) {
     }
 
     //Load Subnetwork Prefix mappings
-    prefix_mappings mappings = GetSubnetworkPrefixMappings(inputDir + "subnetwork_prefixes.txt", simulationName);
+    prefix_mappings prefixes_mappings = GetSubnetworkPrefixMappings(inputDir + "subnetwork_prefixes.txt", simulationName);
 
     //Load Trace Prefix Features
-    std::unordered_map<std::string, prefix_features> features = GetPrefixFeatures(prefixes_features_file, mappings.trace_set);
+    std::unordered_map<std::string, prefix_features> trace_prefixes_features = GetPrefixFeatures(prefixes_features_file, mappings.trace_set);
 
     //Load prefix failures
     std::unordered_map<std::string, std::vector<failure_event>> prefix_failures =  GetPrefixFailures(prefixes_failures_file, simulationName);
 
-
-    //TODO REMOVE
-//    //Load Real prefixes file
-//    std::unordered_map<std::string, prefix_metadata> prefixes = getPrefixes(inputDir + "prefixes_real.txt",
-//                                                                            inputDir + "prefixes_to_loss.txt");
-//
-//    //Load prefixes to fail
-//    std::vector<std::string> prefixes_to_fail = getPrefixesToFail(inputDir + prefixes_failures_file);
-
-
+    //Populate Prefixes Object
+    std::unordered_map<std::string, prefix_metadata> prefixes = LoadPrefixesMetadata
+            (prefixes_mappings, prefix_features);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     //Build Topology
