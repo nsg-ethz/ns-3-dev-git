@@ -306,6 +306,25 @@ GetNodeIp(Ptr<Node> node)
 //  	return ipToString((address.m_address & 0xff000000) >> 24, (address.m_address & 0x00ff0000) >> 16, (address.m_address & 0x0000ff00) >> 8, address.m_address & 0x000000ff);
  }
 
+ip_mask GetIpMask(std::string prefix){
+
+	std::string buff("");
+	ip_mask address;
+	for (auto chr: prefix){
+		if (chr == '/'){
+			address.ip = buff;
+			buff = "";
+		}
+		else{
+			buff +=chr;
+		}
+	}
+
+	address.mask = "/" + buff;
+	return address;
+}
+
+
 //Returns node if added to the name system , 0 if it does not exist
 Ptr<Node> GetNode(std::string name){
 	return Names::Find<Node>(name);

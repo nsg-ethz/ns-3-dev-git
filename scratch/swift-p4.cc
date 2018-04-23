@@ -411,7 +411,7 @@ main(int argc, char *argv[]) {
     for (auto it = prefixes.begin(); it != prefixes.end(); it++) {
 
         std::stringstream host_name;
-        host_name << "d_" << dst_index;
+        host_name << "p_" << dst_index;
         NS_LOG_DEBUG("Naming Host: " << host_name.str());
         Names::Add(host_name.str(), receivers.Get(dst_index));
 
@@ -433,15 +433,9 @@ main(int argc, char *argv[]) {
                                   << " bandiwdth(bps)"
                                   << sendersBandwidth);
 
-        //Build prefixes_info
-        prefix_info info;
-        info.metadata = it->second;
-        info.link = links[GetNodeName(sw2) + "->" + host_name.str()];
-
-        //Assign IP
-        std::string net_ip = it->second.prefix_ip;
-        std::string base_ip = it->second.ips_to_allocate[0];
-        std::string net_mask = it->second.prefix_mask;
+        //Update prefixes object
+        it->second.link = links[GetNodeName(sw2) + "->" + host_name.str()];
+        it->second.server = receivers.Get(dst_index);
 
         /*
          * I need to do some hacking in order to asing IPs following the prefixes I got. For the Ip we have to assing
@@ -453,23 +447,23 @@ main(int argc, char *argv[]) {
          * Base = 10.10.0.0 ^ 10.10.128.1 = 0.0.128.1
          * */
 
-        const char *net_ip_p = net_ip.c_str();
-        const char *base_ip_p = base_ip.c_str();
-        const char *net_mask_p = net_mask.c_str();
+//        //Assign IP
+//        std::string net_ip = it->second.prefix_ip;
+//        std::string base_ip = it->second.ips_to_allocate[0];
+//        std::string net_mask = it->second.prefix_mask;
+//
+//        const char *net_ip_p = net_ip.c_str();
+//        const char *base_ip_p = base_ip.c_str();
+//        const char *net_mask_p = net_mask.c_str();
+//
+//        Ipv4Address base_address(base_ip_p);
+//        Ipv4Address net_address(net_ip_p);
+//        Ipv4AddressHelper address(net_ip_p, net_mask_p, Ipv4Address(base_address.Get() ^ net_address.Get()));
 
-        Ipv4Address base_address(base_ip_p);
-        Ipv4Address net_address(net_ip_p);
+        ip_mask prefix_address = GetIpMask(it->first);
+        Ipv4AddressHelper address(prefix_address.ip.c_str(), prefix_address.mask.c_str());
 
-        //std::cout << net_ip_p << " " << base_ip_p << " " << net_mask_p << "\n";
-
-        Ipv4AddressHelper address(net_ip_p, net_mask_p, Ipv4Address(base_address.Get() ^ net_address.Get()));
         address.Assign(links[GetNodeName(sw2) + "->" + host_name.str()]);
-
-        //Get destination ips address if it was propelty set
-        info.server_dst = GetNode(host_name.str());
-
-        //Set prefix to dst node
-        prefix_to_dst_node[it->first] = GetNode(host_name.str());
 
         //Assign some failure rate if (enabled to the interface)
         if (enable_errors) {
@@ -478,12 +472,9 @@ main(int argc, char *argv[]) {
             }
             // Takes it from a file
             else {
-                ChangeLinkDropRate(links[GetNodeName(sw2) + "->" + host_name.str()], it->second.loss);
+                ChangeLinkDropRate(links[GetNodeName(sw2) + "->" + host_name.str()], it->second.features.loss);
             }
         }
-
-        //Set info with all the needed infomration during the simulation
-        prefixes_info[it->first] = info;
 
         dst_index++;
     }
@@ -536,7 +527,6 @@ main(int argc, char *argv[]) {
     *(metadata_file->GetStream()) << "prefixes_failed " << prefixes_to_fail.size() << "\n";
     *(metadata_file->GetStream()) << "rtt_shift " << rtt_shift << "\n";
     metadata_file->GetStream()->flush();
-
 
     NS_LOG_DEBUG("Time To Set Hosts: " << float(clock() - begin_time) / CLOCKS_PER_SEC);
 
@@ -626,7 +616,7 @@ main(int argc, char *argv[]) {
 
         if (fail_all_prefixes){
 
-            for (auto it = prefixes_info.begin(); it != prefixes_info.end(); it++) {
+            for (auto it : prefixes) {
                 NetDeviceContainer link = it->second.link;
 
                 NS_LOG_DEBUG("Scheduling prefix fail: " << it->first);
@@ -639,25 +629,29 @@ main(int argc, char *argv[]) {
 
         }
         else{
-            //Add a way to fail them all
-            for (auto const &prefix_to_fail: prefixes_to_fail) {
+            for (auto prefix_to_fail: prefix_failures) {
 
-                prefix_info prefix_data = prefixes_info[prefix_to_fail];
-                NetDeviceContainer link = prefix_data.link;
-
+                NetDeviceContainer link = prefix_to_fail.link;
                 NS_LOG_DEBUG("Scheduling prefix fail: " << prefix_to_fail);
 
                 *(prefixes_failed_file->GetStream()) << prefix_to_fail << "\n";
                 prefixes_failed_file->GetStream()->flush();
 
-                Simulator::Schedule(Seconds(failure_time), &FailLink, link);
+                for (auto failure: prefix_to_fail->second){
+
+                    Simulator::Schedule(Seconds(failure.failure_time), &ChangeLinkDropRate, link, failure.failure_intensity);
+                    if (failure.failure_recovery_time > 0) {
+                        //set back to loss level
+                        Simulator::Schedule(Seconds(failure.failure_time), &ChangeLinkDropRate, link, prefixes[prefix_to_fail].features.loss);
+                    }
+                }
+
                 //Simulator::Schedule(Seconds(4), &RecoverLink, links[GetNodeName(sw2)+"->"+dst_name]);
             }
         }
     }
 
     //Simulation Starts
-    //p2p.EnablePcap(outputNameRoot + "sender.pcap", links["s_25->sw1"].Get(0), bool(1));
 
     if (stop_time != 0) {
         //We schedule it here otherwise simulations never finish

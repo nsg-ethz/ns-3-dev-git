@@ -54,6 +54,11 @@ NS_LOG_COMPONENT_DEFINE ("test");
 int
 main(int argc, char *argv[]) {
 
+    ip_mask address = GetIpMask("192.168.1.0/24");
+    std::cout << address.ip << "\n" << address.mask << "\n";
+
+    return 0;
+
 //    Ipv4AddressHelper address("10.0.0.0", "255.255.0.0");
 //    for (int j=0; j < 1000; j++)
 //    {
@@ -92,7 +97,7 @@ main(int argc, char *argv[]) {
     std::unordered_map<std::string, prefix_features> features =  GetPrefixFeatures("/home/cedgar/traffic-generator/inputs/caida_dirA/prefix_loss.txt", mappings.trace_set);
     std::cout << features.size() << "\n";
 
-    std::vector<flow_metadata_new> flows = GetFlowsPerPrefix("/home/cedgar/traffic-generator/inputs/caida_dirA/caida_dirA_10_flows_per_prefix.txt", mappings.trace_to_sim);
+    std::vector<flow_metadata> flows = GetFlowsPerPrefix("/home/cedgar/traffic-generator/inputs/caida_dirA/caida_dirA_10_flows_per_prefix.txt", mappings.trace_to_sim);
     std::cout << flows.size() << "\n";
 //    int counter = 0;
 //    for (auto element: flows){
@@ -140,6 +145,7 @@ main(int argc, char *argv[]) {
 //                  [](std::pair<std::string, int> element) {
 //                      std::cout << element.first << " :: " << element.second << std::endl;
 //                  });
+
 
 
     return 0;

@@ -34,6 +34,11 @@ namespace ns3 {
         uint64_t rx_bytes;
     };
 
+    struct ip_mask {
+        std::string ip;
+        std::string mask;
+    };
+
     struct less_rx_flows {
         bool operator()(const usage_struct &x, const usage_struct &y) const {
             return x.rx_flows < y.rx_flows;
@@ -105,6 +110,8 @@ namespace ns3 {
     std::string GetNodeName(Ptr<Node> node);
 
     std::string ipv4AddressToString(Ipv4Address address);
+
+    ip_mask GetIpMask(std::string prefix);
 
     uint64_t BytesFromRate(DataRate dataRate, double time);
 

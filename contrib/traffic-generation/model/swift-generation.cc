@@ -25,7 +25,7 @@ namespace ns3 {
 
 
         //Load flow distribution
-        std::vector<flow_metadata> flowDist = getPrefixesDistribution(flowDistFile);
+        std::vector<flow_metadata> flowDist;// = getPrefixesDistribution(flowDistFile);
 
         //Usage object
         NodesUsage nodes_usage = NodesUsage();
