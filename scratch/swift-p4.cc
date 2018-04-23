@@ -258,14 +258,12 @@ main(int argc, char *argv[]) {
         }
     }
 
-    return 0;
-
     //Load Subnetwork Prefix mappings
-    prefix_mappings mappings = GetSubnetowkrPrefixMappings(inputDir + "subnetwork_prefixes.txt");
+    prefix_mappings mappings = GetSubnetworkPrefixMappings(inputDir + "subnetwork_prefixes.txt", simulationName);
 
 
     //Load Trace Prefix Features
-    std::unordered_map<std::string, prefix_features> GetPrefixFeatures(inputDir + "prefix_features.txt", mappings.trace_set);
+    std::unordered_map<std::string, prefix_features> features = GetPrefixFeatures(inputDir + "prefix_features.txt", mappings.trace_set);
 
 
     //Load Real prefixes file

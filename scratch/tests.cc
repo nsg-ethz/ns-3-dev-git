@@ -78,7 +78,7 @@ main(int argc, char *argv[]) {
 //        }
 //    }
 
-    prefix_mappings mappings = GetSubnetworkPrefixMappings("/home/cedgar/traffic-generator/inputs/caida_dirA/subnetwork_prefixes.txt", "Subnetwork_1");
+    prefix_mappings mappings = GetSubnetworkPrefixMappings("/home/cedgar/traffic-generator/inputs/caida_dirA/subnetwork_prefixes.txt", "Subnetwork_0");
 
 //    int test_prefixes_coun = 0;
 //    for (auto it: mappings.trace_to_sim){
