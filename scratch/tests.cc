@@ -78,18 +78,28 @@ main(int argc, char *argv[]) {
 //        }
 //    }
 
-    prefix_mappings mappings = GetSubnetworkPrefixMappings("/home/cedgar/traffic-generator/inputs/caida_dirA/subnetwork_prefixes.txt", "Subnetwork_0");
+    prefix_mappings mappings = GetSubnetworkPrefixMappings("/home/cedgar/traffic-generator/inputs/caida_dirA/subnetwork_prefixes.txt", "Subnetwork_1");
+
+//    int test_prefixes_coun = 0;
+//    for (auto it: mappings.trace_to_sim){
+//        if (it.second.size() > 1){
+//            test_prefixes_coun++;
+//        }
+//    }
+//    std::cout << test_prefixes_coun << "\n";
+//    return 0;
+
     std::vector<flow_metadata_new> flows = GetFlowsPerPrefix("/home/cedgar/traffic-generator/inputs/caida_dirA/caida_dirA_10_flows_per_prefix.txt", mappings.trace_to_sim);
     std::cout << flows.size() << "\n";
-    int counter = 0;
-    for (auto element: flows){
-        std::cout << element.prefix << " "<< element.bytes << " "<< element.duration << " "<< element.packets << " "<< element.rtt << "\n";
-        counter++;
-
-        if (counter >10){
-            return 0;
-        }
-    }
+//    int counter = 0;
+//    for (auto element: flows){
+//        std::cout << element.prefix << " "<< element.bytes << " "<< element.duration << " "<< element.packets << " "<< element.rtt << "\n";
+//        counter++;
+//
+//        if (counter >10){
+//            return 0;
+//        }
+//    }
 
 
 

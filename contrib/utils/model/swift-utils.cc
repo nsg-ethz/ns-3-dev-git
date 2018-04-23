@@ -323,7 +323,6 @@ namespace ns3 {
         std::string strip_a, strip_b;
 
         bool skip = false;
-
         while(std::getline(flowsDist, line)) {
 
             //skip blank lines
@@ -335,14 +334,11 @@ namespace ns3 {
                 std::istringstream lineStream(line);
                 lineStream >> strip_a >> current_prefix >> strip_b;
 
-
                 //Check if its a valid prefix
                 if (trace_to_sim_prefixes.count(current_prefix) == 0) {
                     skip = true;
                 } else {
                     skip = false;
-                    std::cout << current_prefix << "\n";
-
                 }
             }
             else if (skip){

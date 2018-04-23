@@ -28,7 +28,7 @@ namespace ns3 {
     struct flow_metadata_new {
         std::string prefix;
         uint32_t packets;
-        uint32_t duration;
+        double duration;
         uint64_t bytes;
         double rtt;
     };
