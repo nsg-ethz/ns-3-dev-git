@@ -19,8 +19,8 @@ namespace ns3 {
     };
 
     struct prefix_features {
-        double loss;
-        double out_of_order;
+        double loss = 0;
+        double out_of_order = 0;
     };
 
 // Possible structure when using multiple server at the receivers side
@@ -41,9 +41,9 @@ namespace ns3 {
 
 
     struct failure_event {
-        double failure_time;
-        double recovery_time;
-        float failure_intensity;
+        double failure_time = -1;
+        double recovery_time = -1;
+        float failure_intensity = 0;
     };
 
     struct prefix_mappings {

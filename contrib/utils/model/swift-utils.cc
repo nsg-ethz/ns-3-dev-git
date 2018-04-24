@@ -97,7 +97,11 @@ namespace ns3 {
         std::unordered_map<std::string, prefix_features> trace_prefix_features;
 
         std::ifstream prefix_features_file(prefixFeaturesFile);
-        NS_ASSERT_MSG(prefix_features_file, "Please provide a valid prefixes file");
+
+        if (!prefix_features_file) {
+            NS_LOG_WARN("The features file file was not found, if not specified later any prefix will be failed");
+            return trace_prefix_features;
+        }
 
         std::string prefix;
 
@@ -118,7 +122,10 @@ namespace ns3 {
 
         std::ifstream infile(prefix_failure_file);
 
-        NS_ASSERT_MSG(infile, "Please provide a valid file for prefixes to fail");
+        if (!infile) {
+            NS_LOG_WARN("The prefix Failure file was not found, if not specified later any prefix will be failed");
+            return prefix_to_events;
+        }
 
         std::string line;
         bool subnetwork_found = false;
@@ -168,7 +175,12 @@ namespace ns3 {
         for (auto prefix: mappings.trace_set){
             prefix_metadata metadata;
             metadata.trace_prefix = mappings.sim_to_trace[prefix];
-            metadata.features = trace_prefixes_features[metadata.trace_prefix];
+
+            //Only if it was provided, otherwise we use default features (all 0)
+            if (trace_prefixes_features.find(metadata.trace_prefix) != trace_prefixes_features.end()){
+                metadata.features = trace_prefixes_features[metadata.trace_prefix];
+            }
+
             prefixes[prefix] = metadata;
         }
 

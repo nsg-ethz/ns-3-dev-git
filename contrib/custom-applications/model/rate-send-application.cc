@@ -307,9 +307,8 @@ void RateSendApplication::ConnectionSucceeded (Ptr<Socket> socket)
   NS_LOG_FUNCTION (this << socket);
   NS_LOG_LOGIC ("RateSendApplication Connection succeeded");
   m_connected = true;
-	RefillBucket();
+  RefillBucket();
   SendData ();
-//  SendData ();
 }
 
 void RateSendApplication::ConnectionFailed (Ptr<Socket> socket)
@@ -331,22 +330,12 @@ void RateSendApplication::DataSend (Ptr<Socket>, uint32_t)
 void RateSendApplication::SocketNormalClose (Ptr<Socket>)
 {
   NS_LOG_FUNCTION (this);
-
   NS_LOG_DEBUG("Connection closed normally");
-
-  double endTime  = Simulator::Now().GetSeconds();
-
 }
 
 void RateSendApplication::SocketErrorClose (Ptr<Socket>)
 {
   NS_LOG_FUNCTION (this);
-
   NS_LOG_ERROR("Connection closed by an error");
-
-
 }
-
-
-
 } // Namespace ns3

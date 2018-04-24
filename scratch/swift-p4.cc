@@ -88,7 +88,7 @@ main(int argc, char *argv[]) {
     uint64_t runStep = 1;
     double rtt_shift = 1;
 
-    bool enable_errors = false;
+    bool enable_uniform_loss = false;
     double prefixes_loss = 0;
     uint64_t network_delay = 1; //ns?
     uint16_t num_hosts_per_rtt = 1;
@@ -111,14 +111,14 @@ main(int argc, char *argv[]) {
     cmd.AddValue("OutputDir", "Set it to something if you want to store the simulation output "
             "in a particular folder inside outputs", outputDir);
     cmd.AddValue("InputDir", "Where to find all the input data", inputDir);
-    cmd.AddValue("PrefixFailures", "Where to find all the input data", prefixes_failures_file);
-    cmd.AddValue("PrefixFeatures", "Where to find all the input data", prefixes_features_file);
+    cmd.AddValue("PrefixFailures", "", prefixes_failures_file);
+    cmd.AddValue("PrefixFeatures", "", prefixes_features_file);
 
     //General
     //Links properties
     cmd.AddValue("LinkBandwidth", "Bandwidth of link, used in multiple experiments", networkBandwidth);
     cmd.AddValue("NetworkDelay", "Added delay between nodes", network_delay);
-    cmd.AddValue("EnableErrors", "Enable Error Per Prefix", enable_errors);
+    cmd.AddValue("EnableUniformLoss", "Enable Error Per Prefix", enable_uniform_loss);
     cmd.AddValue("PrefixesLoss", "Sets the same loss for all prefixes", prefixes_loss);
     cmd.AddValue("EnablePcap", "Save traffic in a pcap file", save_pcap);
     cmd.AddValue("FailAll", "If enabled all prefixes will be failed ignoring what the prefixes_to_fail file says", fail_all_prefixes);
@@ -133,7 +133,6 @@ main(int argc, char *argv[]) {
     cmd.AddValue("FailureTime", "Time when all prefixes will be lost", failure_time);
     cmd.AddValue("StopTime", "Time when the simulation finishes", stop_time);
     cmd.AddValue("RttShift", "Paramater to shift the used RTT distribution. It will shift senders and flows rtts", rtt_shift);
-
 
     cmd.Parse(argc, argv);
 
@@ -462,16 +461,15 @@ main(int argc, char *argv[]) {
         address.Assign(links[GetNodeName(sw2) + "->" + host_name.str()]);
 
         //Assign some failure rate if (enabled to the interface)
-        if (enable_errors) {
-            if (prefixes_loss != 0){
-                ChangeLinkDropRate(links[GetNodeName(sw2) + "->" + host_name.str()], prefixes_loss);
-            }
-            // Takes it from a file
-            else {
+        if (enable_uniform_loss) {
+            if (it->second.features.loss > 0){
                 ChangeLinkDropRate(links[GetNodeName(sw2) + "->" + host_name.str()], it->second.features.loss);
             }
-        }
 
+            else if (prefixes_loss > 0){
+                ChangeLinkDropRate(links[GetNodeName(sw2) + "->" + host_name.str()], prefixes_loss);
+            }
+        }
         dst_index++;
     }
 
@@ -514,7 +512,7 @@ main(int argc, char *argv[]) {
     *(metadata_file->GetStream()) << "network_bw " << networkBandwidth << "\n";
     *(metadata_file->GetStream()) << "senders_bw " << sendersBandwidth << "\n";
     *(metadata_file->GetStream()) << "receivers_bw " << receiversBandwidth << "\n";
-    *(metadata_file->GetStream()) << "emulated_congestion_on " << enable_errors << "\n";
+    *(metadata_file->GetStream()) << "emulated_congestion_on " << enable_uniform_loss << "\n";
     *(metadata_file->GetStream()) << "prefixes_loss " << prefixes_loss << "\n";
     *(metadata_file->GetStream()) << "rtt_cdf_size " << src_rtts.size() << "\n";
     *(metadata_file->GetStream()) << "num_senders " << num_senders << "\n";
@@ -534,7 +532,6 @@ main(int argc, char *argv[]) {
     *(metadata_file->GetStream()) << "routing_time " << routing_time << "\n";
     metadata_file->GetStream()->flush();
     NS_LOG_DEBUG("Time Installing Routes: " << routing_time);
-
 
     //START TRAFFIC
     //Install Traffic sinks at receivers
@@ -609,10 +606,10 @@ main(int argc, char *argv[]) {
     Ptr<OutputStreamWrapper> prefixes_failed_file = asciiTraceHelper.CreateFileStream(
             outputNameRoot + "failed_prefixes.txt");
 
-    if (failure_time > 0) {
+    //we ignore what the prefix file says and we fail all the prefixes at failure_time.
+    if (fail_all_prefixes){
 
-        if (fail_all_prefixes){
-
+        if (failure_time > 0) {
             for (auto it : prefixes) {
                 NetDeviceContainer link = it.second.link;
 
@@ -623,25 +620,32 @@ main(int argc, char *argv[]) {
 
                 Simulator::Schedule(Seconds(failure_time), &FailLink, link);
             }
-
         }
-        else{
-            for (auto prefix_to_fail: prefix_failures) {
+    }
 
-                NetDeviceContainer link = prefixes[prefix_to_fail.first].link;
-                NS_LOG_DEBUG("Scheduling prefix fail: " << prefix_to_fail.first);
+    else{
+        for (auto prefix_to_fail: prefix_failures) {
 
-                *(prefixes_failed_file->GetStream()) << prefix_to_fail.first << "\n";
-                prefixes_failed_file->GetStream()->flush();
+            NetDeviceContainer link = prefixes[prefix_to_fail.first].link;
+            NS_LOG_DEBUG("Scheduling prefix fail: " << prefix_to_fail.first);
 
-                for (auto failure: prefix_to_fail.second){
+            *(prefixes_failed_file->GetStream()) << prefix_to_fail.first << "\n";
+            prefixes_failed_file->GetStream()->flush();
 
+            //IF there is no events and the default duration was provided we use that
+            if (prefix_to_fail.second.size() == 0 and failure_time > 0){
+                Simulator::Schedule(Seconds(failure_time), &FailLink, link);
+                continue;
+            }
+
+            for (auto failure: prefix_to_fail.second){
+                if (failure.failure_time > 0 ){
                     Simulator::Schedule(Seconds(failure.failure_time), &ChangeLinkDropRate, link, failure.failure_intensity);
-                    if (failure.recovery_time != -1) {
-                        //set back to loss level
-                        Simulator::Schedule(Seconds(failure.failure_time), &ChangeLinkDropRate, link,
-                                            prefixes[prefix_to_fail.first].features.loss);
-                    }
+                }
+                if (failure.recovery_time > 0) {
+                    //set back to loss level
+                    Simulator::Schedule(Seconds(failure.failure_time), &ChangeLinkDropRate, link,
+                                        prefixes[prefix_to_fail.first].features.loss);
                 }
             }
         }
