@@ -1,12 +1,10 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
 #include <random>
-#include <utils/model/swift-utils.h>
 #include "traffic-generation.h"
 #include "swift-generation.h"
 #include "ns3/custom-applications-module.h"
 #include "ns3/applications-module.h"
-
 #include "ns3/swift-utils.h"
 
 

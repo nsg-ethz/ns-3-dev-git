@@ -54,8 +54,22 @@ NS_LOG_COMPONENT_DEFINE ("test");
 int
 main(int argc, char *argv[]) {
 
+    return 0;
+
     ip_mask address = GetIpMask("192.168.1.0/24");
     std::cout << address.ip << "\n" << address.mask << "\n";
+
+
+    //Load Subnetwork Prefix mappings
+    prefix_mappings mappings = GetSubnetworkPrefixMappings("/home/cedgar/traffic-generator/inputs/caida_dirA/subnetwork_prefixes.txt", "Subnetwork_0");
+    std::unordered_map<std::string, prefix_features> features =  GetPrefixFeatures("/home/cedgar/traffic-generator/inputs/caida_dirA/prefix_loss.txt", mappings.trace_set);
+
+    //Populate Prefixes Object
+    std::unordered_map<std::string, prefix_metadata> prefixes = LoadPrefixesMetadata(mappings, features);
+
+    for (auto it: prefixes){
+        std::cout << it.first << "\n";
+    }
 
     return 0;
 
@@ -83,7 +97,7 @@ main(int argc, char *argv[]) {
 //        }
 //    }
 
-    prefix_mappings mappings = GetSubnetworkPrefixMappings("/home/cedgar/traffic-generator/inputs/caida_dirA/subnetwork_prefixes.txt", "Subnetwork_0");
+    //prefix_mappings mappings = GetSubnetworkPrefixMappings("/home/cedgar/traffic-generator/inputs/caida_dirA/subnetwork_prefixes.txt", "Subnetwork_0");
 
 //    int test_prefixes_coun = 0;
 //    for (auto it: mappings.trace_to_sim){
@@ -94,11 +108,11 @@ main(int argc, char *argv[]) {
 //    std::cout << test_prefixes_coun << "\n";
 //    return 0;
 
-    std::unordered_map<std::string, prefix_features> features =  GetPrefixFeatures("/home/cedgar/traffic-generator/inputs/caida_dirA/prefix_loss.txt", mappings.trace_set);
-    std::cout << features.size() << "\n";
+    //std::unordered_map<std::string, prefix_features> features =  GetPrefixFeatures("/home/cedgar/traffic-generator/inputs/caida_dirA/prefix_loss.txt", mappings.trace_set);
+    //std::cout << features.size() << "\n";
 
-    std::vector<flow_metadata> flows = GetFlowsPerPrefix("/home/cedgar/traffic-generator/inputs/caida_dirA/caida_dirA_10_flows_per_prefix.txt", mappings.trace_to_sim);
-    std::cout << flows.size() << "\n";
+    //std::vector<flow_metadata> flows = GetFlowsPerPrefix("/home/cedgar/traffic-generator/inputs/caida_dirA/caida_dirA_10_flows_per_prefix.txt", mappings.trace_to_sim);
+    //std::cout << flows.size() << "\n";
 //    int counter = 0;
 //    for (auto element: flows){
 //        std::cout << element.prefix << " "<< element.bytes << " "<< element.duration << " "<< element.packets << " "<< element.rtt << "\n";

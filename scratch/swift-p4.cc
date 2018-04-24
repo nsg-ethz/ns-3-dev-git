@@ -609,43 +609,43 @@ main(int argc, char *argv[]) {
     Ptr<OutputStreamWrapper> prefixes_failed_file = asciiTraceHelper.CreateFileStream(
             outputNameRoot + "failed_prefixes.txt");
 
-//    if (failure_time > 0) {
-//
-//        if (fail_all_prefixes){
-//
-//            for (auto it : prefixes) {
-//                NetDeviceContainer link = it->second.link;
-//
-//                NS_LOG_DEBUG("Scheduling prefix fail: " << it->first);
-//
-//                *(prefixes_failed_file->GetStream()) << it->first << "\n";
-//                prefixes_failed_file->GetStream()->flush();
-//
-//                Simulator::Schedule(Seconds(failure_time), &FailLink, link);
-//            }
-//
-//        }
-//        else{
-//            for (auto prefix_to_fail: prefix_failures) {
-//
-//                NetDeviceContainer link = prefixes[prefix_to_fail->first].link;
-//                NS_LOG_DEBUG("Scheduling prefix fail: " << prefix_to_fail->first);
-//
-//                *(prefixes_failed_file->GetStream()) << prefix_to_fail->first << "\n";
-//                prefixes_failed_file->GetStream()->flush();
-//
-//                for (auto failure: prefix_to_fail->second){
-//
-//                    Simulator::Schedule(Seconds(failure.failure_time), &ChangeLinkDropRate, link, failure.failure_intensity);
-//                    if (failure.failure_recovery_time > 0) {
-//                        //set back to loss level
-//                        Simulator::Schedule(Seconds(failure.failure_time), &ChangeLinkDropRate, link,
-//                                            prefixes[prefix_to_fail->first].features.loss);
-//                    }
-//                }
-//            }
-//        }
-//    }
+    if (failure_time > 0) {
+
+        if (fail_all_prefixes){
+
+            for (auto it : prefixes) {
+                NetDeviceContainer link = it.second.link;
+
+                NS_LOG_DEBUG("Scheduling prefix fail: " << it.first);
+
+                *(prefixes_failed_file->GetStream()) << it.first << "\n";
+                prefixes_failed_file->GetStream()->flush();
+
+                Simulator::Schedule(Seconds(failure_time), &FailLink, link);
+            }
+
+        }
+        else{
+            for (auto prefix_to_fail: prefix_failures) {
+
+                NetDeviceContainer link = prefixes[prefix_to_fail.first].link;
+                NS_LOG_DEBUG("Scheduling prefix fail: " << prefix_to_fail.first);
+
+                *(prefixes_failed_file->GetStream()) << prefix_to_fail.first << "\n";
+                prefixes_failed_file->GetStream()->flush();
+
+                for (auto failure: prefix_to_fail.second){
+
+                    Simulator::Schedule(Seconds(failure.failure_time), &ChangeLinkDropRate, link, failure.failure_intensity);
+                    if (failure.recovery_time != -1) {
+                        //set back to loss level
+                        Simulator::Schedule(Seconds(failure.failure_time), &ChangeLinkDropRate, link,
+                                            prefixes[prefix_to_fail.first].features.loss);
+                    }
+                }
+            }
+        }
+    }
 
     //Simulation Starts
 
