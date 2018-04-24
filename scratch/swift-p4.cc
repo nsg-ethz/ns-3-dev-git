@@ -158,7 +158,7 @@ main(int argc, char *argv[]) {
     //Timeout calculations (in milliseconds)
     std::string outputNameRoot = outputDir;
 
-    outputNameRoot = outputNameRoot + simulationName + "_" + std::string(run.str()) + "/";
+    outputNameRoot = outputNameRoot + simulationName + "/";
     system(("mkdir -p " + outputNameRoot).c_str());
 
     //copy input files that should go to output
@@ -168,8 +168,12 @@ main(int argc, char *argv[]) {
     system(("cp " + inputDir + "rtt_cdfs.txt " + outputNameRoot + "rtt_cdfs.txt").c_str());
 
     //Copy faliure files to output
-    system(("cp " + inputDir + prefixes_failures_file + " " + outputNameRoot + prefixes_failures_file).c_str());
-    system(("cp " + inputDir + prefixes_features_file + " " + outputNameRoot + prefixes_features_file).c_str());
+    if (prefixes_failures_file != ""){
+        system(("cp " + inputDir + prefixes_failures_file + " " + outputNameRoot + prefixes_failures_file).c_str());
+    }
+    if (prefixes_features_file != ""){
+        system(("cp " + inputDir + prefixes_features_file + " " + outputNameRoot + prefixes_features_file).c_str());
+    }
 
     //TCP
     uint16_t rtt = 200;
@@ -231,9 +235,14 @@ main(int argc, char *argv[]) {
     p2p.SetChannelAttribute("Delay", TimeValue(MicroSeconds(network_delay)));
     p2p.SetDeviceAttribute("Mtu", UintegerValue(1500));
 
-    p2p.SetQueue("ns3::DropTailQueue", "Mode", StringValue("QUEUE_MODE_PACKETS"));
-    p2p.SetQueue("ns3::DropTailQueue", "MaxPackets", UintegerValue(queue_size));
+    //This got deprecated
+//    p2p.SetQueue("ns3::DropTailQueue", "Mode", StringValue("QUEUE_MODE_PACKETS"));
+//    p2p.SetQueue("ns3::DropTailQueue", "MaxPackets", UintegerValue(queue_size));
 
+    //New way of setting the queue length and mode
+    std::stringstream queue_size_str;
+    queue_size_str << queue_size << "p";
+    p2p.SetQueue("ns3::DropTailQueue", "MaxSize", StringValue(queue_size_str.str()));
 
     //SIMULATION STARTS
 
@@ -559,7 +568,7 @@ main(int argc, char *argv[]) {
                                    prefixes,
                                    prefixes_mappings,
                                    hostToPort,
-                                   inputDir + "prefixes_flow_dist.txt",
+                                   inputDir + "flows_per_prefix.txt",
                                    runStep,
                                    flowsPersec,
                                    duration,
@@ -659,6 +668,7 @@ main(int argc, char *argv[]) {
         printNowMem(1);
         Simulator::Stop(Seconds(stop_time));
     }
+
     Simulator::Run();
 
     *(metadata_file->GetStream()) << "real_time_duration " << (float(clock() - simulation_execution_time) / CLOCKS_PER_SEC) << "\n";
