@@ -172,9 +172,10 @@ namespace ns3 {
 
         std::unordered_map<std::string, prefix_metadata> prefixes;
 
-        for (auto prefix: mappings.trace_set){
+        for (auto prefix: mappings.sim_set){
             prefix_metadata metadata;
             metadata.trace_prefix = mappings.sim_to_trace[prefix];
+            std::cout << metadata.trace_prefix << "\n";
 
             //Only if it was provided, otherwise we use default features (all 0)
             if (trace_prefixes_features.find(metadata.trace_prefix) != trace_prefixes_features.end()){
