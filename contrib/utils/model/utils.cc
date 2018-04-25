@@ -415,11 +415,11 @@ void printMemUsage(double delay){
 	Simulator::Schedule (Seconds(delay), &printMemUsage, delay);
 }
 
-void printNowMem(double delay){
+void printNowMem(double delay, std::clock_t starting_time){
 
-	std::cout  <<"Simulation Time: " << Simulator::Now().GetSeconds()
+	std::cout  <<"Simulation Time: " << Simulator::Now().GetSeconds() << "(" << (float(clock() - starting_time) / CLOCKS_PER_SEC) << ")"
 									  << "\t Memory Used: " << GetMemoryUsed() <<"\n";
-	Simulator::Schedule (Seconds(delay), &printNowMem, delay);
+	Simulator::Schedule (Seconds(delay), &printNowMem, delay, starting_time);
 }
 
 void saveNow(double delay, Ptr<OutputStreamWrapper> file){
@@ -486,7 +486,7 @@ double find_closest(std::vector<double> vect, double value){
 		return vect.back();
 	}
 	else{
-		NS_LOG_DEBUG(*(it-1) << " " << std::abs(value - *(it-1)) << " " << *it << " " << std::abs(value - *(it)) << "\n");
+		//NS_LOG_DEBUG(*(it-1) << " " << std::abs(value - *(it-1)) << " " << *it << " " << std::abs(value - *(it)) << "\n");
 		if (std::abs(value - *(it-1)) <= std::abs( value - *it)){
 			return *(it-1);
 		}

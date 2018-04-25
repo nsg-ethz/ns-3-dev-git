@@ -60,7 +60,7 @@ namespace ns3 {
             Ptr<Node> dst = prefixes[flow.prefix].server;
 
             NS_LOG_DEBUG(
-                    "Flow Features:" << "          Real_rtt: " << flow.rtt
+                    "Flow Features:    " << "\tReal_rtt: " << flow.rtt
                                      << "\tRtt Found: " << rtt
                                      << "\tSrc: " << GetNodeName(src)  << "(" << GetNodeIp(src) << ")"
                                      << "\tDst: " << GetNodeName(dst)  << "(" << GetNodeIp(dst) << ")");

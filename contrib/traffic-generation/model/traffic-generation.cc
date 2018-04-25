@@ -114,9 +114,14 @@ void installRateSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint3
 
   uint64_t bytes_per_period = uint64_t(avg_size_per_packet);
 
+  NS_LOG_DEBUG("Flow Features:    " << "\tNumber Packets: " << n_packets
+                                << "\t Bytes To send: " <<  max_size
+                                << "\t Duration: " << duration);
+
   NS_LOG_DEBUG("Install Rate Send: " << "\tBytes per sec: " << bytes_per_sec
                                      << "\t Avg Pkt Size: " <<  avg_size_per_packet
-                                     << "\t Interval Duration: " << interval_duration);
+                                     << "\t Interval Duration: " << interval_duration
+                                     << "\t Packets Per Second: " << 1/interval_duration << "\n");
 
   rate_send_app->SetAttribute("MaxBytes", UintegerValue(max_size));
   rate_send_app->SetAttribute("BytesPerInterval", UintegerValue(bytes_per_period));

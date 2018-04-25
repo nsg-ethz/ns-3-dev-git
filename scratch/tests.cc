@@ -54,11 +54,11 @@ NS_LOG_COMPONENT_DEFINE ("test");
 int
 main(int argc, char *argv[]) {
 
-    return 0;
 
     ip_mask address = GetIpMask("192.168.1.0/24");
     std::cout << address.ip << "\n" << address.mask << "\n";
-
+    NS_LOG_UNCOND("TEST\n");
+    return 0;
 
     //Load Subnetwork Prefix mappings
     prefix_mappings mappings = GetSubnetworkPrefixMappings("/home/cedgar/traffic-generator/inputs/caida_dirA/subnetwork_prefixes.txt", "Subnetwork_0");

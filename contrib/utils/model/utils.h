@@ -12,6 +12,7 @@
 
 #include "sys/types.h"
 #include "sys/sysinfo.h"
+#include <ctime>
 
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
@@ -125,7 +126,7 @@ namespace ns3 {
 
     void printMemUsage(double delay);
 
-    void printNowMem(double delay);
+    void printNowMem(double delay, std::clock_t starting_time);
 
     void saveNow(double delay, Ptr<OutputStreamWrapper> file);
 

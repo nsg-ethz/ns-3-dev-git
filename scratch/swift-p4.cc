@@ -260,18 +260,18 @@ main(int argc, char *argv[]) {
         }
     }
 
-    if (debug) {
-        NS_LOG_DEBUG("Reading RTT CDF file: ");
-        std::cout << "Rtt to src length: " << src_rtts.size() << "\n";
-        for (const auto &e : src_rtts) {
-            std::cout << "Rtt(s): " << e << " Link Delay(s): " << e / 2 << "\n";
-        }
-    }
+//    if (debug) {
+//        NS_LOG_DEBUG("Reading RTT CDF file: ");
+//        std::cout << "Rtt to src length: " << src_rtts.size() << "\n";
+//        for (const auto &e : src_rtts) {
+//            std::cout << "Rtt(s): " << e << " Link Delay(s): " << e / 2 << "\n";
+//        }
+//    }
 
     //Load Subnetwork Prefix mappings
     prefix_mappings prefixes_mappings = GetSubnetworkPrefixMappings(inputDir + "subnetwork_prefixes.txt", simulationName);
 
-    NS_LOG_DEBUG("Prefix Sizes: \n");
+    NS_LOG_DEBUG("Prefix Sizes:");
     NS_LOG_DEBUG("Unique Different Prefixes: " << prefixes_mappings.trace_set.size());
     NS_LOG_DEBUG("Simulation Different Prefixes: " << prefixes_mappings.sim_set.size());
 
@@ -367,14 +367,13 @@ main(int argc, char *argv[]) {
         //Assign host name, and add it to the names system
         std::stringstream host_name;
         host_name << "s_" << host_count;
-        NS_LOG_DEBUG("Naming Host: " << host_name.str());
+        //NS_LOG_DEBUG("Naming Host: " << host_name.str());
         Names::Add(host_name.str(), (*host));
 
         //save delay in file
         *(sender_to_delay_file->GetStream()) << host_name.str() << " "  << interface_delay << "\n";
 
         //add link host-> sw1
-        NS_LOG_DEBUG("Link Add: " << host_name.str() << " -> " << GetNodeName(sw1));
         links[host_name.str() + "->" + GetNodeName(sw1)] = p2p.Install(NodeContainer(*host, sw1));
 
         //Set delay from rtt_cdf /2
@@ -389,7 +388,7 @@ main(int argc, char *argv[]) {
                                   << GetNodeName(sw1)
                                   << " delay(s):"
                                   << interface_delay
-                                  << " bandiwdth(bps)"
+                                  << " bandiwdth: "
                                   << sendersBandwidth);
 
         //Assign IP
@@ -411,12 +410,12 @@ main(int argc, char *argv[]) {
         }
     }
 
-    NS_LOG_DEBUG("Rtt to src length: " << senders_latency_to_node.size());
-    if (debug){
-        for(auto it = senders_latency_to_node.begin(); it != senders_latency_to_node.end(); it++){
-            NS_LOG_DEBUG("rtt: " << it->first << " " << it->second.size() << "\n");
-        }
-    }
+//    NS_LOG_DEBUG("Rtt to src length: " << senders_latency_to_node.size());
+//    if (debug){
+//        for(auto it = senders_latency_to_node.begin(); it != senders_latency_to_node.end(); it++){
+//            NS_LOG_DEBUG("rtt: " << it->first << " " << it->second.size() << "\n");
+//        }
+//    }
 
     //Receivers
     int dst_index = 0;
@@ -424,7 +423,7 @@ main(int argc, char *argv[]) {
 
         std::stringstream host_name;
         host_name << "p_" << dst_index;
-        NS_LOG_DEBUG("Naming Host: " << host_name.str());
+        //NS_LOG_DEBUG("Naming Host: " << host_name.str());
         Names::Add(host_name.str(), receivers.Get(dst_index));
 
         //Add link sw2->host
@@ -442,7 +441,7 @@ main(int argc, char *argv[]) {
                                   << host_name.str()
                                   << " delay(ms):"
                                   << network_delay
-                                  << " bandiwdth(bps)"
+                                  << " bandiwdth:"
                                   << sendersBandwidth);
 
         //Update prefixes object
@@ -673,7 +672,7 @@ main(int argc, char *argv[]) {
     if (stop_time != 0) {
         //We schedule it here otherwise simulations never finish
         std::cout <<"\n";
-        printNowMem(1);
+        printNowMem(1, simulation_execution_time);
         Simulator::Stop(Seconds(stop_time));
     }
 
