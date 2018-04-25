@@ -111,6 +111,8 @@ main(int argc, char *argv[]) {
     //Experiment
     cmd.AddValue("QueueSize", "Interfaces Queue length", queue_size);
     cmd.AddValue("RunStep", "Random generator starts at", runStep);
+    cmd.AddValue("EnablePcap", "Save traffic in a pcap file", save_pcap);
+
 
     cmd.Parse(argc, argv);
 
@@ -300,108 +302,34 @@ main(int argc, char *argv[]) {
         tch.Uninstall(it.second);
     }
 
-    //DEBUG FEATURE
-    //Create a ip to node mapping, saves the ip to name for debugging
-    std::unordered_map<std::string, Ptr<Node>> ipToNode;
-
-    for (uint32_t host_i = 0; host_i < senders.GetN(); host_i++) {
-        Ptr<Node> host = senders.Get(host_i);
-        ipToNode[ipv4AddressToString(GetNodeIp(host))] = host;
-    }
-    for (uint32_t host_i = 0; host_i < receivers.GetN(); host_i++) {
-        Ptr<Node> host = receivers.Get(host_i);
-        ipToNode[ipv4AddressToString(GetNodeIp(host))] = host;
-    }
-    //Store in a file ip -> node name
-    Ptr<OutputStreamWrapper> ipToName_file = asciiTraceHelper.CreateFileStream(outputNameRoot + "ip_to_name.txt");
-    for (auto it = ipToNode.begin(); it != ipToNode.end(); it++) {
-        *(ipToName_file->GetStream()) << it->first << " " << GetNodeName(it->second) << "\n";
-    }
-    ipToName_file->GetStream()->flush();
-
-    //Saving metadata file with simulation configurations
-    Ptr<OutputStreamWrapper> metadata_file = asciiTraceHelper.CreateFileStream(outputNameRoot + "metadata.txt");
-    *(metadata_file->GetStream()) << "simulation_name " << simulationName << "\n";
-    *(metadata_file->GetStream()) << "run_step " << runStep << "\n";
-    *(metadata_file->GetStream()) << "duration " << duration << "\n";
-    *(metadata_file->GetStream()) << "failure_time " << failure_time << "\n";
-    *(metadata_file->GetStream()) << "flows_per_sec " << flowsPersec << "\n";
-    *(metadata_file->GetStream()) << "input_dir " << inputDir << "\n";
-    *(metadata_file->GetStream()) << "output_dir " << outputDir << "\n";
-    *(metadata_file->GetStream()) << "queue_size " << queue_size << "\n";
-    *(metadata_file->GetStream()) << "network_bw " << networkBandwidth << "\n";
-    *(metadata_file->GetStream()) << "senders_bw " << sendersBandwidth << "\n";
-    *(metadata_file->GetStream()) << "receivers_bw " << receiversBandwidth << "\n";
-    *(metadata_file->GetStream()) << "emulated_congestion_on " << enable_uniform_loss << "\n";
-    *(metadata_file->GetStream()) << "prefixes_loss " << prefixes_loss << "\n";
-    *(metadata_file->GetStream()) << "rtt_cdf_size " << src_rtts.size() << "\n";
-    *(metadata_file->GetStream()) << "num_senders " << num_senders << "\n";
-    *(metadata_file->GetStream()) << "num_receivers " << num_receivers << "\n";
-    *(metadata_file->GetStream()) << "prefixes " << prefixes.size() << "\n";
-    *(metadata_file->GetStream()) << "prefixes_failed " << prefix_failures.size() << "\n";
-    *(metadata_file->GetStream()) << "rtt_shift " << rtt_shift << "\n";
-    metadata_file->GetStream()->flush();
-
-    NS_LOG_DEBUG("Time To Set Hosts: " << float(clock() - begin_time) / CLOCKS_PER_SEC);
-
-    //Populate tables
-    begin_time = std::clock();
-
     Ipv4GlobalRoutingHelper::PopulateRoutingTables();
-    float routing_time = float(clock() - begin_time) / CLOCKS_PER_SEC;
-    *(metadata_file->GetStream()) << "routing_time " << routing_time << "\n";
-    metadata_file->GetStream()->flush();
-    NS_LOG_DEBUG("Time Installing Routes: " << routing_time);
 
     //START TRAFFIC
     //Install Traffic sinks at receivers
 
     NS_LOG_DEBUG("Starting Sinks");
-    begin_time = std::clock();
 
-    std::unordered_map<std::string, std::vector<uint16_t>> hostToPort = installSinks(receivers, 35, 0, "TCP");
-
-    NS_LOG_DEBUG("Time Starting Sinks: " << float(clock() - begin_time) / CLOCKS_PER_SEC);
+    std::unordered_map<std::string, std::vector<uint16_t>> hostToPort = installSinks(receivers, 5, 0, "TCP");
 
 
     NS_LOG_DEBUG("Starting Traffic Scheduling");
-    begin_time = std::clock();
 
-    NodesUsage nodes_usage = NodesUsage();
+//    nodes_usage = sendSwiftTraffic(senders_latency_to_node,
+//                                   src_rtts,
+//                                   prefixes,
+//                                   prefixes_mappings,
+//                                   hostToPort,
+//                                   inputDir + "flows_per_prefix.txt",
+//                                   runStep,
+//                                   flowsPersec,
+//                                   duration,
+//                                   rtt_shift);
 
-//    std::cout << "Rtt to src length: " << senders_latency_to_node.size() << "\n";
-//    for(auto it = senders_latency_to_node.begin(); it != senders_latency_to_node.end(); it++){
-//        std::cout << "rtt: " << it->first << " " << it->second.size() << "\n";
-//    }
 
-    nodes_usage = sendSwiftTraffic(senders_latency_to_node,
-                                   src_rtts,
-                                   prefixes,
-                                   prefixes_mappings,
-                                   hostToPort,
-                                   inputDir + "flows_per_prefix.txt",
-                                   runStep,
-                                   flowsPersec,
-                                   duration,
-                                   rtt_shift);
-
-    //save ranks
-    nodes_usage.save(outputNameRoot + "bytes", false, true);
-
-    std::vector<usage_struct> receivers_vector = nodes_usage.getReceiversVector();
-    float time_scheduling_traffic = float(clock() - begin_time) / CLOCKS_PER_SEC;
-    *(metadata_file->GetStream()) << "time_scheduling_traffic " << time_scheduling_traffic << "\n";
-    metadata_file->GetStream()->flush();
-    NS_LOG_DEBUG("Time Scheduling: " << time_scheduling_traffic);
-
-    //Senders function
     //////////////////
     //TRACES
     ///////////////////
 
-    //Capture traffic between sw1 and sw2 at the first switch.
-//  p2p.EnablePcap(outputNameRoot, links[GetNodeName(sw1)+"->"+GetNodeName(sw2)].Get(0), bool(1));
-//
 //  //Only save TX traffic
     if (save_pcap) {
 
@@ -416,74 +344,12 @@ main(int argc, char *argv[]) {
                                                                                                                pcap_file));
     }
 
-    NS_LOG_DEBUG("Total Bytes Received By Servers: " << nodes_usage.get_total_rx());
-
-
-
-    //TODO: DO this better and cleaner
-    //Schedule Prefixes to fail
-
-    Ptr<OutputStreamWrapper> prefixes_failed_file = asciiTraceHelper.CreateFileStream(
-            outputNameRoot + "failed_prefixes.txt");
-
-    //we ignore what the prefix file says and we fail all the prefixes at failure_time.
-    if (fail_all_prefixes){
-
-        if (failure_time > 0) {
-            for (auto it : prefixes) {
-                NetDeviceContainer link = it.second.link;
-
-                NS_LOG_DEBUG("Scheduling prefix fail: " << it.first);
-
-                *(prefixes_failed_file->GetStream()) << it.first << "\n";
-                prefixes_failed_file->GetStream()->flush();
-
-                Simulator::Schedule(Seconds(failure_time), &FailLink, link);
-            }
-        }
-    }
-
-    else{
-        for (auto prefix_to_fail: prefix_failures) {
-
-            NetDeviceContainer link = prefixes[prefix_to_fail.first].link;
-            NS_LOG_DEBUG("Scheduling prefix fail: " << prefix_to_fail.first);
-
-            *(prefixes_failed_file->GetStream()) << prefix_to_fail.first << "\n";
-            prefixes_failed_file->GetStream()->flush();
-
-            //IF there is no events and the default duration was provided we use that
-            if (prefix_to_fail.second.size() == 0 and failure_time > 0){
-                Simulator::Schedule(Seconds(failure_time), &FailLink, link);
-                continue;
-            }
-
-            for (auto failure: prefix_to_fail.second){
-                if (failure.failure_time > 0 ){
-                    Simulator::Schedule(Seconds(failure.failure_time), &ChangeLinkDropRate, link, failure.failure_intensity);
-                }
-                if (failure.recovery_time > 0) {
-                    //set back to loss level
-                    Simulator::Schedule(Seconds(failure.failure_time), &ChangeLinkDropRate, link,
-                                        prefixes[prefix_to_fail.first].features.loss);
-                }
-            }
-        }
-    }
 
     //Simulation Starts
 
-    if (stop_time != 0) {
-        //We schedule it here otherwise simulations never finish
-        std::cout <<"\n";
-        printNowMem(1, simulation_execution_time);
-        Simulator::Stop(Seconds(stop_time));
-    }
 
+    Simulator::Stop(Seconds(stop_time));
     Simulator::Run();
-
-    *(metadata_file->GetStream()) << "real_time_duration " << (float(clock() - simulation_execution_time) / CLOCKS_PER_SEC) << "\n";
-    metadata_file->GetStream()->flush();
     Simulator::Destroy();
 
     return 0;
