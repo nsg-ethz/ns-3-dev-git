@@ -65,44 +65,30 @@ int
 main(int argc, char *argv[]) {
 
     //INITIALIZATION
-    std::clock_t simulation_execution_time = std::clock();
-
 
     //Set simulator's time resolution (click)
     Time::SetResolution(Time::NS);
 
     //Fat tree parameters
-    DataRate networkBandwidth("100Gbps");
-    DataRate sendersBandwidth("4Gbps");
-    DataRate receiversBandwidth("4Gbps");
+    DataRate sendersBandwidth("10Mbps");
+    DataRate receiversBandwidth("10Mbps");
+    DataRate networkBandwidth("10Mbps");
 
     //Command line arguments
     std::string simulationName = "test";
     std::string outputDir = "outputs/";
 
     std::string inputDir = "swift_datasets/test/";
-    std::string prefixes_failures_file = "";
-    std::string prefixes_features_file = "";
 
     uint16_t queue_size = 1000;
     uint64_t runStep = 1;
-    double rtt_shift = 1;
 
-    bool enable_uniform_loss = false;
-    double prefixes_loss = 0;
     uint64_t network_delay = 1; //ns?
-    uint16_t num_hosts_per_rtt = 1;
-    uint16_t num_servers_per_prefix = 1;
     uint32_t flowsPersec = 100;
     double duration = 5;
-    double failure_time = 0;
-    double stop_time = 0;
-    bool debug = false;
     bool save_pcap = false;
-    bool fail_all_prefixes = false;
 
     CommandLine cmd;
-
     //General
     //Links properties
     cmd.AddValue("LinkBandwidth", "Bandwidth of link, used in multiple experiments", networkBandwidth);
@@ -112,7 +98,6 @@ main(int argc, char *argv[]) {
     cmd.AddValue("QueueSize", "Interfaces Queue length", queue_size);
     cmd.AddValue("RunStep", "Random generator starts at", runStep);
     cmd.AddValue("EnablePcap", "Save traffic in a pcap file", save_pcap);
-
 
     cmd.Parse(argc, argv);
 
@@ -126,7 +111,7 @@ main(int argc, char *argv[]) {
     //Timeout calculations (in milliseconds)
     std::string outputNameRoot = outputDir;
 
-    outputNameRoot = outputNameRoot + simulationName + "/";
+    outputNameRoot = outputNameRoot + "/";
 
     //TCP
     uint16_t rtt = 200;
@@ -193,7 +178,6 @@ main(int argc, char *argv[]) {
     p2p.SetQueue("ns3::DropTailQueue", "MaxSize", StringValue(queue_size_str.str()));
 
     //SIMULATION STARTS
-    std::clock_t begin_time = std::clock();
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -208,7 +192,7 @@ main(int argc, char *argv[]) {
     senders.Create(num_senders);
 
     NodeContainer receivers;
-    senders.Create(num_receivers);
+    receivers.Create(num_receivers);
 
     //naming
 
@@ -241,7 +225,7 @@ main(int argc, char *argv[]) {
     // Install Internet stack : aggregate ipv4 udp and tcp implementations to nodes
     InternetStackHelper stack;
     stack.Install(senders);
-    stack.Install(d1);
+    stack.Install(receivers);
     stack.Install(sw1);
     stack.Install(sw2);
 
@@ -286,9 +270,9 @@ main(int argc, char *argv[]) {
 
     }
     //Receivers
-    for (auto host = receivers.begin(); it != receivers.end(); host++) {
+    for (NodeContainer::Iterator host = receivers.Begin(); host != receivers.End(); host++) {
 
-        links[GetNodeName(sw2) + "->" + GetNodeName(*host)] = p2p.Install(NodeContainer(sw2, receivers.Get(*host)));
+        links[GetNodeName(sw2) + "->" + GetNodeName(*host)] = p2p.Install(NodeContainer(sw2, GetNodeName(*host)));
         links[GetNodeName(sw2) + "->" + GetNodeName(*host)].Get(0)->SetAttribute("DataRate", DataRateValue(receiversBandwidth));
         address.Assign(links[GetNodeName(sw2) + "->" + GetNodeName(*host)]);
         address.NewNetwork();
@@ -308,23 +292,20 @@ main(int argc, char *argv[]) {
     //Install Traffic sinks at receivers
 
     NS_LOG_DEBUG("Starting Sinks");
-
-    std::unordered_map<std::string, std::vector<uint16_t>> hostToPort = installSinks(receivers, 5, 0, "TCP");
-
-
+    std::unordered_map<std::string, std::vector<uint16_t>> hostsToPorts = installSinks(receivers, 10, 0, "TCP");
     NS_LOG_DEBUG("Starting Traffic Scheduling");
 
-//    nodes_usage = sendSwiftTraffic(senders_latency_to_node,
-//                                   src_rtts,
-//                                   prefixes,
-//                                   prefixes_mappings,
-//                                   hostToPort,
-//                                   inputDir + "flows_per_prefix.txt",
-//                                   runStep,
-//                                   flowsPersec,
-//                                   duration,
-//                                   rtt_shift);
+    for (NodeContainer::Iterator host = senders.Begin(); host != senders.End(); host++){
 
+        for (int l =0 ; l < 5; l++) {
+
+            Ptr<Node> dst = receivers.Get(random_variable->GetInteger(0, receivers.GetN() - 1));
+            std::vector<uint16_t> availablePorts = hostsToPorts[GetNodeName(dst)];
+            uint16_t dport = randomFromVector<uint16_t>(availablePorts);
+            installNormalBulkSend(*host, dst, dport, 125000000, random_variable->GetInteger(1, 3));
+        }
+
+    }
 
     //////////////////
     //TRACES
@@ -348,7 +329,7 @@ main(int argc, char *argv[]) {
     //Simulation Starts
 
 
-    Simulator::Stop(Seconds(stop_time));
+    Simulator::Stop(Seconds(100));
     Simulator::Run();
     Simulator::Destroy();
 
