@@ -61,6 +61,15 @@ NS_LOG_COMPONENT_DEFINE (fileNameRoot);
 const char *file_name = g_log.Name();
 std::string script_name = file_name;
 
+
+void ChangeLinkBandwidth(double delay, NetDeviceContainer link, DataRate previous_rate, DataRate next_rate){
+
+  link.Get(0)->SetAttribute("DataRate", DataRateValue(next_rate));
+  link.Get(1)->SetAttribute("DataRate", DataRateValue(next_rate));
+  Simulator::Schedule(Seconds(delay), &ChangeLinkBandwidth, delay, link, next_rate, previous_rate);
+  
+}
+
 int
 main(int argc, char *argv[]) {
 
@@ -70,9 +79,9 @@ main(int argc, char *argv[]) {
     Time::SetResolution(Time::NS);
 
     //Fat tree parameters
-    DataRate sendersBandwidth("10Mbps");
-    DataRate receiversBandwidth("10Mbps");
-    DataRate networkBandwidth("10Mbps");
+    DataRate sendersBandwidth("25Mbps");
+    DataRate receiversBandwidth("100Mbps");
+    DataRate networkBandwidth("100Mbps");
 
     //Command line arguments
     std::string simulationName = "test";
@@ -297,7 +306,7 @@ main(int argc, char *argv[]) {
 
     for (NodeContainer::Iterator host = senders.Begin(); host != senders.End(); host++){
 
-        for (int l =0 ; l < 5; l++) {
+        for (int l =0 ; l < 2; l++) {
 
             Ptr<Node> dst = receivers.Get(random_variable->GetInteger(0, receivers.GetN() - 1));
             std::vector<uint16_t> availablePorts = hostsToPorts[GetNodeName(dst)];
@@ -306,6 +315,10 @@ main(int argc, char *argv[]) {
         }
 
     }
+
+    //set repetitive event.
+    NetDeviceContainer link = links[GetNodeName(sw1) + "->" + GetNodeName(sw2)];
+    ChangeLinkBandwidth(5, link, networkBandwidth, DataRate("5Mbps"));
 
     //////////////////
     //TRACES
@@ -329,7 +342,7 @@ main(int argc, char *argv[]) {
     //Simulation Starts
 
 
-    Simulator::Stop(Seconds(100));
+    Simulator::Stop(Seconds(10000));
     Simulator::Run();
     Simulator::Destroy();
 
