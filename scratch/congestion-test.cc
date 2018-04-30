@@ -62,11 +62,11 @@ const char *file_name = g_log.Name();
 std::string script_name = file_name;
 
 
-void ChangeLinkBandwidth(double delay, NetDeviceContainer link, DataRate previous_rate, DataRate next_rate){
+void ChangeLinkBandwidth(NetDeviceContainer link, DataRate rate){
 
-  link.Get(0)->SetAttribute("DataRate", DataRateValue(next_rate));
-  link.Get(1)->SetAttribute("DataRate", DataRateValue(next_rate));
-  Simulator::Schedule(Seconds(delay), &ChangeLinkBandwidth, delay, link, next_rate, previous_rate);
+  link.Get(0)->SetAttribute("DataRate", DataRateValue(rate));
+  link.Get(1)->SetAttribute("DataRate", DataRateValue(rate));
+  //Simulator::Schedule(Seconds(delay), &ChangeLinkBandwidth, delay, link, next_rate, previous_rate);
   
 }
 
@@ -79,20 +79,21 @@ main(int argc, char *argv[]) {
     Time::SetResolution(Time::NS);
 
     //Fat tree parameters
-    DataRate sendersBandwidth("25Mbps");
-    DataRate receiversBandwidth("100Mbps");
-    DataRate networkBandwidth("100Mbps");
+    DataRate sendersBandwidth("10Mbps");
+    DataRate receiversBandwidth("10Mbps");
+    DataRate networkBandwidth("10Mbps");
 
     //Command line arguments
     std::string simulationName = "test";
     std::string outputDir = "outputs/";
+    std::string pcap_name = "tx";
 
     std::string inputDir = "swift_datasets/test/";
 
     uint16_t queue_size = 1000;
     uint64_t runStep = 1;
 
-    uint64_t network_delay = 1; //ns?
+    uint64_t network_delay = 10; //ns?
     uint32_t flowsPersec = 100;
     double duration = 5;
     bool save_pcap = false;
@@ -107,6 +108,7 @@ main(int argc, char *argv[]) {
     cmd.AddValue("QueueSize", "Interfaces Queue length", queue_size);
     cmd.AddValue("RunStep", "Random generator starts at", runStep);
     cmd.AddValue("EnablePcap", "Save traffic in a pcap file", save_pcap);
+    cmd.AddValue("PcapName", "Save traffic in a pcap file", pcap_name);
 
     cmd.Parse(argc, argv);
 
@@ -178,7 +180,7 @@ main(int argc, char *argv[]) {
 
 //   create point-to-point link from A to R
     p2p.SetDeviceAttribute("DataRate", DataRateValue(DataRate(networkBandwidth)));
-    p2p.SetChannelAttribute("Delay", TimeValue(MicroSeconds(network_delay)));
+    p2p.SetChannelAttribute("Delay", TimeValue(MilliSeconds(network_delay)));
     p2p.SetDeviceAttribute("Mtu", UintegerValue(1500));
 
      //New way of setting the queue length and mode
@@ -249,7 +251,8 @@ main(int argc, char *argv[]) {
     links[GetNodeName(sw1) + "->" + GetNodeName(sw2)] = p2p.Install(NodeContainer(sw1, sw2));
     //Set delay and bandwdith
     links[GetNodeName(sw1) + "->" + GetNodeName(sw2)].Get(0)->GetChannel()->SetAttribute("Delay", TimeValue(
-            NanoSeconds(network_delay)));
+            MilliSeconds(network_delay)));
+
     links[GetNodeName(sw1) + "->" + GetNodeName(sw2)].Get(0)->SetAttribute("DataRate", DataRateValue(networkBandwidth));
 
     NS_LOG_DEBUG("Link Add: " << GetNodeName(sw1)
@@ -296,7 +299,6 @@ main(int argc, char *argv[]) {
     }
 
     Ipv4GlobalRoutingHelper::PopulateRoutingTables();
-
     //START TRAFFIC
     //Install Traffic sinks at receivers
 
@@ -311,14 +313,28 @@ main(int argc, char *argv[]) {
             Ptr<Node> dst = receivers.Get(random_variable->GetInteger(0, receivers.GetN() - 1));
             std::vector<uint16_t> availablePorts = hostsToPorts[GetNodeName(dst)];
             uint16_t dport = randomFromVector<uint16_t>(availablePorts);
-            installNormalBulkSend(*host, dst, dport, 125000000, random_variable->GetInteger(1, 3));
+            installNormalBulkSend(*host, dst, dport, 80000000, random_variable->GetInteger(1, 3));
+            break;
         }
-
+        break;
     }
 
     //set repetitive event.
     NetDeviceContainer link = links[GetNodeName(sw1) + "->" + GetNodeName(sw2)];
-    ChangeLinkBandwidth(5, link, networkBandwidth, DataRate("5Mbps"));
+    //ChangeLinkBandwidth(0.5, link, networkBandwidth, DataRate("1Mbps"));
+
+//    for (int i = 0; i <100; i++){
+//        Simulator::Schedule(Seconds(i), &ChangeLinkDropRate , link,  0.8);
+//        Simulator::Schedule(Seconds(i+0.5), &ChangeLinkDropRate, link,  0);
+//    }
+
+//    for (int i = 0; i <200; i++){
+//        Simulator::Schedule(Seconds(i), &ChangeLinkBandwidth , link,  DataRate("10Mbps"));
+//        Simulator::Schedule(Seconds(i+0.5), &ChangeLinkBandwidth, link,  DataRate("1Mbps"));
+//    }
+
+    //Simulator::Schedule(Seconds(10), &ChangeLinkBandwidth , link,  DataRate("1Mbps"));
+    //Simulator::Schedule(Seconds(20), &ChangeLinkBandwidth, link,  DataRate("10Mbps"));
 
     //////////////////
     //TRACES
@@ -331,17 +347,18 @@ main(int argc, char *argv[]) {
 
         PcapHelper pcapHelper;
         Ptr<PcapFileWrapper> pcap_file = pcapHelper.CreateFile(
-                outputNameRoot + "tx.pcap", std::ios::out,
+                outputNameRoot + pcap_name + ".pcap", std::ios::out,
                 PcapHelper::DLT_PPP);
         links[GetNodeName(sw1) + "->" + GetNodeName(sw2)].Get(0)->TraceConnectWithoutContext("PhyTxBegin",
+                                                                                             MakeBoundCallback(&TracePcap,
+                                                                                                               pcap_file));
+        links[GetNodeName(sw1) + "->" + GetNodeName(sw2)].Get(1)->TraceConnectWithoutContext("PhyTxBegin",
                                                                                              MakeBoundCallback(&TracePcap,
                                                                                                                pcap_file));
     }
 
 
     //Simulation Starts
-
-
     Simulator::Stop(Seconds(10000));
     Simulator::Run();
     Simulator::Destroy();

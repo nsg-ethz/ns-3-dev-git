@@ -51,13 +51,50 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("test");
 
+void printNow(void){
+    std::cout << Simulator::Now().GetSeconds() << " " << Simulator::GetContext() << "\n";
+}
+static double
+CbOne (double a, double b)
+{
+    std::cout << "invoke cbOne a=" << a << ", b=" << b << std::endl;
+    return a;
+}
+
+class MyCb {
+public:
+    int CbTwo (double a) {
+        std::cout << "invoke cbTwo a=" << a << std::endl;
+        return -5;
+    }
+};
+
 int
 main(int argc, char *argv[]) {
 
 
-    ip_mask address = GetIpMask("192.168.1.0/24");
-    std::cout << address.ip << "\n" << address.mask << "\n";
-    NS_LOG_UNCOND("TEST\n");
+//    for (int i= 0; i < 100; i++){
+//        //Simulator::Schedule(Seconds(i+1), &printNow);
+//        Simulator::ScheduleNow(&printNow);
+//    }
+
+    Callback<double, double, double> one;
+    one = MakeCallback(&CbOne);
+
+    std::cout << one(10, 20) << "\n";
+
+    Callback<int, double> two;
+    MyCb cb;
+    two  = MakeCallback(&MyCb::CbTwo, &cb);
+
+    std::cout << two(5) << "\n";
+
+    Simulator::Run();
+    Simulator::Destroy();
+
+//    ip_mask address = GetIpMask("192.168.1.0/24");
+//    std::cout << address.ip << "\n" << address.mask << "\n";
+//    NS_LOG_UNCOND("TEST\n");
     return 0;
 
     //Load Subnetwork Prefix mappings
