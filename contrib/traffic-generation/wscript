@@ -10,7 +10,6 @@ def build(bld):
     module = bld.create_ns3_module('traffic-generation', ['core', 'network', 'internet', 'utils', 'applications', 'custom-applications'])
     module.source = [
         'model/traffic-generation.cc',
-        'model/fat-tree-generation.cc',
         'model/swift-generation.cc',
         'helper/traffic-generation-helper.cc',
         ]
@@ -25,7 +24,6 @@ def build(bld):
     headers.source = [
         'model/traffic-generation.h',
         'helper/traffic-generation-helper.h',
-        'model/fat-tree-generation.h',
         'model/swift-generation.h'
         ]
 

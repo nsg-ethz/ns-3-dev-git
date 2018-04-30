@@ -89,9 +89,9 @@ RateSendApplication::RateSendApplication ()
   : m_socket (0),
     m_connected (false),
     m_totBytes (0),
-		m_bytesInBucket(0),
-		m_startTime(0),
-		m_sendingData(false)
+    m_bytesInBucket(0),
+    m_startTime(0),
+    m_sendingData(false)
 {
   NS_LOG_FUNCTION (this);
 }

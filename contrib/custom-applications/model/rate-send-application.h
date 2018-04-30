@@ -142,9 +142,8 @@ private:
 	TypeId m_tid;          //!< The type of protocol to use.
 	double m_startTime;    //!<Starting sending time
 	flow_tuple_rate m_flow_tuple;
-  EventId         m_refillEvent;
-  bool            m_sendingData;
-
+	EventId         m_refillEvent;
+	bool            m_sendingData;
 
 	/// Traced Callback: sent packets
 	TracedCallback<Ptr<const Packet> > m_txTrace;
