@@ -8,18 +8,22 @@
 
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
+#include "ns3/point-to-point-module.h"
+#include "ns3/internet-module.h"
 
-void
-CwndChange(Ptr<OutputStreamWrapper> stream, uint32_t oldCwnd, uint32_t newCwnd);
+namespace ns3 {
 
-void
-TracePcap(Ptr<PcapFileWrapper> file, Ptr<const Packet> packet);
+    void
+    CwndChange(Ptr<OutputStreamWrapper> stream, uint32_t oldCwnd, uint32_t newCwnd);
 
-void
-RxDropAscii(Ptr<OutputStreamWrapper> file, Ptr<const Packet> packet);
+    void
+    TracePcap(Ptr<PcapFileWrapper> file, Ptr<const Packet> packet);
 
-void
-TxDrop(std::string s, Ptr<const Packet> p);
+    void
+    RxDropAscii(Ptr<OutputStreamWrapper> file, Ptr<const Packet> packet);
 
+    void
+    TxDrop(std::string string, Ptr<const Packet> p);
+}
 
 #endif //TRACE_SINKS_H

@@ -82,7 +82,7 @@ namespace ns3 {
 
     double FindClosest(std::vector<double> vect, double value);
 
-    Ptr<Queue<Packet>> GetPointToPointNetDeviceQueue(NetDevice netDevice);
+    //Ptr<Queue<Packet>> GetPointToPointNetDeviceQueue(NetDevice netDevice);
 
     }
 

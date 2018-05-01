@@ -70,7 +70,7 @@ uint64_t BytesFromRate(DataRate dataRate, double time){
 		return bytes;
 }
 
-uint64_t hash_string(std::string message){
+uint64_t HashString(std::string message){
   Hasher hasher;
   hasher.clear();
   return hasher.GetHash64(message);
@@ -160,7 +160,7 @@ GetNodeIp(Ptr<Node> node)
   return Ipv4Address("127.0.0.1");
 }
 
- std::string ipv4AddressToString(Ipv4Address address){
+ std::string Ipv4AddressToString(Ipv4Address address){
 
 	 std::stringstream ip;
 	 ip << address;
@@ -204,8 +204,6 @@ double MeasureInterfaceLoad(Ptr<Queue<Packet>> q,  double next_schedule, std::st
 	double total_load = double(current_counter)/BytesFromRate(DataRate(linkBandwidth), next_schedule);
 	return total_load;
 }
-
-
 
 
 void PrintNow(double delay){
@@ -299,7 +297,7 @@ double FindClosest(std::vector<double> vect, double value){
 	}
 }
 
-Ptr<Queue<Packet>> GetPointToPointNetDeviceQueue(NetDevice netDevice){
+//Ptr<Queue<Packet>> GetPointToPointNetDeviceQueue(NetDevice netDevice){
 
 //	//DynamicCast<PointToPointNetDevice>(netDevice)
 //	Ptr<PointToPointNetDevice> p2pNetDevice = netDevice.GetObject<PointToPointNetDevice>();
@@ -309,7 +307,7 @@ Ptr<Queue<Packet>> GetPointToPointNetDeviceQueue(NetDevice netDevice){
 //	// return tmp.GetObject<Queue<Packet>>();
 //	return p2pNetDevice->GetQueue();
 
-}
+//}
 
 
 }

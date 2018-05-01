@@ -367,7 +367,7 @@ void CustomBulkApplication::SocketNormalClose (Ptr<Socket>)
 					//create 5 tuple
 		std::ostringstream flowIdentification;
 
-		flowIdentification << ipv4AddressToString(m_flow_tuple.srcAddr)<< ":" << m_flow_tuple.srcPort  << "_" << m_flow_tuple.dstAdrr
+		flowIdentification << Ipv4AddressToString(m_flow_tuple.srcAddr)<< ":" << m_flow_tuple.srcPort  << "_" << m_flow_tuple.dstAdrr
 				<< ":" << m_flow_tuple.dstPort << "_" << m_flowId;
 
 		*(m_outputFile->GetStream ()) << flowIdentification.str() << " " << m_maxBytes << " "
@@ -391,7 +391,7 @@ void CustomBulkApplication::SocketNormalClose (Ptr<Socket>)
 		//create 5 tuple
 		std::ostringstream flowIdentification;
 
-		flowIdentification << ipv4AddressToString(m_flow_tuple.srcAddr)<< ":" << m_flow_tuple.srcPort  << "_" << m_flow_tuple.dstAdrr
+		flowIdentification << Ipv4AddressToString(m_flow_tuple.srcAddr)<< ":" << m_flow_tuple.srcPort  << "_" << m_flow_tuple.dstAdrr
 				<< ":" << m_flow_tuple.dstPort << "_" << m_flowId;
 
 		if (m_outputFile != NULL)

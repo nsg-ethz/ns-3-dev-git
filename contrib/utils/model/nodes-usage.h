@@ -8,42 +8,45 @@
 
 #include <unordered_map>
 #include "ns3/core-module.h"
-#include "ns3/network-module.h
+#include "ns3/network-module.h"
 
-struct UsageStruct {
-    std::string name;
-    std::string ipAddr;
-    uint64_t rxFlows;
-    uint64_t txFlows;
-    uint64_t txBytes;
-    uint64_t rxBytes;
-};
+namespace ns3 {
 
-struct LessRxFlows {
-    bool operator()(const UsageStruct &x, const UsageStruct &y) const {
-        return x.rxFlows < y.rxFlows;
-    }
-};
 
-struct LessTxFlows {
-    bool operator()(const UsageStruct &x, const UsageStruct &y) const {
-        return x.txFlows < y.txFlows;
-    }
-};
+    struct UsageStruct {
+        std::string name;
+        std::string ipAddr;
+        uint64_t rxFlows;
+        uint64_t txFlows;
+        uint64_t txBytes;
+        uint64_t rxBytes;
+    };
 
-struct LessRxBytes {
-    bool operator()(const UsageStruct &x, const UsageStruct &y) const {
-        return x.rxBytes < y.rxBytes;
-    }
-};
+    struct LessRxFlows {
+        bool operator()(const UsageStruct &x, const UsageStruct &y) const {
+            return x.rxFlows < y.rxFlows;
+        }
+    };
 
-struct LessTxBytes {
-    bool operator()(const UsageStruct &x, const UsageStruct &y) const {
-        return x.txBytes < y.txBytes;
-    }
-};
+    struct LessTxFlows {
+        bool operator()(const UsageStruct &x, const UsageStruct &y) const {
+            return x.txFlows < y.txFlows;
+        }
+    };
 
-class NodesUsage {
+    struct LessRxBytes {
+        bool operator()(const UsageStruct &x, const UsageStruct &y) const {
+            return x.rxBytes < y.rxBytes;
+        }
+    };
+
+    struct LessTxBytes {
+        bool operator()(const UsageStruct &x, const UsageStruct &y) const {
+            return x.txBytes < y.txBytes;
+        }
+    };
+
+    class NodesUsage {
 
     private:
 
@@ -79,7 +82,8 @@ class NodesUsage {
         /*Saves senders and receivers in two different files. Sorts using: num flows as default */
         void Save(std::string outputFile, bool sortedByFlows = true, bool sortedByBytes = false);
 
-};
+    };
 
+}
 
 #endif //NODES_USAGE_H

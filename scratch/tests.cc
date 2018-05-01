@@ -39,8 +39,7 @@
 #include "ns3/traffic-control-module.h"
 #include "ns3/traffic-generation-module.h"
 #include "ns3/flow-monitor-module.h"
-#include "ns3/utils.h"
-#include "ns3/swift-utils.h"
+#include "ns3/utils-module.h"
 
 #include <iostream>
 #include <unordered_map>
@@ -98,7 +97,7 @@ main(int argc, char *argv[]) {
     return 0;
 
     //Load Subnetwork Prefix mappings
-    prefix_mappings mappings = GetSubnetworkPrefixMappings("/home/cedgar/traffic-generator/inputs/caida_dirA/subnetwork_prefixes.txt", "Subnetwork_0");
+    PrefixMappings mappings = GetSubnetworkPrefixMappings("/home/cedgar/traffic-generator/inputs/caida_dirA/subnetwork_prefixes.txt", "Subnetwork_0");
     std::unordered_map<std::string, prefix_features> features =  GetPrefixFeatures("/home/cedgar/traffic-generator/inputs/caida_dirA/prefix_loss.txt", mappings.trace_set);
 
     //Populate Prefixes Object
@@ -114,7 +113,7 @@ main(int argc, char *argv[]) {
 //    for (int j=0; j < 1000; j++)
 //    {
 //        Ipv4Address host_addr = address.NewAddress();
-//        std::cout << ipv4AddressToString(host_addr) << "\n";
+//        std::cout << Ipv4AddressToString(host_addr) << "\n";
 //    }
 
 //    std::vector<double> src_rtts = GetSubnetworkRtts("/home/cedgar/traffic-generator/inputs/caida_dirA/rtt_cdfs.txt", "Subnetwork_2");
@@ -164,7 +163,7 @@ main(int argc, char *argv[]) {
 
 //    for (int i=0; i < 1000; i++){
 //        Ipv4Address addr = address.NewNetwork();
-//        std::cout << ipv4AddressToString(addr) << "\n";
+//        std::cout << Ipv4AddressToString(addr) << "\n";
 //    }
 //
 //// Initialize an unordered_map through initializer_list

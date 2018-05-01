@@ -1,11 +1,10 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
 #include <random>
-#include "traffic-generation.h"
-#include "swift-generation.h"
 #include "ns3/custom-applications-module.h"
 #include "ns3/applications-module.h"
-#include "ns3/swift-utils.h"
+#include "ns3/utils-module.h"
+#include "ns3/traffic-generation-module.h"
 
 
 NS_LOG_COMPONENT_DEFINE ("swift-generation");
@@ -16,7 +15,7 @@ namespace ns3 {
     NodesUsage  SendSwiftTraffic(std::unordered_map<double, std::vector<Ptr<Node>>> rtt_to_senders,
                                  std::vector<double> rtt_cdf,
                                  std::unordered_map<std::string, prefix_metadata> prefixes,
-                                 prefix_mappings mapping,
+                                 PrefixMappings mapping,
                                  std::unordered_map<std::string, std::vector<uint16_t>> hostsToPorts,
                                  std::string flowDistFile,
                                  uint32_t seed,
@@ -45,15 +44,15 @@ namespace ns3 {
         while ((startTime -1) < simulationTime){
 
             //get a flow
-            flow_metadata flow = randomFromVector<flow_metadata>(flowDist);
+            flow_metadata flow = RandomFromVector<flow_metadata>(flowDist);
 
             flow.rtt = flow.rtt * rtt_shift;
 
-            double rtt = find_closest(rtt_cdf , flow.rtt);
+            double rtt = FindClosest(rtt_cdf , flow.rtt);
 
             NS_ASSERT_MSG(rtt_to_senders[rtt].size() >= 1, "There are no source hosts for rtt: " <<rtt);
 
-            Ptr<Node> src = randomFromVector<Ptr<Node>>(rtt_to_senders[rtt]);
+            Ptr<Node> src = RandomFromVector<Ptr<Node>>(rtt_to_senders[rtt]);
 
 
             //Get Destination
@@ -67,13 +66,13 @@ namespace ns3 {
 
             //Destination port
             std::vector<uint16_t> availablePorts = hostsToPorts[GetNodeName(dst)];
-            uint16_t dport = randomFromVector<uint16_t>(availablePorts);
+            uint16_t dport = RandomFromVector<uint16_t>(availablePorts);
 
             startTime += interArrivalTime(gen);
 
 //            installBulkSend(src, dst, dport, flowSize, startTime);
-            installRateSend(src,dst,dport,flow.packets, flow.bytes, flow.duration, startTime);
-            nodes_usage.update(src, dst, flow.bytes);
+            InstallRateSend(src,dst,dport,flow.packets, flow.bytes, flow.duration, startTime);
+            nodes_usage.Update(src, dst, flow.bytes);
 //            if (flow.duration == 0){
 //                flow.duration = 1;
 //            }

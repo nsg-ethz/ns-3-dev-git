@@ -5,8 +5,7 @@
 #include <string>
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
-#include "ns3/utils.h"
-#include "ns3/swift-utils.h"
+#include "ns3/utils-module.h"
 #include <unordered_map>
 #include <vector>
 

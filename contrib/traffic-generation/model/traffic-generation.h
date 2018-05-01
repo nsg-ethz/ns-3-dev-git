@@ -17,18 +17,18 @@ std::unordered_map <std::string, std::vector<uint16_t>>
 InstallSinks(NodeContainer hosts, uint16_t sinksPerHost, uint32_t duration, std::string protocol);
 
 
-Ptr<Socket> installSimpleSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t sinkPort, DataRate dataRate, uint32_t numPackets, std::string protocol);
+Ptr<Socket> InstallSimpleSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t sinkPort, DataRate dataRate, uint32_t numPackets, std::string protocol);
 
-void installBulkSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint64_t size, double startTime,
+void InstallBulkSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint64_t size, double startTime,
 					 Ptr<OutputStreamWrapper> fctFile = NULL, Ptr<OutputStreamWrapper> counterFile = NULL,
 					 Ptr<OutputStreamWrapper> flowsFile = NULL, uint64_t flowId = 0,
 					 uint64_t *recordedFlowsCounter = NULL, double *startRecordingTime = NULL,
 					 double recordingTime = -1);
 
-void installNormalBulkSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint64_t size, double startTime);
-void installOnOffSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, DataRate dataRate, uint32_t packet_size, uint64_t max_size, double startTime);
-void installRateSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint32_t n_packets, uint64_t max_size, double duration, double startTime);
-void sendBindTest(Ptr<Node> src,NodeContainer receivers, std::unordered_map<std::string, std::vector<uint16_t>> hostsToPorts, uint32_t flows);
+void InstallNormalBulkSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint64_t size, double startTime);
+void InstallOnOffSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, DataRate dataRate, uint32_t packet_size, uint64_t max_size, double startTime);
+void InstallRateSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint32_t n_packets, uint64_t max_size, double duration, double startTime);
+void SendBindTest(Ptr<Node> src,NodeContainer receivers, std::unordered_map<std::string, std::vector<uint16_t>> hostsToPorts, uint32_t flows);
 
 }
 

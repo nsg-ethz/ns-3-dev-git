@@ -1,11 +1,11 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
 #include <random>
-#include "traffic-generation.h"
-#include "ns3/custom-applications-module.h"
+
 #include "ns3/applications-module.h"
-#include "ns3/utils.h"
 #include "ns3/traffic-generation-module.h"
+#include "ns3/custom-applications-module.h"
+#include "ns3/utils-module.h"
 
 NS_LOG_COMPONENT_DEFINE ("traffic-generation");
 
@@ -89,7 +89,7 @@ InstallRateSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint32_t n
 {
     if (duration <= 0){
         NS_LOG_DEBUG("Install Rate Send: \t Bulk Send Instead!");
-        installNormalBulkSend(srcHost,dstHost,dport,max_size,startTime);
+        InstallNormalBulkSend(srcHost,dstHost,dport,max_size,startTime);
         return;
     }
 
@@ -136,7 +136,7 @@ InstallRateSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint32_t n
 
 
 void
-installNormalBulkSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint64_t size, double startTime)
+InstallNormalBulkSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint64_t size, double startTime)
 {
 
   Ipv4Address addr = GetNodeIp(dstHost);
@@ -188,7 +188,7 @@ InstallSinks(NodeContainer hosts, uint16_t sinksPerHost, uint32_t duration, std:
 }
 
 //DO THE SAME WITH THE BULK APP, WHICH IS PROBABLY WHAT WE WANT TO HAVE.
-void installBulkSend(Ptr <Node> srcHost, Ptr <Node> dstHost, uint16_t dport, uint64_t size, double startTime,
+void InstallBulkSend(Ptr <Node> srcHost, Ptr <Node> dstHost, uint16_t dport, uint64_t size, double startTime,
                      Ptr <OutputStreamWrapper> fctFile, Ptr <OutputStreamWrapper> counterFile,
                      Ptr <OutputStreamWrapper> flowsFile,
                      uint64_t flowId, uint64_t *recordedFlowsCounter, double *startRecordingTime,
@@ -231,8 +231,8 @@ SendBindTest(Ptr<Node> src, NodeContainer receivers, std::unordered_map<std::str
 	for (uint32_t i = 0 ; i < flows ;i++){
 		Ptr<Node> dst  = receivers.Get(random_variable->GetInteger(0, receivers.GetN()-1));
 		std::vector<uint16_t> availablePorts = hostsToPorts[GetNodeName(dst)];
-		uint16_t dport = randomFromVector<uint16_t>(availablePorts);
-		installNormalBulkSend(src, dst, dport, 50000, random_variable->GetValue(1, 10));
+		uint16_t dport = RandomFromVector<uint16_t>(availablePorts);
+		InstallNormalBulkSend(src, dst, dport, 50000, random_variable->GetValue(1, 10));
 	}
 }
 

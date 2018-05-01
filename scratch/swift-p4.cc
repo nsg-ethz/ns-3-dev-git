@@ -555,7 +555,7 @@ main(int argc, char *argv[]) {
     NS_LOG_DEBUG("Starting Sinks");
     begin_time = std::clock();
 
-    std::unordered_map<std::string, std::vector<uint16_t>> hostToPort = installSinks(receivers, 35, 0, "TCP");
+    std::unordered_map<std::string, std::vector<uint16_t>> hostToPort = InstallSinks(receivers, 35, 0, "TCP");
 
     NS_LOG_DEBUG("Time Starting Sinks: " << float(clock() - begin_time) / CLOCKS_PER_SEC);
 

@@ -34,7 +34,7 @@
 #include "ns3/traffic-control-module.h"
 #include "ns3/flow-monitor-module.h"
 #include "ns3/utils-module.h"
-#include "ns3/traffic-generation-module.h
+#include "ns3/traffic-generation-module.h"
 
 // TOPOLOGY
 //+---+                                                 +---+
@@ -228,7 +228,7 @@ main(int argc, char *argv[]) {
     Ptr<Node> sw1 = CreateObject<Node>();
     Ptr<Node> sw2 = CreateObject<Node>();
 
-    //Add two switches
+    //Add two switcheIIs
     Names::Add("sw1", sw1);
     Names::Add("sw2", sw2);
 
@@ -312,7 +312,7 @@ main(int argc, char *argv[]) {
             Ptr<Node> dst = receivers.Get(random_variable->GetInteger(0, receivers.GetN() - 1));
             std::vector<uint16_t> availablePorts = hostsToPorts[GetNodeName(dst)];
             uint16_t dport = RandomFromVector<uint16_t>(availablePorts);
-            installNormalBulkSend(*host, dst, dport, 80000000, random_variable->GetInteger(1, 3));
+            InstallNormalBulkSend(*host, dst, dport, 80000000, random_variable->GetInteger(1, 3));
             break;
         }
         break;
