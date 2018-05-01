@@ -12,8 +12,9 @@ NS_LOG_COMPONENT_DEFINE ("traffic-generation");
 
 namespace ns3 {
 
-void installSink(Ptr<Node> node, uint16_t sinkPort, uint32_t duration, std::string protocol){
-
+void
+InstallSink(Ptr<Node> node, uint16_t sinkPort, uint32_t duration, std::string protocol)
+{
   //create sink helper
   PacketSinkHelper packetSinkHelper ("ns3::TcpSocketFactory", InetSocketAddress (Ipv4Address::GetAny (), sinkPort));
 
@@ -30,10 +31,9 @@ void installSink(Ptr<Node> node, uint16_t sinkPort, uint32_t duration, std::stri
   }
 }
 
-
-
-Ptr<Socket> installSimpleSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t sinkPort, DataRate dataRate, uint32_t numPackets, std::string protocol){
-
+Ptr<Socket>
+InstallSimpleSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t sinkPort, DataRate dataRate, uint32_t numPackets, std::string protocol)
+{
   Ptr<Socket> ns3Socket;
   uint32_t num_packets = numPackets;
 
@@ -63,8 +63,9 @@ Ptr<Socket> installSimpleSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t sin
   return ns3Socket;
 }
 
-void installOnOffSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, DataRate dataRate, uint32_t packet_size, uint64_t max_size, double startTime){
-
+void
+InstallOnOffSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, DataRate dataRate, uint32_t packet_size, uint64_t max_size, double startTime)
+{
   Ipv4Address addr = GetNodeIp(dstHost);
   Address sinkAddress (InetSocketAddress (addr, dport));
 
@@ -81,11 +82,11 @@ void installOnOffSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, Data
   onoff_sender->SetStartTime(Seconds(startTime));
   //TODO: check if this has some implication.
   onoff_sender->SetStopTime(Seconds(1000));
-
 }
 
-void installRateSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint32_t n_packets, uint64_t max_size, double duration, double startTime){
-
+void
+InstallRateSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint32_t n_packets, uint64_t max_size, double duration, double startTime)
+{
     if (duration <= 0){
         NS_LOG_DEBUG("Install Rate Send: \t Bulk Send Instead!");
         installNormalBulkSend(srcHost,dstHost,dport,max_size,startTime);
@@ -134,7 +135,9 @@ void installRateSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint3
 }
 
 
-void installNormalBulkSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint64_t size, double startTime){
+void
+installNormalBulkSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint64_t size, double startTime)
+{
 
   Ipv4Address addr = GetNodeIp(dstHost);
   Address sinkAddress (InetSocketAddress (addr, dport));
@@ -155,7 +158,9 @@ void installNormalBulkSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport,
 //  return socket;
 }
 
-std::unordered_map <std::string, std::vector<uint16_t>> installSinks(NodeContainer hosts, uint16_t sinksPerHost, uint32_t duration, std::string protocol){
+std::unordered_map <std::string, std::vector<uint16_t>>
+InstallSinks(NodeContainer hosts, uint16_t sinksPerHost, uint32_t duration, std::string protocol)
+{
 
 	NS_ASSERT_MSG(sinksPerHost < ((uint16_t) -2), "Can not create such amount of sinks");
 
@@ -171,7 +176,7 @@ std::unordered_map <std::string, std::vector<uint16_t>> installSinks(NodeContain
         hostsToPorts[host_name] = std::vector<uint16_t>();
 
         for (int i = 0; i < sinksPerHost ; i++){
-            installSink((*host), starting_port+i, duration, protocol);
+            InstallSink((*host), starting_port+i, duration, protocol);
             //Add port into the vector
             //NS_LOG_DEBUG("Install Sink: " << host_name << " port:" << starting_port+i);
             hostsToPorts[host_name].push_back(starting_port+i);
@@ -220,16 +225,15 @@ void installBulkSend(Ptr <Node> srcHost, Ptr <Node> dstHost, uint16_t dport, uin
     return;
 }
 
-void sendBindTest(Ptr<Node> src, NodeContainer receivers, std::unordered_map<std::string, std::vector<uint16_t>> hostsToPorts, uint32_t flows){
-
+void
+SendBindTest(Ptr<Node> src, NodeContainer receivers, std::unordered_map<std::string, std::vector<uint16_t>> hostsToPorts, uint32_t flows)
+{
 	for (uint32_t i = 0 ; i < flows ;i++){
 		Ptr<Node> dst  = receivers.Get(random_variable->GetInteger(0, receivers.GetN()-1));
 		std::vector<uint16_t> availablePorts = hostsToPorts[GetNodeName(dst)];
 		uint16_t dport = randomFromVector<uint16_t>(availablePorts);
 		installNormalBulkSend(src, dst, dport, 50000, random_variable->GetValue(1, 10));
 	}
-
-
 }
 
 
