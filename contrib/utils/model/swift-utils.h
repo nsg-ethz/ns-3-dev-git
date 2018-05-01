@@ -46,7 +46,7 @@ namespace ns3 {
         float failure_intensity = 0;
     };
 
-    struct prefix_mappings {
+    struct PrefixMappings {
         std::unordered_map<std::string, std::string> sim_to_trace;
         std::unordered_map<std::string, std::set<std::string>> trace_to_sim;
         std::set<std::string> trace_set;
@@ -56,23 +56,23 @@ namespace ns3 {
     std::vector<flow_metadata> GetFlowsPerPrefix(std::string flows_per_prefix_file, std::unordered_map<std::string, std::set<std::string>> trace_to_sim_prefixes);
     std::unordered_map<std::string, std::vector<failure_event>> GetPrefixFailures(std::string prefix_failure_file, std::string subnetwork_name);
     std::vector<double> GetSubnetworkRtts(std::string rttsFile, std::string subnet_name);
-    prefix_mappings GetSubnetworkPrefixMappings(std::string prefixesFile, std::string subnetwork_name);
+    PrefixMappings GetSubnetworkPrefixMappings(std::string prefixesFile, std::string subnetwork_name);
     std::unordered_map<std::string, prefix_features> GetPrefixFeatures(std::string prefixFeaturesFile, std::set<std::string> subnetwork_trace_prefixes);
     std::unordered_map<std::string, prefix_metadata> LoadPrefixesMetadata
-            (prefix_mappings mappings, std::unordered_map<std::string, prefix_features> trace_prefixes_features);
+            (PrefixMappings mappings, std::unordered_map<std::string, prefix_features> trace_prefixes_features);
 
     //New headers
     template<typename T>
-    std::vector<T> read_lines(std::string file_name, uint32_t max_lines = 20000000) {
+    std::vector<T> ReadLines(std::string fileName, uint32_t maxLines = 20000000) {
 
         std::vector<T> lines;
         T line;
         uint32_t line_count = 0;
 
-        std::ifstream file_in(file_name);
-        NS_ASSERT_MSG(file_in, "Invalid File " + file_name);
+        std::ifstream file_in(fileName);
+        NS_ASSERT_MSG(file_in, "Invalid File " + fileName);
 
-        while (file_in >> line and (line_count < max_lines or max_lines == 0)) {
+        while (file_in >> line and (line_count < maxLines or maxLines == 0)) {
             lines.push_back(line);
         }
         return lines;

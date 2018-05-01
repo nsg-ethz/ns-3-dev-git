@@ -230,7 +230,7 @@ void SaveNow(double delay, Ptr<OutputStreamWrapper> file){
 	*(file->GetStream()) << Simulator::Now().GetSeconds() << "\n";
 	(file->GetStream())->flush();
 
-	Simulator::Schedule (Seconds(delay), &saveNow, delay, file);
+	Simulator::Schedule (Seconds(delay), &SaveNow, delay, file);
 }
 
 void PrintQueueSize(Ptr<Queue<Packet>> q){
@@ -299,19 +299,17 @@ double FindClosest(std::vector<double> vect, double value){
 	}
 }
 
-
 Ptr<Queue<Packet>> GetPointToPointNetDeviceQueue(NetDevice netDevice){
 
-	//DynamicCast<PointToPointNetDevice>(netDevice)
-	Ptr<PointToPointNetDevice> p2pNetDevice = netDevice.GetObject<PointToPointNetDevice>();
-	//alternative
-	//PointerValue tmp;
-	//p2pNetDevice->GetAttribute("TxQueue", tmp);
-	// return tmp.GetObject<Queue<Packet>>();
-	return p2pNetDevice->GetQueue();
+//	//DynamicCast<PointToPointNetDevice>(netDevice)
+//	Ptr<PointToPointNetDevice> p2pNetDevice = netDevice.GetObject<PointToPointNetDevice>();
+//	//alternative
+//	//PointerValue tmp;
+//	//p2pNetDevice->GetAttribute("TxQueue", tmp);
+//	// return tmp.GetObject<Queue<Packet>>();
+//	return p2pNetDevice->GetQueue();
 
 }
-
 
 
 }

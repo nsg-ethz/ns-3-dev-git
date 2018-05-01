@@ -34,8 +34,8 @@
 #include "ns3/traffic-control-module.h"
 #include "ns3/traffic-generation-module.h"
 #include "ns3/flow-monitor-module.h"
-#include "ns3/utils.h"
-#include "ns3/swift-utils.h"
+
+#include "ns3/utils-module.h"
 
 // TOPOLOGY
 //+---+                                                 +---+
@@ -269,7 +269,7 @@ main(int argc, char *argv[]) {
 //    }
 
     //Load Subnetwork Prefix mappings
-    prefix_mappings prefixes_mappings = GetSubnetworkPrefixMappings(inputDir + "subnetwork_prefixes.txt", simulationName);
+    PrefixMappings prefixes_mappings = GetSubnetworkPrefixMappings(inputDir + "subnetwork_prefixes.txt", simulationName);
 
     NS_LOG_DEBUG("Prefix Sizes:");
     NS_LOG_DEBUG("Unique Different Prefixes: " << prefixes_mappings.trace_set.size());
@@ -471,7 +471,7 @@ main(int argc, char *argv[]) {
 //        Ipv4Address net_address(net_ip_p);
 //        Ipv4AddressHelper address(net_ip_p, net_mask_p, Ipv4Address(base_address.Get() ^ net_address.Get()));
 
-        ip_mask prefix_address = GetIpMask(it->first);
+        IpMask prefix_address = GetIpMask(it->first);
         Ipv4AddressHelper address(prefix_address.ip.c_str(), prefix_address.mask.c_str());
 
         address.Assign(links[GetNodeName(sw2) + "->" + host_name.str()]);
@@ -502,11 +502,11 @@ main(int argc, char *argv[]) {
 
     for (uint32_t host_i = 0; host_i < senders.GetN(); host_i++) {
         Ptr<Node> host = senders.Get(host_i);
-        ipToNode[ipv4AddressToString(GetNodeIp(host))] = host;
+        ipToNode[Ipv4AddressToString(GetNodeIp(host))] = host;
     }
     for (uint32_t host_i = 0; host_i < receivers.GetN(); host_i++) {
         Ptr<Node> host = receivers.Get(host_i);
-        ipToNode[ipv4AddressToString(GetNodeIp(host))] = host;
+        ipToNode[Ipv4AddressToString(GetNodeIp(host))] = host;
     }
     //Store in a file ip -> node name
     Ptr<OutputStreamWrapper> ipToName_file = asciiTraceHelper.CreateFileStream(outputNameRoot + "ip_to_name.txt");
@@ -570,7 +570,7 @@ main(int argc, char *argv[]) {
 //        std::cout << "rtt: " << it->first << " " << it->second.size() << "\n";
 //    }
 
-    nodes_usage = sendSwiftTraffic(senders_latency_to_node,
+    nodes_usage = SendSwiftTraffic(senders_latency_to_node,
                                    src_rtts,
                                    prefixes,
                                    prefixes_mappings,
@@ -582,9 +582,9 @@ main(int argc, char *argv[]) {
                                    rtt_shift);
 
     //save ranks
-    nodes_usage.save(outputNameRoot + "bytes", false, true);
+    nodes_usage.Save(outputNameRoot + "bytes", false, true);
 
-    std::vector<usage_struct> receivers_vector = nodes_usage.getReceiversVector();
+    std::vector<UsageStruct> receiversVector = nodes_usage.GetReceiversVector();
     float time_scheduling_traffic = float(clock() - begin_time) / CLOCKS_PER_SEC;
     *(metadata_file->GetStream()) << "time_scheduling_traffic " << time_scheduling_traffic << "\n";
     metadata_file->GetStream()->flush();
@@ -612,7 +612,7 @@ main(int argc, char *argv[]) {
                                                                                                                pcap_file));
     }
 
-    NS_LOG_DEBUG("Total Bytes Received By Servers: " << nodes_usage.get_total_rx());
+    NS_LOG_DEBUG("Total Bytes Received By Servers: " << nodes_usage.GetTotalRx());
 
 
 
@@ -672,7 +672,7 @@ main(int argc, char *argv[]) {
     if (stop_time != 0) {
         //We schedule it here otherwise simulations never finish
         std::cout <<"\n";
-        printNowMem(1, simulation_execution_time);
+        PrintNowMem(1, simulation_execution_time);
         Simulator::Stop(Seconds(stop_time));
     }
 

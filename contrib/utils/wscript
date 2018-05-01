@@ -11,8 +11,8 @@ def build(bld):
     module.source = [
         'model/utils.cc',
         'model/swift-utils.cc',
-        'model/fat-tree-utils.cc',
         'model/nodes-usage.cc',
+        'model/trace-sinks.cc',
         'helper/utils-helper.cc',
         ]
 
@@ -26,8 +26,8 @@ def build(bld):
     headers.source = [
         'model/utils.h',
         'model/swift-utils.h',
-        'model/fat-tree-utils.h',
         'model/nodes-usage.h',
+        'model/trace-sinks.h',
         'helper/utils-helper.h',
         ]
 

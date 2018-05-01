@@ -13,7 +13,7 @@ NS_LOG_COMPONENT_DEFINE ("swift-generation");
 
 namespace ns3 {
 
-    NodesUsage  sendSwiftTraffic(std::unordered_map<double, std::vector<Ptr<Node>>> rtt_to_senders,
+    NodesUsage  SendSwiftTraffic(std::unordered_map<double, std::vector<Ptr<Node>>> rtt_to_senders,
                                  std::vector<double> rtt_cdf,
                                  std::unordered_map<std::string, prefix_metadata> prefixes,
                                  prefix_mappings mapping,

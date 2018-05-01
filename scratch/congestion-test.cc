@@ -32,10 +32,9 @@
 #include "ns3/mobility-module.h"
 #include "ns3/netanim-module.h"
 #include "ns3/traffic-control-module.h"
-#include "ns3/traffic-generation-module.h"
 #include "ns3/flow-monitor-module.h"
-#include "ns3/utils.h"
-#include "ns3/swift-utils.h"
+#include "ns3/utils-module.h"
+#include "ns3/traffic-generation-module.h
 
 // TOPOLOGY
 //+---+                                                 +---+
@@ -303,7 +302,7 @@ main(int argc, char *argv[]) {
     //Install Traffic sinks at receivers
 
     NS_LOG_DEBUG("Starting Sinks");
-    std::unordered_map<std::string, std::vector<uint16_t>> hostsToPorts = installSinks(receivers, 10, 0, "TCP");
+    std::unordered_map<std::string, std::vector<uint16_t>> hostsToPorts = InstallSinks(receivers, 10, 0, "TCP");
     NS_LOG_DEBUG("Starting Traffic Scheduling");
 
     for (NodeContainer::Iterator host = senders.Begin(); host != senders.End(); host++){
@@ -312,7 +311,7 @@ main(int argc, char *argv[]) {
 
             Ptr<Node> dst = receivers.Get(random_variable->GetInteger(0, receivers.GetN() - 1));
             std::vector<uint16_t> availablePorts = hostsToPorts[GetNodeName(dst)];
-            uint16_t dport = randomFromVector<uint16_t>(availablePorts);
+            uint16_t dport = RandomFromVector<uint16_t>(availablePorts);
             installNormalBulkSend(*host, dst, dport, 80000000, random_variable->GetInteger(1, 3));
             break;
         }

@@ -8,10 +8,10 @@ NS_LOG_COMPONENT_DEFINE ("swift-utils");
 
 namespace ns3 {
 
-    prefix_mappings GetSubnetworkPrefixMappings(std::string prefixesFile, std::string subnetwork_name){
+    PrefixMappings GetSubnetworkPrefixMappings(std::string prefixesFile, std::string subnetwork_name){
 
         //mapping
-        prefix_mappings mappings;
+        PrefixMappings mappings;
 
         std::ifstream prefixes_file(prefixesFile);
         NS_ASSERT_MSG(prefixes_file, "Please provide a valid prefixes file");
@@ -168,7 +168,7 @@ namespace ns3 {
     };
 
     std::unordered_map<std::string, prefix_metadata> LoadPrefixesMetadata
-            (prefix_mappings mappings, std::unordered_map<std::string, prefix_features> trace_prefixes_features){
+            (PrefixMappings mappings, std::unordered_map<std::string, prefix_features> trace_prefixes_features){
 
         std::unordered_map<std::string, prefix_metadata> prefixes;
 
