@@ -10,7 +10,7 @@
 
 namespace ns3 {
 
-    struct flow_metadata {
+    struct FlowMetadata {
         std::string prefix;
         uint32_t packets;
         double duration;
@@ -18,29 +18,21 @@ namespace ns3 {
         double rtt;
     };
 
-    struct prefix_features {
+    struct PrefixFeatures {
         double loss = 0;
         double out_of_order = 0;
     };
 
-// Possible structure when using multiple server at the receivers side
-//    struct prefix_metadata {
-//        std::string trace_prefix;
-//        prefix_features features;
-//        NetDeviceContainer main_link;
-//        std::vector<Ptr<Node>> servers;
-//        std::unordered_map<std::string, NetDeviceContainer> server_links;
-//    };
 
-    struct prefix_metadata {
+    struct PrefixMetadata {
         std::string trace_prefix;
-        prefix_features features;
+        PrefixFeatures features;
         NetDeviceContainer link;
         Ptr<Node> server;
     };
 
 
-    struct failure_event {
+    struct FailureEvent {
         double failure_time = -1;
         double recovery_time = -1;
         float failure_intensity = 0;
@@ -53,13 +45,13 @@ namespace ns3 {
         std::set<std::string> sim_set;
     };
 
-    std::vector<flow_metadata> GetFlowsPerPrefix(std::string flows_per_prefix_file, std::unordered_map<std::string, std::set<std::string>> trace_to_sim_prefixes);
-    std::unordered_map<std::string, std::vector<failure_event>> GetPrefixFailures(std::string prefix_failure_file, std::string subnetwork_name);
+    std::vector<FlowMetadata> GetFlowsPerPrefix(std::string flows_per_prefix_file, std::unordered_map<std::string, std::set<std::string>> trace_to_sim_prefixes);
+    std::unordered_map<std::string, std::vector<FailureEvent>> GetPrefixFailures(std::string prefix_failure_file, std::string subnetwork_name);
     std::vector<double> GetSubnetworkRtts(std::string rttsFile, std::string subnet_name);
     PrefixMappings GetSubnetworkPrefixMappings(std::string prefixesFile, std::string subnetwork_name);
-    std::unordered_map<std::string, prefix_features> GetPrefixFeatures(std::string prefixFeaturesFile, std::set<std::string> subnetwork_trace_prefixes);
-    std::unordered_map<std::string, prefix_metadata> LoadPrefixesMetadata
-            (PrefixMappings mappings, std::unordered_map<std::string, prefix_features> trace_prefixes_features);
+    std::unordered_map<std::string, PrefixFeatures> GetPrefixFeatures(std::string prefixFeaturesFile, std::set<std::string> subnetwork_trace_prefixes);
+    std::unordered_map<std::string, PrefixMetadata> LoadPrefixesMetadata
+            (PrefixMappings mappings, std::unordered_map<std::string, PrefixFeatures> trace_prefixes_features);
 
     //New headers
     template<typename T>

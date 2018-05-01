@@ -276,16 +276,16 @@ main(int argc, char *argv[]) {
     NS_LOG_DEBUG("Simulation Different Prefixes: " << prefixes_mappings.sim_set.size());
 
     //Load Trace Prefix Features
-    std::unordered_map<std::string, prefix_features> trace_prefixes_features = GetPrefixFeatures(prefixes_features_file, prefixes_mappings.trace_set);
+    std::unordered_map<std::string, PrefixFeatures> trace_prefixes_features = GetPrefixFeatures(prefixes_features_file, prefixes_mappings.trace_set);
     NS_LOG_DEBUG("Trace prefixes features length: : " << trace_prefixes_features.size());
 
 
     //Load prefix failures
-    std::unordered_map<std::string, std::vector<failure_event>> prefix_failures =  GetPrefixFailures(prefixes_failures_file, simulationName);
+    std::unordered_map<std::string, std::vector<FailureEvent>> prefix_failures =  GetPrefixFailures(prefixes_failures_file, simulationName);
     NS_LOG_DEBUG("Prefixes failure legnth: " << prefix_failures.size());
 
     //Populate Prefixes Object
-    std::unordered_map<std::string, prefix_metadata> prefixes = LoadPrefixesMetadata(prefixes_mappings, trace_prefixes_features);
+    std::unordered_map<std::string, PrefixMetadata> prefixes = LoadPrefixesMetadata(prefixes_mappings, trace_prefixes_features);
     NS_LOG_DEBUG("Prefixes: " << prefixes.size());
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////

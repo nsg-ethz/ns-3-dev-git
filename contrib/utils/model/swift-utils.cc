@@ -92,9 +92,9 @@ namespace ns3 {
 
     /*Gets trace prefix features, then we have to change that and set it to the simulation prefixes*/
 
-    std::unordered_map<std::string, prefix_features> GetPrefixFeatures(std::string prefixFeaturesFile, std::set<std::string> subnetwork_trace_prefixes){
+    std::unordered_map<std::string, PrefixFeatures> GetPrefixFeatures(std::string prefixFeaturesFile, std::set<std::string> subnetwork_trace_prefixes){
 
-        std::unordered_map<std::string, prefix_features> trace_prefix_features;
+        std::unordered_map<std::string, PrefixFeatures> trace_prefix_features;
 
         std::ifstream prefix_features_file(prefixFeaturesFile);
 
@@ -105,7 +105,7 @@ namespace ns3 {
 
         std::string prefix;
 
-        prefix_features features;
+        PrefixFeatures features;
 
         while (prefix_features_file >> prefix >> features.loss){
             if (subnetwork_trace_prefixes.find(prefix) != subnetwork_trace_prefixes.end()){
@@ -115,10 +115,10 @@ namespace ns3 {
         return trace_prefix_features;
     };
 
-    std::unordered_map<std::string, std::vector<failure_event>> GetPrefixFailures(std::string prefix_failure_file, std::string subnetwork_name){
+    std::unordered_map<std::string, std::vector<FailureEvent>> GetPrefixFailures(std::string prefix_failure_file, std::string subnetwork_name){
 
         // variables
-        std::unordered_map<std::string, std::vector<failure_event>> prefix_to_events;
+        std::unordered_map<std::string, std::vector<FailureEvent>> prefix_to_events;
 
         std::ifstream infile(prefix_failure_file);
 
@@ -152,8 +152,8 @@ namespace ns3 {
                 std::istringstream lineStream(line);
                 std::string prefix;
                 lineStream >> prefix;
-                failure_event event;
-                std::vector<failure_event> events_vector;
+                FailureEvent event;
+                std::vector<FailureEvent> events_vector;
                 prefix_to_events[prefix] = events_vector;
 
                 while (lineStream >> event.failure_time >> event.recovery_time >> event.failure_intensity){
@@ -167,13 +167,13 @@ namespace ns3 {
 
     };
 
-    std::unordered_map<std::string, prefix_metadata> LoadPrefixesMetadata
-            (PrefixMappings mappings, std::unordered_map<std::string, prefix_features> trace_prefixes_features){
+    std::unordered_map<std::string, PrefixMetadata> LoadPrefixesMetadata
+            (PrefixMappings mappings, std::unordered_map<std::string, PrefixFeatures> trace_prefixes_features){
 
-        std::unordered_map<std::string, prefix_metadata> prefixes;
+        std::unordered_map<std::string, PrefixMetadata> prefixes;
 
         for (auto prefix: mappings.sim_set){
-            prefix_metadata metadata;
+            PrefixMetadata metadata;
             metadata.trace_prefix = mappings.sim_to_trace[prefix];
 
             //Only if it was provided, otherwise we use default features (all 0)
@@ -187,15 +187,15 @@ namespace ns3 {
         return prefixes;
     };
 
-    std::vector<flow_metadata> GetFlowsPerPrefix(std::string flows_per_prefix_file,
+    std::vector<FlowMetadata> GetFlowsPerPrefix(std::string flows_per_prefix_file,
                                                  std::unordered_map<std::string, std::set<std::string>> trace_to_sim_prefixes){
 
-        std::vector<flow_metadata> flows;
+        std::vector<FlowMetadata> flows;
         std::ifstream flowsDist(flows_per_prefix_file);
         NS_ASSERT_MSG(flowsDist, "Please provide a valid prefixes dist file");
 
         std::string line;
-        flow_metadata flow;
+        FlowMetadata flow;
 
         std::string current_prefix;
         std::string strip_a, strip_b;

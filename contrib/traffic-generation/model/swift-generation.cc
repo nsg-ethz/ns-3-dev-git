@@ -14,7 +14,7 @@ namespace ns3 {
 
     NodesUsage  SendSwiftTraffic(std::unordered_map<double, std::vector<Ptr<Node>>> rtt_to_senders,
                                  std::vector<double> rtt_cdf,
-                                 std::unordered_map<std::string, prefix_metadata> prefixes,
+                                 std::unordered_map<std::string, PrefixMetadata> prefixes,
                                  PrefixMappings mapping,
                                  std::unordered_map<std::string, std::vector<uint16_t>> hostsToPorts,
                                  std::string flowDistFile,
@@ -24,7 +24,7 @@ namespace ns3 {
 
 
         //Load flow distribution
-        std::vector<flow_metadata> flowDist = GetFlowsPerPrefix(flowDistFile, mapping.trace_to_sim);
+        std::vector<FlowMetadata> flowDist = GetFlowsPerPrefix(flowDistFile, mapping.trace_to_sim);
 
         //Usage object
         NodesUsage nodes_usage = NodesUsage();
@@ -44,7 +44,7 @@ namespace ns3 {
         while ((startTime -1) < simulationTime){
 
             //get a flow
-            flow_metadata flow = RandomFromVector<flow_metadata>(flowDist);
+            FlowMetadata flow = RandomFromVector<FlowMetadata>(flowDist);
 
             flow.rtt = flow.rtt * rtt_shift;
 
