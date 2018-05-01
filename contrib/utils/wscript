@@ -12,6 +12,7 @@ def build(bld):
         'model/utils.cc',
         'model/swift-utils.cc',
         'model/fat-tree-utils.cc',
+        'model/nodes-usage.cc',
         'helper/utils-helper.cc',
         ]
 
@@ -26,6 +27,7 @@ def build(bld):
         'model/utils.h',
         'model/swift-utils.h',
         'model/fat-tree-utils.h',
+        'model/nodes-usage.h',
         'helper/utils-helper.h',
         ]
 

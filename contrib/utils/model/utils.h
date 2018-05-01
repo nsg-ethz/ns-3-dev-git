@@ -25,7 +25,7 @@ namespace ns3 {
 /* ... */
     extern Ptr<UniformRandomVariable> random_variable;
 
-    struct ip_mask {
+    struct IpMask {
         std::string ip;
         std::string mask;
     };
@@ -39,9 +39,9 @@ namespace ns3 {
 
     std::string GetNodeName(Ptr<Node> node);
 
-    std::string ipv4AddressToString(Ipv4Address address);
+    std::string Ipv4AddressToString(Ipv4Address address);
 
-    ip_mask GetIpMask(std::string prefix);
+    IpMask GetIpMask(std::string prefix);
 
     uint64_t BytesFromRate(DataRate dataRate, double time);
 
@@ -51,34 +51,20 @@ namespace ns3 {
 
     std::pair<uint16_t, uint16_t> GetHostPositionPair(std::string name);
 
-    void printNow(double delay);
+    void PrintNow(double delay);
 
-    void printMemUsage(double delay);
+    void PrintMemUsage(double delay);
 
-    void printNowMem(double delay, std::clock_t starting_time);
+    void PrintNowMem(double delay, std::clock_t starting_time);
 
-    void saveNow(double delay, Ptr<OutputStreamWrapper> file);
+    void SaveNow(double delay, Ptr<OutputStreamWrapper> file);
 
-    uint64_t hash_string(std::string message);
-
+    uint64_t HashString(std::string message);
 
     double MeasureInterfaceLoad(Ptr<Queue<Packet>> q, double next_schedule, std::string name, DataRate linkBandwidth);
 
-// trace sinks
-    void
-    CwndChange(Ptr<OutputStreamWrapper> stream, uint32_t oldCwnd, uint32_t newCwnd);
-
-    void
-    TracePcap(Ptr<PcapFileWrapper> file, Ptr<const Packet> packet);
-
-    void
-    RxDropAscii(Ptr<OutputStreamWrapper> file, Ptr<const Packet> packet);
-
-    void
-    TxDrop(std::string s, Ptr<const Packet> p);
 
     void PrintQueueSize(Ptr<Queue<Packet>> q);
-
 
     void ChangeLinkDropRate(NetDeviceContainer link_to_change, double drop_rate);
 
@@ -86,18 +72,19 @@ namespace ns3 {
 
     void RecoverLink(NetDeviceContainer link_to_recover);
 
-
-    uint64_t leftMostPowerOfTen(uint64_t number);
+    uint64_t LeftMostPowerOfTen(uint64_t number);
 
 //gets a random element from a vector!
     template<typename T>
-    T randomFromVector(std::vector<T> &vect) {
+    T RandomFromVector(std::vector<T> &vect) {
         return vect[random_variable->GetInteger(0, vect.size() - 1)];
     }
 
-    double find_closest(std::vector<double> vect, double value);
+    double FindClosest(std::vector<double> vect, double value);
 
-}
+    Ptr<Queue<Packet>> GetPointToPointNetDeviceQueue(NetDevice netDevice);
+
+    }
 
 #endif /* UTILS_H */
 

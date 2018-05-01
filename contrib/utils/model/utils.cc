@@ -1,5 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
+#include <ns3/csma-module.h>
 #include "utils.h"
 
 NS_LOG_COMPONENT_DEFINE ("utils");
@@ -168,10 +169,10 @@ GetNodeIp(Ptr<Node> node)
 //  	return ipToString((address.m_address & 0xff000000) >> 24, (address.m_address & 0x00ff0000) >> 16, (address.m_address & 0x0000ff00) >> 8, address.m_address & 0x000000ff);
  }
 
-ip_mask GetIpMask(std::string prefix){
+IpMask GetIpMask(std::string prefix){
 
 	std::string buff("");
-	ip_mask address;
+	IpMask address;
 	for (auto chr: prefix){
 		if (chr == '/'){
 			address.ip = buff;
@@ -204,87 +205,27 @@ double MeasureInterfaceLoad(Ptr<Queue<Packet>> q,  double next_schedule, std::st
 	return total_load;
 }
 
-//TRACE SINKS
-  void
-  CwndChange (Ptr<OutputStreamWrapper> stream, uint32_t oldCwnd, uint32_t newCwnd)
-  {
-  //  NS_LOG_UNCOND (Simulator::Now ().GetSeconds () << "\t" << newCwnd);
-    *stream->GetStream () << Simulator::Now ().GetSeconds () << " " << newCwnd << std::endl;
-  }
-
-   void
-  TracePcap (Ptr<PcapFileWrapper> file, Ptr<const Packet> packet)
-  {
-    file->Write (Simulator::Now (), packet);
-  }
-
-   void
-  RxDropAscii (Ptr<OutputStreamWrapper> file, Ptr<const Packet> packet)
-  {
-  //	Ptr<PcapFileWrapper> file OLD VERSION
-    //NS_LOG_UNCOND ("RxDrop at " << Simulator::Now ().GetSeconds ());
-
-  	Ptr<Packet> p = packet->Copy();
-
-  	PppHeader ppp_header;
-  	p->RemoveHeader(ppp_header);
-
-  	Ipv4Header ip_header;
-  	p->RemoveHeader(ip_header);
 
 
-    std::ostringstream oss;
-    oss << Simulator::Now().GetSeconds() << " "
-    		<< ip_header.GetSource() << " "
-        << ip_header.GetDestination() << " "
-        << int(ip_header.GetProtocol()) << " ";
 
-  	if (ip_header.GetProtocol() == uint8_t(17)){ //udp
-      UdpHeader udpHeader;
-      p->PeekHeader(udpHeader);
-      oss << int(udpHeader.GetSourcePort()) << " "
-          << int(udpHeader.GetDestinationPort()) << " ";
-
-  	}
-  	else if (ip_header.GetProtocol() == uint8_t(6)) {//tcp
-      TcpHeader tcpHeader;
-      p->PeekHeader(tcpHeader);
-      oss << int(tcpHeader.GetSourcePort()) << " "
-          << int(tcpHeader.GetDestinationPort()) << " ";
-  	}
-
-  	oss << packet->GetSize() << "\n";
-  	*(file->GetStream()) << oss.str();
-    (file->GetStream())->flush();
-
-  //  file->Write (Simulator::Now (), p);
-  }
-
-  void
-  TxDrop (std::string s, Ptr<const Packet> p){
-  	static int counter = 0;
-  	NS_LOG_UNCOND (counter++ << " " << s << " at " << Simulator::Now ().GetSeconds ()) ;
-  }
-
-
-void printNow(double delay){
+void PrintNow(double delay){
 	NS_LOG_UNCOND("Simulation Time: " << Simulator::Now().GetSeconds());
-	Simulator::Schedule (Seconds(delay), &printNow, delay);
+	Simulator::Schedule (Seconds(delay), &PrintNow, delay);
 }
 
-void printMemUsage(double delay){
+void PrintMemUsage(double delay){
 	NS_LOG_UNCOND("Memory Used: " << GetMemoryUsed());
-	Simulator::Schedule (Seconds(delay), &printMemUsage, delay);
+	Simulator::Schedule (Seconds(delay), &PrintMemUsage, delay);
 }
 
-void printNowMem(double delay, std::clock_t starting_time){
+void PrintNowMem(double delay, std::clock_t starting_time){
 
 	std::cout  <<"Simulation Time: " << Simulator::Now().GetSeconds() << "(" << (float(clock() - starting_time) / CLOCKS_PER_SEC) << ")"
 									  << "\t Memory Used: " << GetMemoryUsed() <<"\n";
-	Simulator::Schedule (Seconds(delay), &printNowMem, delay, starting_time);
+	Simulator::Schedule (Seconds(delay), &PrintNowMem, delay, starting_time);
 }
 
-void saveNow(double delay, Ptr<OutputStreamWrapper> file){
+void SaveNow(double delay, Ptr<OutputStreamWrapper> file){
 
 	*(file->GetStream()) << Simulator::Now().GetSeconds() << "\n";
 	(file->GetStream())->flush();
@@ -319,7 +260,7 @@ void RecoverLink(NetDeviceContainer link_to_recover){
 	ChangeLinkDropRate(link_to_recover, 0);
 }
 
-uint64_t leftMostPowerOfTen(uint64_t number){
+uint64_t LeftMostPowerOfTen(uint64_t number){
 	uint64_t leftMost = 0;
 	uint64_t power_of_10 = 0;
 
@@ -337,7 +278,7 @@ uint64_t leftMostPowerOfTen(uint64_t number){
 	return leftMost * std::pow(10, power_of_10 -1);
 }
 
-double find_closest(std::vector<double> vect, double value){
+double FindClosest(std::vector<double> vect, double value){
 
 	auto it = std::lower_bound(vect.begin(), vect.end(), value);
 
@@ -357,5 +298,20 @@ double find_closest(std::vector<double> vect, double value){
 		}
 	}
 }
+
+
+Ptr<Queue<Packet>> GetPointToPointNetDeviceQueue(NetDevice netDevice){
+
+	//DynamicCast<PointToPointNetDevice>(netDevice)
+	Ptr<PointToPointNetDevice> p2pNetDevice = netDevice.GetObject<PointToPointNetDevice>();
+	//alternative
+	//PointerValue tmp;
+	//p2pNetDevice->GetAttribute("TxQueue", tmp);
+	// return tmp.GetObject<Queue<Packet>>();
+	return p2pNetDevice->GetQueue();
+
+}
+
+
 
 }
