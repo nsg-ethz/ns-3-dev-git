@@ -23,14 +23,12 @@ namespace ns3 {
         double out_of_order = 0;
     };
 
-
     struct PrefixMetadata {
         std::string trace_prefix;
         PrefixFeatures features;
         NetDeviceContainer link;
         Ptr<Node> server;
     };
-
 
     struct FailureEvent {
         double failure_time = -1;

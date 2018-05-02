@@ -151,6 +151,8 @@ main(int argc, char *argv[]) {
         //LogComponentEnable("TcpSocketBase", LOG_ALL);
     }
 
+    NS_LOG_DEBUG("Simulation name " << simulationName);
+
     //Update root name
     std::ostringstream run;
     run << runStep;
@@ -162,11 +164,18 @@ main(int argc, char *argv[]) {
     system(("mkdir -p " + outputNameRoot).c_str());
 
     //copy input files that should go to output
-    system(("cp " + inputDir + "prefixes_stats.txt " + outputNameRoot + "prefixes_stats.txt").c_str());
-    system(("cp " + inputDir + "subnetwork_prefixes.txt " + outputNameRoot + "subnetwork_prefixes.txt").c_str());
-    system(("cp " + inputDir + "subnetwork_shares.txt " + outputNameRoot + "subnetwork_shares.txt").c_str());
-    system(("cp " + inputDir + "rtt_cdfs.txt " + outputNameRoot + "rtt_cdfs.txt").c_str());
-
+    if (file_exists(inputDir + "prefixes_stats.txt")){
+        system(("cp " + inputDir + "prefixes_stats.txt " + outputNameRoot + "prefixes_stats.txt").c_str());
+    }
+    if (file_exists(inputDir + "subnetwork_prefixes.txt")) {
+        system(("cp " + inputDir + "subnetwork_prefixes.txt " + outputNameRoot + "subnetwork_prefixes.txt").c_str());
+    }
+    if (file_exists(inputDir + "subnetwork_shares.txt")) {
+        system(("cp " + inputDir + "subnetwork_shares.txt " + outputNameRoot + "subnetwork_shares.txt").c_str());
+    }
+    if (file_exists(inputDir + "rtt_cdfs.txt")) {
+        system(("cp " + inputDir + "rtt_cdfs.txt " + outputNameRoot + "rtt_cdfs.txt").c_str());
+    }
     //Copy faliure files to output
     if (prefixes_failures_file != ""){
         system(("cp " + inputDir + prefixes_failures_file + " " + outputNameRoot + prefixes_failures_file).c_str());
@@ -177,7 +186,6 @@ main(int argc, char *argv[]) {
 
     //TCP
     uint16_t rtt = 200;
-
     uint16_t initial_rto = 2000;
 
     //GLOBAL CONFIGURATION
@@ -287,6 +295,8 @@ main(int argc, char *argv[]) {
     //Populate Prefixes Object
     std::unordered_map<std::string, PrefixMetadata> prefixes = LoadPrefixesMetadata(prefixes_mappings, trace_prefixes_features);
     NS_LOG_DEBUG("Prefixes: " << prefixes.size());
+
+    return 0;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     //Build Topology

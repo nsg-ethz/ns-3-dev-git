@@ -22,5 +22,4 @@ namespace ns3 {
                                  double duration = 5, double rtt_shift=1);
 
 }
-
 #endif /* SWIFT_GENERATION_H */

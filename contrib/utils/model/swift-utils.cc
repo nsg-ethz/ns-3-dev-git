@@ -17,6 +17,9 @@ namespace ns3 {
         NS_ASSERT_MSG(prefixes_file, "Please provide a valid prefixes file");
 
         std::string line;
+        std::string strip_a;
+        std::string current_sub_test;
+
         bool subnetwork_found = false;
 
         std::string sim_prefix;
@@ -30,7 +33,9 @@ namespace ns3 {
             }
 
             if (0 == line.find("#")){
-                if (line.find(subnetwork_name) != std::string::npos){
+                std::istringstream lineStream(line);
+                lineStream >> strip_a >> current_sub_test;
+                if (current_sub_test == subnetwork_name){
                     subnetwork_found = true;
                 }
 
@@ -61,6 +66,8 @@ namespace ns3 {
         NS_ASSERT_MSG(infile, "Please provide a valid file for reading RTT values");
         double rtt;
         std::string line;
+        std::string strip_a;
+        std::string current_sub_test;
         bool subnetwork_found = false;
 
         while (getline(infile, line)) {
@@ -72,9 +79,12 @@ namespace ns3 {
 
             //Check if the line starts with #
             if (0 == line.find("#")){
-                if (line.find(subnet_name) != std::string::npos){
+                std::istringstream lineStream(line);
+                lineStream >> strip_a >> current_sub_test;
+                if (current_sub_test == subnet_name){
                     subnetwork_found = true;
                 }
+
                 else if (subnetwork_found == true){
                     break;
                 }
@@ -128,6 +138,8 @@ namespace ns3 {
         }
 
         std::string line;
+        std::string strip_a;
+        std::string current_sub_test;
         bool subnetwork_found = false;
 
         while (getline(infile, line)) {
@@ -139,7 +151,9 @@ namespace ns3 {
 
             //Check if the line starts with #
             if (0 == line.find("#")){
-                if (line.find(subnetwork_name) != std::string::npos){
+                std::istringstream lineStream(line);
+                lineStream >> strip_a >> current_sub_test;
+                if (current_sub_test == subnetwork_name){
                     subnetwork_found = true;
                 }
                 else if (subnetwork_found == true){

@@ -26,6 +26,8 @@ namespace ns3 {
         //Load flow distribution
         std::vector<FlowMetadata> flowDist = GetFlowsPerPrefix(flowDistFile, mapping.trace_to_sim);
 
+        std::cout << flowDist.size() << "\n";
+
         //Usage object
         NodesUsage nodes_usage = NodesUsage();
 

@@ -10,6 +10,8 @@ namespace ns3 {
 
 /* ... */
 
+
+
 Ptr<UniformRandomVariable> random_variable = CreateObject<UniformRandomVariable> ();
 
 
@@ -307,6 +309,12 @@ Ptr<Queue<Packet>> GetPointToPointNetDeviceQueue(PointToPointNetDevice netDevice
 	// return tmp.GetObject<Queue<Packet>>();
 	return p2pNetDevice->GetQueue();
 
+}
+
+
+bool file_exists (const std::string& name){
+	std::ifstream f(name.c_str());
+	return f.good();
 }
 
 

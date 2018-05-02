@@ -84,6 +84,8 @@ namespace ns3 {
 
     Ptr<Queue<Packet>> GetPointToPointNetDeviceQueue(PointToPointNetDevice netDevice);
 
+    bool file_exists (const std::string& name);
+
     }
 
 #endif /* UTILS_H */
