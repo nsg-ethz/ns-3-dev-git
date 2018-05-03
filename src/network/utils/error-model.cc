@@ -634,17 +634,17 @@ FlowErrorModel::~FlowErrorModel ()
   NS_LOG_FUNCTION (this);
 }
 
-FlowErrorModel::ErrorUnit
-FlowErrorModel::GetUnit (void) const
+FlowErrorModel::FlowLayer
+FlowErrorModel::GetLayer (void) const
 {
   NS_LOG_FUNCTION (this);
-  return m_unit;
+  return m_layer;
 }
 
 void
 FlowErrorModel::SetLayer (enum FlowLayer flow_layer)
 {
-  NS_LOG_FUNCTION (this << error_unit);
+  NS_LOG_FUNCTION (this << flow_layer);
   m_layer = flow_layer;
 }
 
@@ -685,16 +685,14 @@ FlowErrorModel::DoCorrupt (Ptr<Packet> p)
   {
     return false;
   }
-  switch (m_unit)
+  switch (m_layer)
   {
-    case ERROR_UNIT_PACKET:
-      return DoCorruptPkt (p);
-    case ERROR_UNIT_BYTE:
-      return DoCorruptByte (p);
-    case ERROR_UNIT_BIT:
-      return DoCorruptBit (p);
+    case L3_LAYER:
+      return DoCorruptL3 (p);
+    case L4_LAYER:
+      return DoCorruptL4 (p);
     default:
-      NS_ASSERT_MSG (false, "m_unit not supported yet");
+      NS_ASSERT_MSG (false, "m_layer not supported yet");
           break;
   }
   return false;
