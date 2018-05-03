@@ -685,6 +685,9 @@ FlowErrorModel::DoCorrupt (Ptr<Packet> p)
   {
     return false;
   }
+
+  /*Check if the flow was tagged to be failed in the past */
+
   switch (m_layer)
   {
     case L3_LAYER:
