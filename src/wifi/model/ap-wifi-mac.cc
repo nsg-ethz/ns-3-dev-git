@@ -20,13 +20,19 @@
  *          Mirko Banchi <mk.banchi@gmail.com>
  */
 
-#include "ap-wifi-mac.h"
 #include "ns3/log.h"
+#include "ns3/packet.h"
 #include "ns3/simulator.h"
-#include "ns3/string.h"
 #include "ns3/pointer.h"
+#include "ns3/string.h"
+#include "ns3/random-variable-stream.h"
+#include "ap-wifi-mac.h"
 #include "mac-low.h"
 #include "mac-tx-middle.h"
+#include "mgt-headers.h"
+#include "msdu-aggregator.h"
+#include "amsdu-subframe-header.h"
+#include "wifi-phy.h"
 
 namespace ns3 {
 
@@ -61,8 +67,7 @@ ApWifiMac::GetTypeId (void)
     .AddAttribute ("BeaconGeneration",
                    "Whether or not beacons are generated.",
                    BooleanValue (true),
-                   MakeBooleanAccessor (&ApWifiMac::SetBeaconGeneration,
-                                        &ApWifiMac::GetBeaconGeneration),
+                   MakeBooleanAccessor (&ApWifiMac::SetBeaconGeneration),
                    MakeBooleanChecker ())
     .AddAttribute ("EnableNonErpProtection", "Whether or not protection mechanism should be used when non-ERP STAs are present within the BSS."
                    "This parameter is only used when ERP is supported by the AP.",
@@ -86,8 +91,8 @@ ApWifiMac::ApWifiMac ()
   m_beaconDca->SetAifsn (1);
   m_beaconDca->SetMinCw (0);
   m_beaconDca->SetMaxCw (0);
-  m_beaconDca->SetLow (m_low);
-  m_beaconDca->SetManager (m_dcfManager);
+  m_beaconDca->SetMacLow (m_low);
+  m_beaconDca->SetDcfManager (m_dcfManager);
   m_beaconDca->SetTxMiddle (m_txMiddle);
 
   //Let the lower layers know that we are acting as an AP.
@@ -136,13 +141,6 @@ ApWifiMac::SetBeaconGeneration (bool enable)
       m_beaconEvent = Simulator::ScheduleNow (&ApWifiMac::SendOneBeacon, this);
     }
   m_enableBeaconGeneration = enable;
-}
-
-bool
-ApWifiMac::GetBeaconGeneration (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_enableBeaconGeneration;
 }
 
 Time
@@ -245,10 +243,10 @@ ApWifiMac::IsNonGfHtStasPresent (void) const
   return isNonGfHtStasPresent;
 }
 
-uint8_t
+uint16_t
 ApWifiMac::GetVhtOperationalChannelWidth (void) const
 {
-  uint8_t channelWidth = m_phy->GetChannelWidth ();
+  uint16_t channelWidth = m_phy->GetChannelWidth ();
   for (std::map<uint16_t, Mac48Address>::const_iterator i = m_staList.begin (); i != m_staList.end (); i++)
     {
       if (m_stationManager->GetVhtSupported (i->second))
@@ -479,7 +477,6 @@ ApWifiMac::GetEdcaParameterSet (void) const
       edcaParameters.SetBeCWmax (edca->GetMaxCw ());
       edcaParameters.SetBeAifsn (edca->GetAifsn ());
       edcaParameters.SetBeTXOPLimit (txopLimit.GetMicroSeconds () / 32);
-      edcaParameters.SetBeAcm (0);
 
       edca = m_edca.find (AC_BK)->second;
       txopLimit = edca->GetTxopLimit ();
@@ -488,7 +485,6 @@ ApWifiMac::GetEdcaParameterSet (void) const
       edcaParameters.SetBkCWmax (edca->GetMaxCw ());
       edcaParameters.SetBkAifsn (edca->GetAifsn ());
       edcaParameters.SetBkTXOPLimit (txopLimit.GetMicroSeconds () / 32);
-      edcaParameters.SetBkAcm (0);
 
       edca = m_edca.find (AC_VI)->second;
       txopLimit = edca->GetTxopLimit ();
@@ -497,7 +493,6 @@ ApWifiMac::GetEdcaParameterSet (void) const
       edcaParameters.SetViCWmax (edca->GetMaxCw ());
       edcaParameters.SetViAifsn (edca->GetAifsn ());
       edcaParameters.SetViTXOPLimit (txopLimit.GetMicroSeconds () / 32);
-      edcaParameters.SetViAcm (0);
 
       edca = m_edca.find (AC_VO)->second;
       txopLimit = edca->GetTxopLimit ();
@@ -506,7 +501,6 @@ ApWifiMac::GetEdcaParameterSet (void) const
       edcaParameters.SetVoCWmax (edca->GetMaxCw ());
       edcaParameters.SetVoAifsn (edca->GetAifsn ());
       edcaParameters.SetVoTXOPLimit (txopLimit.GetMicroSeconds () / 32);
-      edcaParameters.SetVoAcm (0);
 
       edcaParameters.SetQosInfo (0);
     }
@@ -615,7 +609,7 @@ ApWifiMac::GetVhtOperation (void) const
   if (m_vhtSupported)
     {
       operation.SetVhtSupported (1);
-      uint8_t channelWidth = GetVhtOperationalChannelWidth ();
+      uint16_t channelWidth = GetVhtOperationalChannelWidth ();
       if (channelWidth == 160)
         {
           operation.SetChannelWidth (2);
@@ -736,7 +730,7 @@ ApWifiMac::SendAssocResp (Mac48Address to, bool success, bool isReassoc)
   if (success)
     {
       code.SetSuccess ();
-      uint16_t aid;
+      uint16_t aid = 0;
       bool found = false;
       if (isReassoc)
         {

@@ -20,8 +20,9 @@
  *          Mirko Banchi <mk.banchi@gmail.com>
  */
 
-#include "mgt-headers.h"
 #include "ns3/simulator.h"
+#include "ns3/address-utils.h"
+#include "mgt-headers.h"
 
 namespace ns3 {
 
@@ -149,6 +150,7 @@ MgtProbeRequestHeader::Print (std::ostream &os) const
 {
   os << "ssid=" << m_ssid << ", "
      << "rates=" << m_rates << ", "
+     << "Extended Capabilities=" << m_extendedCapability << " , "
      << "HT Capabilities=" << m_htCapability << " , "
      << "VHT Capabilities=" << m_vhtCapability << " , "
      << "HE Capabilities=" << m_heCapability;
@@ -416,6 +418,7 @@ MgtProbeResponseHeader::Print (std::ostream &os) const
   os << "ssid=" << m_ssid << ", "
      << "rates=" << m_rates << ", "
      << "ERP information=" << m_erpInformation << ", "
+     << "Extended Capabilities=" << m_extendedCapability << " , "
      << "HT Capabilities=" << m_htCapability << " , "
      << "HT Operation=" << m_htOperation << " , "
      << "VHT Capabilities=" << m_vhtCapability << " , "
@@ -648,6 +651,7 @@ MgtAssocRequestHeader::Print (std::ostream &os) const
 {
   os << "ssid=" << m_ssid << ", "
      << "rates=" << m_rates << ", "
+     << "Extended Capabilities=" << m_extendedCapability << " , "
      << "HT Capabilities=" << m_htCapability << " , "
      << "VHT Capabilities=" << m_vhtCapability << " , "
      << "HE Capabilities=" << m_heCapability;
@@ -842,6 +846,7 @@ MgtReassocRequestHeader::Print (std::ostream &os) const
   os << "current AP address=" << m_currentApAddr << ", "
      << "ssid=" << m_ssid << ", "
      << "rates=" << m_rates << ", "
+     << "Extended Capabilities=" << m_extendedCapability << " , "
      << "HT Capabilities=" << m_htCapability << " , "
      << "VHT Capabilities=" << m_vhtCapability << " , "
      << "HE Capabilities=" << m_heCapability;
@@ -1085,6 +1090,7 @@ MgtAssocResponseHeader::Print (std::ostream &os) const
      << "aid=" << m_aid << ", "
      << "rates=" << m_rates << ", "
      << "ERP information=" << m_erpInformation << ", "
+     << "Extended Capabilities=" << m_extendedCapability << " , "
      << "HT Capabilities=" << m_htCapability << " , "
      << "HT Operation=" << m_htOperation << " , "
      << "VHT Capabilities=" << m_vhtCapability << " , "

@@ -18,10 +18,11 @@
  * Author: Matias Richart <mrichart@fing.edu.uy>
  */
 
-#include "aparf-wifi-manager.h"
-#include "wifi-phy.h"
 #include "ns3/log.h"
 #include "ns3/uinteger.h"
+#include "ns3/data-rate.h"
+#include "aparf-wifi-manager.h"
+#include "wifi-phy.h"
 
 #define Min(a,b) ((a < b) ? a : b)
 
@@ -165,7 +166,7 @@ AparfWifiManager::CheckInit (AparfWifiRemoteStation *station)
       station->m_prevPowerLevel = m_maxPower;
       station->m_critRateIndex = 0;
       WifiMode mode = GetSupported (station, station->m_rateIndex);
-      uint8_t channelWidth = GetChannelWidth (station);
+      uint16_t channelWidth = GetChannelWidth (station);
       DataRate rate = DataRate (mode.GetDataRate (channelWidth));
       double power = GetPhy ()->GetPowerDbm (m_maxPower);
       m_powerChange (power, power, station->m_state->m_address);
@@ -321,7 +322,7 @@ AparfWifiManager::DoGetDataTxVector (WifiRemoteStation *st)
 {
   NS_LOG_FUNCTION (this << st);
   AparfWifiRemoteStation *station = (AparfWifiRemoteStation *) st;
-  uint8_t channelWidth = GetChannelWidth (station);
+  uint16_t channelWidth = GetChannelWidth (station);
   if (channelWidth > 20 && channelWidth != 22)
     {
       //avoid to use legacy rate adaptation algorithms for IEEE 802.11n/ac
@@ -353,7 +354,7 @@ AparfWifiManager::DoGetRtsTxVector (WifiRemoteStation *st)
   /// \todo we could/should implement the Arf algorithm for
   /// RTS only by picking a single rate within the BasicRateSet.
   AparfWifiRemoteStation *station = (AparfWifiRemoteStation *) st;
-  uint8_t channelWidth = GetChannelWidth (station);
+  uint16_t channelWidth = GetChannelWidth (station);
   if (channelWidth > 20 && channelWidth != 22)
     {
       //avoid to use legacy rate adaptation algorithms for IEEE 802.11n/ac

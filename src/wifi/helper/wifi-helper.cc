@@ -20,17 +20,18 @@
  *          Mirko Banchi <mk.banchi@gmail.com>
  */
 
-#include "wifi-helper.h"
 #include "ns3/wifi-net-device.h"
 #include "ns3/minstrel-wifi-manager.h"
 #include "ns3/minstrel-ht-wifi-manager.h"
 #include "ns3/ap-wifi-mac.h"
 #include "ns3/ampdu-subframe-header.h"
+#include "ns3/mobility-model.h"
 #include "ns3/log.h"
 #include "ns3/pointer.h"
 #include "ns3/radiotap-header.h"
 #include "ns3/config.h"
 #include "ns3/names.h"
+#include "wifi-helper.h"
 
 namespace ns3 {
 
@@ -55,7 +56,7 @@ AsciiPhyTransmitSinkWithContext (
   uint8_t txLevel)
 {
   NS_LOG_FUNCTION (stream << context << p << mode << preamble << txLevel);
-  *stream->GetStream () << "t " << Simulator::Now ().GetSeconds () << " " << context << " " << *p << std::endl;
+  *stream->GetStream () << "t " << Simulator::Now ().GetSeconds () << " " << context << " " << mode << " " << *p << std::endl;
 }
 
 /**
@@ -75,7 +76,7 @@ AsciiPhyTransmitSinkWithoutContext (
   uint8_t txLevel)
 {
   NS_LOG_FUNCTION (stream << p << mode << preamble << txLevel);
-  *stream->GetStream () << "t " << Simulator::Now ().GetSeconds () << " " << *p << std::endl;
+  *stream->GetStream () << "t " << Simulator::Now ().GetSeconds () << " " << mode << " " << *p << std::endl;
 }
 
 /**
@@ -97,7 +98,7 @@ AsciiPhyReceiveSinkWithContext (
   WifiPreamble preamble)
 {
   NS_LOG_FUNCTION (stream << context << p << snr << mode << preamble);
-  *stream->GetStream () << "r " << Simulator::Now ().GetSeconds () << " " << context << " " << *p << std::endl;
+  *stream->GetStream () << "r " << Simulator::Now ().GetSeconds () << " " << mode << "" << context << " " << *p << std::endl;
 }
 
 /**
@@ -117,7 +118,7 @@ AsciiPhyReceiveSinkWithoutContext (
   WifiPreamble preamble)
 {
   NS_LOG_FUNCTION (stream << p << snr << mode << preamble);
-  *stream->GetStream () << "r " << Simulator::Now ().GetSeconds () << " " << *p << std::endl;
+  *stream->GetStream () << "r " << Simulator::Now ().GetSeconds () << " " << mode << " " << *p << std::endl;
 }
 
 WifiPhyHelper::WifiPhyHelper ()
@@ -293,7 +294,7 @@ WifiPhyHelper::PcapSniffTxEvent (
               {
                 ampduStatusFlags |= RadiotapHeader::A_MPDU_STATUS_LAST;
               }
-            header.SetAmpduStatus (aMpdu.mpduRefNumber, ampduStatusFlags, hdr.GetCrc ());
+            header.SetAmpduStatus (aMpdu.mpduRefNumber, ampduStatusFlags, 1 /*CRC*/);
           }
 
         if (txVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_VHT)
@@ -491,7 +492,7 @@ WifiPhyHelper::PcapSniffRxEvent (
               {
                 ampduStatusFlags |= RadiotapHeader::A_MPDU_STATUS_LAST;
               }
-            header.SetAmpduStatus (aMpdu.mpduRefNumber, ampduStatusFlags, hdr.GetCrc ());
+            header.SetAmpduStatus (aMpdu.mpduRefNumber, ampduStatusFlags, 1 /*CRC*/);
           }
 
         if (txVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_VHT)

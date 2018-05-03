@@ -1,7 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2005, 2009 INRIA
- * Copyright (c) 2009 MIRKO BANCHI
+ * Copyright (c) 2018
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -16,38 +15,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Mirko Banchi <mk.banchi@gmail.com>
+ * Author: Sébastien Deronne <sebastien.deronne@gmail.com>
  */
 
-#include "ns3/mac48-address.h"
-#include "qos-blocked-destinations.h"
+#ifndef BLOCK_ACK_TYPE_H
+#define BLOCK_ACK_TYPE_H
 
 namespace ns3 {
 
-QosBlockedDestinations::QosBlockedDestinations ()
+/**
+ * \ingroup wifi
+ * The different block ACK policies.
+ */
+enum BlockAckType
 {
-}
-
-QosBlockedDestinations::~QosBlockedDestinations ()
-{
-}
-
-bool
-QosBlockedDestinations::IsBlocked (Mac48Address dest, uint8_t tid) const
-{
-  return m_blockedQosPackets.find ({dest, tid}) != m_blockedQosPackets.end ();
-}
-
-void
-QosBlockedDestinations::Block (Mac48Address dest, uint8_t tid)
-{
-  m_blockedQosPackets.insert ({dest, tid});
-}
-
-void
-QosBlockedDestinations::Unblock (Mac48Address dest, uint8_t tid)
-{
-  m_blockedQosPackets.erase ({dest, tid});
-}
+  BASIC_BLOCK_ACK,
+  COMPRESSED_BLOCK_ACK,
+  MULTI_TID_BLOCK_ACK
+};
 
 } //namespace ns3
+
+#endif /* BLOCK_ACK_TYPE_H */

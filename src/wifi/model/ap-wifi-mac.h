@@ -24,14 +24,17 @@
 #define AP_WIFI_MAC_H
 
 #include "regular-wifi-mac.h"
-#include "capability-information.h"
-#include "supported-rates.h"
-#include "dsss-parameter-set.h"
-#include "erp-information.h"
-#include "edca-parameter-set.h"
-#include "ns3/random-variable-stream.h"
 
 namespace ns3 {
+
+class SupportedRates;
+class CapabilityInformation;
+class DsssParameterSet;
+class ErpInformation;
+class EdcaParameterSet;
+class HtOperation;
+class VhtOperation;
+class HeOperation;
 
 /**
  * \brief Wi-Fi AP state machine
@@ -127,7 +130,7 @@ public:
    *
    * \returns the VHT operational channel width (in MHz).
    */
-  uint8_t GetVhtOperationalChannelWidth (void) const;
+  uint16_t GetVhtOperationalChannelWidth (void) const;
 
   /**
    * Assign a fixed random variable stream number to the random variables
@@ -267,12 +270,6 @@ private:
    * \param enable enable or disable beacon generation
    */
   void SetBeaconGeneration (bool enable);
-  /**
-   * Return whether the AP is generating beacons.
-   *
-   * \return true if beacons are periodically generated, false otherwise
-   */
-  bool GetBeaconGeneration (void) const;
   /**
    * Return whether protection for non-ERP stations is used in the BSS.
    *

@@ -21,11 +21,11 @@
  *          Sébastien Deronne <sebastien.deronne@gmail.com>
  */
 
+#include "ns3/string.h"
 #include "ns3/yans-wifi-helper.h"
 #include "ns3/mobility-helper.h"
 #include "ns3/wifi-net-device.h"
 #include "ns3/adhoc-wifi-mac.h"
-#include "ns3/propagation-delay-model.h"
 #include "ns3/propagation-loss-model.h"
 #include "ns3/yans-error-rate-model.h"
 #include "ns3/constant-position-mobility-model.h"
@@ -33,17 +33,15 @@
 #include "ns3/pointer.h"
 #include "ns3/rng-seed-manager.h"
 #include "ns3/config.h"
-#include "ns3/string.h"
 #include "ns3/packet-socket-server.h"
 #include "ns3/packet-socket-client.h"
 #include "ns3/packet-socket-helper.h"
 #include "ns3/spectrum-wifi-helper.h"
-#include "ns3/spectrum-value.h"
 #include "ns3/multi-model-spectrum-channel.h"
 #include "ns3/wifi-spectrum-signal-parameters.h"
 #include "ns3/wifi-phy-tag.h"
-#include <tuple>
-#include <vector>
+#include "ns3/yans-wifi-phy.h"
+#include "ns3/mgt-headers.h"
 
 using namespace ns3;
 
@@ -1185,7 +1183,7 @@ private:
   /**
    * A tuple of {starting frequency, channelWidth, Number of subbands in SpectrumModel, modulation type}
    */
-  typedef std::tuple<double, uint8_t, uint32_t, WifiModulationClass> FreqWidthSubbandModulationTuple;
+  typedef std::tuple<double, uint16_t, uint32_t, WifiModulationClass> FreqWidthSubbandModulationTuple;
   std::vector<FreqWidthSubbandModulationTuple> m_distinctTuples; ///< vector of distinct {starting frequency, channelWidth, Number of subbands in SpectrumModel, modulation type} tuples
 
   /**
@@ -1231,7 +1229,7 @@ Bug2483TestCase::StoreDistinctTuple (std::string context,  Ptr<SpectrumSignalPar
       return;
     }
   WifiTxVector txVector = tag.GetWifiTxVector ();
-  uint8_t channelWidth = txVector.GetChannelWidth ();
+  uint16_t channelWidth = txVector.GetChannelWidth ();
   WifiModulationClass modulationClass = txVector.GetMode ().GetModulationClass ();
 
   // Build a tuple and check if seen before (if so store it)
@@ -1268,7 +1266,7 @@ Bug2483TestCase::DoRun (void)
   Config::SetDefault ("ns3::WifiRemoteStationManager::RtsCtsThreshold", StringValue ("500")); // so as to force RTS/CTS for data frames
   Config::SetDefault ("ns3::WifiPhy::CcaMode1Threshold", DoubleValue (-62.0));
 
-  uint8_t channelWidth = 40; // at least 40 MHz expected here
+  uint16_t channelWidth = 40; // at least 40 MHz expected here
 
   NodeContainer wifiStaNode;
   wifiStaNode.Create (1);
@@ -1451,13 +1449,13 @@ Bug2831TestCase::DoRun (void)
   ObjectFactory mac;
   mac.SetTypeId ("ns3::ApWifiMac");
   Ptr<WifiMac> apMac = mac.Create<WifiMac> ();
-  apMac->ConfigureStandard (WIFI_PHY_STANDARD_80211n_5GHZ);
+  apMac->ConfigureStandard (WIFI_PHY_STANDARD_80211ax_5GHZ);
 
   Ptr<Node> staNode = CreateObject<Node> ();
   Ptr<WifiNetDevice> staDev = CreateObject<WifiNetDevice> ();
   mac.SetTypeId ("ns3::StaWifiMac");
   Ptr<WifiMac> staMac = mac.Create<WifiMac> ();
-  staMac->ConfigureStandard (WIFI_PHY_STANDARD_80211n_5GHZ);
+  staMac->ConfigureStandard (WIFI_PHY_STANDARD_80211ax_5GHZ);
 
   Ptr<ConstantPositionMobilityModel> apMobility = CreateObject<ConstantPositionMobilityModel> ();
   apMobility->SetPosition (Vector (0.0, 0.0, 0.0));
@@ -1469,7 +1467,7 @@ Bug2831TestCase::DoRun (void)
   m_apPhy->SetChannel (channel);
   m_apPhy->SetMobility (apMobility);
   m_apPhy->SetDevice (apDev);
-  m_apPhy->ConfigureStandard (WIFI_PHY_STANDARD_80211n_5GHZ);
+  m_apPhy->ConfigureStandard (WIFI_PHY_STANDARD_80211ax_5GHZ);
   m_apPhy->SetChannelNumber (36);
   m_apPhy->SetChannelWidth (20);
 
@@ -1482,7 +1480,7 @@ Bug2831TestCase::DoRun (void)
   m_staPhy->SetChannel (channel);
   m_staPhy->SetMobility (staMobility);
   m_staPhy->SetDevice (apDev);
-  m_staPhy->ConfigureStandard (WIFI_PHY_STANDARD_80211ac);
+  m_staPhy->ConfigureStandard (WIFI_PHY_STANDARD_80211ax_5GHZ);
   m_staPhy->SetChannelNumber (36);
   m_staPhy->SetChannelWidth (20);
 

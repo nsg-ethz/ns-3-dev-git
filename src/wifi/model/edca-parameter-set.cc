@@ -65,12 +65,6 @@ EdcaParameterSet::SetBeAifsn (uint8_t aifsn)
 }
 
 void
-EdcaParameterSet::SetBeAcm (uint8_t acm)
-{
-  m_acBE |= (acm & 0x01) << 4;
-}
-
-void
 EdcaParameterSet::SetBeAci (uint8_t aci)
 {
   m_acBE |= (aci & 0x03) << 5;
@@ -100,12 +94,6 @@ void
 EdcaParameterSet::SetBkAifsn (uint8_t aifsn)
 {
   m_acBK |= (aifsn & 0x0f);
-}
-
-void
-EdcaParameterSet::SetBkAcm (uint8_t acm)
-{
-  m_acBK |= (acm & 0x01) << 4;
 }
 
 void
@@ -141,12 +129,6 @@ EdcaParameterSet::SetViAifsn (uint8_t aifsn)
 }
 
 void
-EdcaParameterSet::SetViAcm (uint8_t acm)
-{
-  m_acVI |= (acm & 0x01) << 4;
-}
-
-void
 EdcaParameterSet::SetViAci (uint8_t aci)
 {
   m_acVI |= (aci & 0x03) << 5;
@@ -176,12 +158,6 @@ void
 EdcaParameterSet::SetVoAifsn (uint8_t aifsn)
 {
   m_acVO |= (aifsn & 0x0f);
-}
-
-void
-EdcaParameterSet::SetVoAcm (uint8_t acm)
-{
-  m_acVO |= (acm & 0x01) << 4;
 }
 
 void
@@ -222,18 +198,6 @@ EdcaParameterSet::GetBeAifsn (void) const
   return (m_acBE & 0x0f);
 }
 
-uint8_t
-EdcaParameterSet::GetBeAcm (void) const
-{
-  return ((m_acBE >> 4) & 0x01);
-}
-
-uint8_t
-EdcaParameterSet::GetBeAci (void) const
-{
-  return ((m_acBE >> 5) & 0x03);
-}
-
 uint32_t
 EdcaParameterSet::GetBeCWmin (void) const
 {
@@ -258,18 +222,6 @@ uint8_t
 EdcaParameterSet::GetBkAifsn (void) const
 {
   return (m_acBK & 0x0f);
-}
-
-uint8_t
-EdcaParameterSet::GetBkAcm (void) const
-{
-  return ((m_acBK >> 4) & 0x01);
-}
-
-uint8_t
-EdcaParameterSet::GetBkAci (void) const
-{
-  return ((m_acBK >> 5) & 0x03);
 }
 
 uint32_t
@@ -298,18 +250,6 @@ EdcaParameterSet::GetViAifsn (void) const
   return (m_acVI & 0x0f);
 }
 
-uint8_t
-EdcaParameterSet::GetViAcm (void) const
-{
-  return ((m_acVI >> 4) & 0x01);
-}
-
-uint8_t
-EdcaParameterSet::GetViAci (void) const
-{
-  return ((m_acVI >> 5) & 0x03);
-}
-
 uint32_t
 EdcaParameterSet::GetViCWmin (void) const
 {
@@ -334,18 +274,6 @@ uint8_t
 EdcaParameterSet::GetVoAifsn (void) const
 {
   return (m_acVO & 0x0f);
-}
-
-uint8_t
-EdcaParameterSet::GetVoAcm (void) const
-{
-  return ((m_acVO >> 4) & 0x01);
-}
-
-uint8_t
-EdcaParameterSet::GetVoAci (void) const
-{
-  return ((m_acVO >> 5) & 0x03);
 }
 
 uint32_t
@@ -400,7 +328,7 @@ EdcaParameterSet::SerializeInformationField (Buffer::Iterator start) const
 {
   if (m_qosSupported)
     {
-      start.WriteU8 (m_qosInfo);
+      start.WriteU8 (GetQosInfo ());
       start.WriteU8 (m_reserved);
       start.WriteU32 (m_acBE);
       start.WriteU32 (m_acBK);

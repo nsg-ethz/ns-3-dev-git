@@ -20,10 +20,13 @@
  *          Mirko Banchi <mk.banchi@gmail.com>
  */
 
-#include "sta-wifi-mac.h"
 #include "ns3/log.h"
+#include "ns3/packet.h"
 #include "ns3/simulator.h"
+#include "sta-wifi-mac.h"
+#include "wifi-phy.h"
 #include "mac-low.h"
+#include "mgt-headers.h"
 
 /*
  * The state machine for this STA is:
@@ -198,6 +201,7 @@ StaWifiMac::SendAssociationRequest (bool isReassoc)
       assoc.SetSsid (GetSsid ());
       assoc.SetSupportedRates (GetSupportedRates ());
       assoc.SetCapabilities (GetCapabilities ());
+      assoc.SetListenInterval (0);
       if (m_htSupported || m_vhtSupported || m_heSupported)
         {
           assoc.SetExtendedCapabilities (GetExtendedCapabilities ());
@@ -220,6 +224,7 @@ StaWifiMac::SendAssociationRequest (bool isReassoc)
       reassoc.SetSsid (GetSsid ());
       reassoc.SetSupportedRates (GetSupportedRates ());
       reassoc.SetCapabilities (GetCapabilities ());
+      reassoc.SetListenInterval (0);
       if (m_htSupported || m_vhtSupported || m_heSupported)
         {
           reassoc.SetExtendedCapabilities (GetExtendedCapabilities ());
@@ -272,7 +277,7 @@ StaWifiMac::TryToEnsureAssociated (void)
        * We try to initiate a probe request now.
        */
       m_linkDown ();
-      if (m_activeProbing)
+      if (GetActiveProbing ())
         {
           SetState (WAIT_PROBE_RESP);
           SendProbeRequest ();
@@ -528,7 +533,7 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
           Time delay = MicroSeconds (beacon.GetBeaconIntervalUs () * m_maxMissedBeacons);
           RestartBeaconWatchdog (delay);
           SetBssid (hdr->GetAddr3 ());
-          SupportedRates rates = beacon.GetSupportedRates ();
+          rates = beacon.GetSupportedRates ();
           for (uint8_t i = 0; i < m_phy->GetNModes (); i++)
             {
               WifiMode mode = m_phy->GetMode (i);
@@ -542,7 +547,7 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
             {
               ErpInformation erpInformation = beacon.GetErpInformation ();
               isShortPreambleEnabled &= !erpInformation.GetBarkerPreambleMode ();
-              if (erpInformation.GetUseProtection () == true)
+              if (erpInformation.GetUseProtection () != 0)
                 {
                   m_stationManager->SetUseNonErpProtection (true);
                 }
