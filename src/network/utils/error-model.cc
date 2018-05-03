@@ -143,7 +143,7 @@ ErrorModel::IsEnabled (void) const
 }
 
 //
-// RateErrorModel
+// FlowErrorModel
 //
 
 NS_OBJECT_ENSURE_REGISTERED (RateErrorModel);
@@ -592,6 +592,135 @@ BinaryErrorModel::DoReset (void)
   NS_LOG_FUNCTION (this);
   m_counter = 0;
 }
+
+
+//
+// FlowErrorModel
+//
+
+NS_OBJECT_ENSURE_REGISTERED (FlowErrorModel);
+
+TypeId FlowErrorModel::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::FlowErrorModel")
+          .SetParent<ErrorModel> ()
+          .SetGroupName("Network")
+          .AddConstructor<FlowErrorModel> ()
+          .AddAttribute ("FlowLayer", "The error unit",
+                         EnumValue (L4_LAYER),
+                         MakeEnumAccessor (&FlowErrorModel::m_layer),
+                         MakeEnumChecker (L3_LAYER, "L3_LAYER",
+                                          L4_LAYER, "L4_LAYER"))
+          .AddAttribute ("ErrorRate", "The error rate.",
+                         DoubleValue (0.0),
+                         MakeDoubleAccessor (&FlowErrorModel::m_rate),
+                         MakeDoubleChecker<double> ())
+          .AddAttribute ("RanVar", "The decision variable attached to this error model.",
+                         StringValue ("ns3::UniformRandomVariable[Min=0.0|Max=1.0]"),
+                         MakePointerAccessor (&FlowErrorModel::m_ranvar),
+                         MakePointerChecker<RandomVariableStream> ())
+  ;
+  return tid;
+}
+
+
+FlowErrorModel::FlowErrorModel ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+FlowErrorModel::~FlowErrorModel ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+FlowErrorModel::ErrorUnit
+FlowErrorModel::GetUnit (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_unit;
+}
+
+void
+FlowErrorModel::SetLayer (enum FlowLayer flow_layer)
+{
+  NS_LOG_FUNCTION (this << error_unit);
+  m_layer = flow_layer;
+}
+
+double
+FlowErrorModel::GetRate (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_rate;
+}
+
+void
+FlowErrorModel::SetRate (double rate)
+{
+  NS_LOG_FUNCTION (this << rate);
+  m_rate = rate;
+}
+
+void
+FlowErrorModel::SetRandomVariable (Ptr<RandomVariableStream> ranvar)
+{
+  NS_LOG_FUNCTION (this << ranvar);
+  m_ranvar = ranvar;
+}
+
+int64_t
+FlowErrorModel::AssignStreams (int64_t stream)
+{
+  NS_LOG_FUNCTION (this << stream);
+  m_ranvar->SetStream (stream);
+  return 1;
+}
+
+bool
+FlowErrorModel::DoCorrupt (Ptr<Packet> p)
+{
+  NS_LOG_FUNCTION (this << p);
+  if (!IsEnabled ())
+  {
+    return false;
+  }
+  switch (m_unit)
+  {
+    case ERROR_UNIT_PACKET:
+      return DoCorruptPkt (p);
+    case ERROR_UNIT_BYTE:
+      return DoCorruptByte (p);
+    case ERROR_UNIT_BIT:
+      return DoCorruptBit (p);
+    default:
+      NS_ASSERT_MSG (false, "m_unit not supported yet");
+          break;
+  }
+  return false;
+}
+
+bool
+FlowErrorModel::DoCorruptL3 (Ptr<Packet> p)
+{
+  NS_LOG_FUNCTION (this << p);
+  return (m_ranvar->GetValue () < m_rate);
+}
+
+bool
+FlowErrorModel::DoCorruptL4 (Ptr<Packet> p)
+{
+  NS_LOG_FUNCTION (this << p);
+  return (m_ranvar->GetValue () < m_rate);
+}
+
+void
+FlowErrorModel::DoReset (void)
+{
+  NS_LOG_FUNCTION (this);
+  /* re-initialize any state; no-op for now */
+}
+
 
 
 
