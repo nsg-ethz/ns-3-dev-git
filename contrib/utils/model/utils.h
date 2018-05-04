@@ -63,7 +63,6 @@ namespace ns3 {
 
     double MeasureInterfaceLoad(Ptr<Queue<Packet>> q, double next_schedule, std::string name, DataRate linkBandwidth);
 
-
     void PrintQueueSize(Ptr<Queue<Packet>> q);
 
     void ChangeLinkDropRate(NetDeviceContainer link_to_change, double drop_rate);
@@ -71,6 +70,10 @@ namespace ns3 {
     void FailLink(NetDeviceContainer link_to_fail);
 
     void RecoverLink(NetDeviceContainer link_to_recover);
+
+    void LinkUp(NetDeviceContainer link);
+
+    void LinkDown(NetDeviceContainer link);
 
     uint64_t LeftMostPowerOfTen(uint64_t number);
 
