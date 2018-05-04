@@ -3,6 +3,9 @@
 //
 
 #include <cmath>
+
+#include "flow-error-model.h"
+
 #include "ns3/packet.h"
 #include "ns3/assert.h"
 #include "ns3/log.h"
@@ -11,9 +14,7 @@
 #include "ns3/double.h"
 #include "ns3/string.h"
 #include "ns3/pointer.h"
-#include "flow-error-model.h"
 
-//Import headers
 #include "ns3/ppp-header.h"
 #include "ns3/ethernet-header.h"
 #include "ns3/udp-header.h"
@@ -26,6 +27,8 @@ namespace ns3 {
 //
 // FlowErrorModel
 //
+
+NS_LOG_COMPONENT_DEFINE("FlowErrorModel");
 
 NS_OBJECT_ENSURE_REGISTERED (FlowErrorModel);
 

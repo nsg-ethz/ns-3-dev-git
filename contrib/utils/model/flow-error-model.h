@@ -108,4 +108,4 @@ private:
 
 } // namespace ns3
 
-#endif //NS3_BACKEND_FLOW_ERROR_MODEL_H
+#endif //FLOW_ERROR_MODEL_H

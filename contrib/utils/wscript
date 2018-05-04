@@ -13,6 +13,7 @@ def build(bld):
         'model/swift-utils.cc',
         'model/nodes-usage.cc',
         'model/trace-sinks.cc',
+        'model/flow-error-model.cc',
         'helper/utils-helper.cc',
         ]
 
@@ -28,6 +29,7 @@ def build(bld):
         'model/swift-utils.h',
         'model/nodes-usage.h',
         'model/trace-sinks.h',
+        'model/flow-error-model.h',
         'helper/utils-helper.h',
         ]
 
