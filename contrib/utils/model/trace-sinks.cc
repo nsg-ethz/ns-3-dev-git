@@ -29,7 +29,6 @@ namespace ns3 {
 
         PppHeader ppp_header;
         p->RemoveHeader(ppp_header);
-
         Ipv4Header ip_header;
         p->RemoveHeader(ip_header);
 

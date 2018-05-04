@@ -567,6 +567,7 @@ private:
      * \returns true if the packet is corrupted
      */
     virtual bool DoCorruptL4 (Ptr<Packet> p);
+    uint64_t GetHeaderHash(Ptr<Packet> p, FlowLayer layer);
     virtual void DoReset (void);
 
     enum FlowLayer m_layer; //!< Error rate unit

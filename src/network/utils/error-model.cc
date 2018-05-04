@@ -73,6 +73,14 @@
 #include "ns3/string.h"
 #include "ns3/pointer.h"
 
+//Import headers
+#include "ns3/ppp-header.h"
+#include "ns3/ethernet-header.h"
+#include "ns3/udp-header.h"
+#include "ns3/tcp-header.h"
+#include "ns3/ipv4-header.h"
+//#include "ns3/ipv6-header.h" FUTURE
+
 namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("ErrorModel");
@@ -623,7 +631,6 @@ TypeId FlowErrorModel::GetTypeId (void)
   return tid;
 }
 
-
 FlowErrorModel::FlowErrorModel ()
 {
   NS_LOG_FUNCTION (this);
@@ -700,6 +707,64 @@ FlowErrorModel::DoCorrupt (Ptr<Packet> p)
   }
   return false;
 }
+
+uint64_t
+FlowErrorModel::GetHeaderHash(Ptr<Packet> packet, FlowLayer layer){
+
+  Ptr<Packet> p = packet->Copy();
+
+  /* Assumes that the packet is a ppp */
+  PppHeader ppp_header;
+  p->RemoveHeader(ppp_header);
+
+  /* Assumes IPv4 header */
+  Ipv4Header ip_header;
+  p->RemoveHeader(ip_header);
+
+  uint8_t ip_protocol = ip_header.GetProtocol();
+  uint16_t src_port = 0;
+  uint16_t dst_port = 0;
+
+  switch (layer)
+  {
+    case L3_LAYER:
+      break;
+    case L4_LAYER:
+
+      if (ip_protocol == uint8_t(17)){//udp
+        UdpHeader udp_header;
+        p->RemoveHeader(udp_header);
+        src_port = udp_header.GetSourcePort();
+        dst_port = udp_header.GetDestinationPort();
+      }
+      else if (ip_protocol ==  uint8_t(6)) {//tcp
+        TcpHeader tcp_header;
+        p->RemoveHeader(tcp_header);
+        src_port = tcp_header.GetSourcePort();
+        dst_port = tcp_header.GetDestinationPort();
+      }
+    default:
+      NS_ASSERT_MSG(false, "Layer not supported");
+      break;
+  }
+
+  uint8_t buf[13];
+  ip_header.GetSource().Serialize(buf);
+  ip_header.GetDestination().Serialize(buf+4);
+  buf[8] = ip_protocol;
+  buf[9] = (src_port >> 8) & 0xff;
+  buf[10] = src_port & 0xff;
+  buf[11] = (dst_port >> 8) & 0xff;
+  buf[12] = dst_port & 0xff;
+
+  uint64_t hash = Hash64((char*) buf, 13);
+
+  NS_LOG_DEBUG("Flow Error Model Packet Hash" << hash);
+
+  return hash;
+
+}
+
 
 bool
 FlowErrorModel::DoCorruptL3 (Ptr<Packet> p)
