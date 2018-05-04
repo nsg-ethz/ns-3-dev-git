@@ -242,12 +242,13 @@ void PrintQueueSize(Ptr<Queue<Packet>> q){
 }
 
 void ChangeLinkDropRate(NetDeviceContainer link_to_change, double drop_rate){
+
 	Ptr<RateErrorModel> em = CreateObject<RateErrorModel> ();
 	em->SetAttribute ("ErrorRate", DoubleValue (drop_rate));
 	em->SetAttribute ("ErrorUnit", EnumValue(RateErrorModel::ERROR_UNIT_PACKET));
-
 	link_to_change.Get(0)->SetAttribute ("ReceiveErrorModel", PointerValue (em));
 	link_to_change.Get(1)->SetAttribute ("ReceiveErrorModel", PointerValue (em));
+
 }
 
 void FailLink(NetDeviceContainer link_to_fail){
