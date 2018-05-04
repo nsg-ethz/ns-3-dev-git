@@ -99,10 +99,11 @@ private:
     bool IsGreen(uint64_t hash);
 
     enum FlowLayer m_layer; //!< Error rate unit
-    double m_rate; //!< Error rate
+    double m_flowErrorRate; //!< Error rate
     Ptr<RandomVariableStream> m_ranvar; //!< rng stream
     std::set<uint64_t> m_redFlows; //! Set of flows that have to be failed
     std::set<uint64_t> m_greenFlows; //! Set of flows that will not be dropped
+    Ptr<ErrorModel> m_normalErrorModel; //! Default Error model applyed to green packets
 };
 
 } // namespace ns3

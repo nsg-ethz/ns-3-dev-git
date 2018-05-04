@@ -40,14 +40,20 @@ TypeId FlowErrorModel::GetTypeId (void)
                            MakeEnumAccessor (&FlowErrorModel::m_layer),
                            MakeEnumChecker (L3_LAYER, "L3_LAYER",
                                             L4_LAYER, "L4_LAYER"))
-            .AddAttribute ("ErrorRate", "The error rate.",
+            .AddAttribute ("FlowErrorRate", "The Flow error rate.",
                            DoubleValue (0.0),
-                           MakeDoubleAccessor (&FlowErrorModel::m_rate),
+                           MakeDoubleAccessor (&FlowErrorModel::m_flowErrorRate),
                            MakeDoubleChecker<double> ())
             .AddAttribute ("RanVar", "The decision variable attached to this error model.",
                            StringValue ("ns3::UniformRandomVariable[Min=0.0|Max=1.0]"),
                            MakePointerAccessor (&FlowErrorModel::m_ranvar),
                            MakePointerChecker<RandomVariableStream> ())
+
+            .AddAttribute ("NormalErrorModel",
+                           "The receiver error model used to simulate packet loss",
+                           StringValue("ns3::BurstErrorModel"),
+                           MakePointerAccessor (&FlowErrorModel::m_normalErrorModel),
+                           MakePointerChecker<ErrorModel> ())
     ;
     return tid;
 }
@@ -80,14 +86,14 @@ double
 FlowErrorModel::GetRate (void) const
 {
     NS_LOG_FUNCTION (this);
-    return m_rate;
+    return m_flowErrorRate;
 }
 
 void
 FlowErrorModel::SetRate (double rate)
 {
     NS_LOG_FUNCTION (this << rate);
-    m_rate = rate;
+    m_flowErrorRate = rate;
 }
 
 void
@@ -125,14 +131,18 @@ FlowErrorModel::DoCorrupt (Ptr<Packet> p)
 
     if (IsGreen(flow_id))
     {
-        //apply the burst error model
-        return false;
+        return m_normalErrorModel->IsCorrupt(p);
     }
 
     /* New Flow: check if it has to be corrupted */
+    bool to_corrupt =  DoCorruptFlow(flow_id);
 
+    if (!to_corrupt) /* Apply normal Error Model*/
+    {
+        to_corrupt = m_normalErrorModel->IsCorrupt(p);
+    }
 
-    return false;
+    return to_corrupt;
 }
 
 uint64_t
@@ -207,7 +217,7 @@ bool
 FlowErrorModel::DoCorruptFlow (uint64_t flow_id)
 {
     NS_LOG_FUNCTION (this << flow_id);
-    bool to_corrupt = (m_ranvar->GetValue () < m_rate);
+    bool to_corrupt = (m_ranvar->GetValue () < m_flowErrorRate);
     if (to_corrupt)
     {
         m_redFlows.insert(flow_id);
@@ -224,6 +234,9 @@ FlowErrorModel::DoReset (void)
 {
     NS_LOG_FUNCTION (this);
     /* re-initialize any state; no-op for now */
+    m_normalErrorModel->Reset();
+    m_greenFlows.clear();
+    m_redFlows.clear();
 }
 
 } // namespace ns3
