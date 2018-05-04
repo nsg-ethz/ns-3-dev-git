@@ -248,7 +248,6 @@ void ChangeLinkDropRate(NetDeviceContainer link_to_change, double drop_rate){
 	em->SetAttribute ("ErrorUnit", EnumValue(RateErrorModel::ERROR_UNIT_PACKET));
 	link_to_change.Get(0)->SetAttribute ("ReceiveErrorModel", PointerValue (em));
 	link_to_change.Get(1)->SetAttribute ("ReceiveErrorModel", PointerValue (em));
-
 }
 
 void FailLink(NetDeviceContainer link_to_fail){
@@ -259,6 +258,16 @@ void FailLink(NetDeviceContainer link_to_fail){
 
 void RecoverLink(NetDeviceContainer link_to_recover){
 	ChangeLinkDropRate(link_to_recover, 0);
+}
+
+void LinkUp(NetDeviceContainer link){
+	DynamicCast<PointToPointNetDevice>(link.Get(0))->LinkUp();
+	DynamicCast<PointToPointNetDevice>(link.Get(1))->LinkUp();
+}
+
+void LinkDown(NetDeviceContainer link){
+	DynamicCast<PointToPointNetDevice>(link.Get(0))->LinkDown();
+	DynamicCast<PointToPointNetDevice>(link.Get(1))->LinkDown();
 }
 
 uint64_t LeftMostPowerOfTen(uint64_t number){

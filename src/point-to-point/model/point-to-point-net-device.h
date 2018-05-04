@@ -150,6 +150,9 @@ public:
    */
   void Receive (Ptr<Packet> p);
 
+  void LinkUp(void);
+  void LinkDown(void);
+
   // The remaining methods are documented in ns3::NetDevice*
 
   virtual void SetIfIndex (const uint32_t index);
@@ -285,6 +288,8 @@ private:
    * It calls also the linkChange callback.
    */
   void NotifyLinkUp (void);
+
+  void NotifyLinkDown (void);
 
   /**
    * Enumeration of the states of the transmit machine of the net device.

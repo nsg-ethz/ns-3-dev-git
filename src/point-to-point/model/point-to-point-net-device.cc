@@ -430,6 +430,26 @@ PointToPointNetDevice::NotifyLinkUp (void)
 }
 
 void
+PointToPointNetDevice::NotifyLinkDown (void)
+{
+  NS_LOG_FUNCTION (this);
+  m_linkUp = false;
+  m_linkChangeCallbacks ();
+}
+
+void PointToPointNetDevice::LinkUp(void)
+{
+  NS_LOG_FUNCTION(this);
+  NotifyLinkUp();
+}
+
+void PointToPointNetDevice::LinkDown(void)
+{
+  NS_LOG_FUNCTION(this);
+  NotifyLinkDown();
+}
+
+void
 PointToPointNetDevice::SetIfIndex (const uint32_t index)
 {
   NS_LOG_FUNCTION (this);
