@@ -183,6 +183,7 @@ FlowErrorModel::GetHeaderHash(Ptr<Packet> packet){
                 src_port = tcp_header.GetSourcePort();
                 dst_port = tcp_header.GetDestinationPort();
             }
+            break;
         default:
             NS_ASSERT_MSG(false, "Layer not supported");
             break;
