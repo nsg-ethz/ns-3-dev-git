@@ -43,11 +43,12 @@ main (int argc, char *argv[])
     nodes.Create (3);
 
     PointToPointHelper pointToPoint;
-    pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
+    pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
     pointToPoint.SetChannelAttribute ("Delay", StringValue ("2ms"));
 
     Config::SetDefault("ns3::TcpSocket::DataRetries", UintegerValue(5)); //retranmissions
     Config::SetDefault("ns3::TcpSocketBase::MinRto", TimeValue(MilliSeconds(200))); //min RTO value that can be set
+    Config::SetDefault("ns3::TcpSocketBase::Sack", BooleanValue(true)); //enable sack
 
     NetDeviceContainer link1;
     NetDeviceContainer link2;
@@ -55,7 +56,9 @@ main (int argc, char *argv[])
     link2 = pointToPoint.Install (NodeContainer(nodes.Get(1), nodes.Get(2)));
 
     Ptr<FlowErrorModel> em = CreateObject<FlowErrorModel> ();
+    //Ptr<RateErrorModel> em1 = CreateObject<RateErrorModel>();
 //  em->SetAttribute ("ErrorRate", DoubleValue (0.00001));
+    em->Disable();
     DynamicCast<PointToPointNetDevice>(link2.Get (0))->SetReceiveErrorModel(em);
 
     InternetStackHelper stack;
@@ -73,11 +76,11 @@ main (int argc, char *argv[])
     //traffic
     uint16_t dst_port = 7000;
     InstallSink(nodes.Get(2), dst_port, 0, "TCP");
-    InstallNormalBulkSend(nodes.Get(0), nodes.Get(2), dst_port, 15000, 1);
+    InstallNormalBulkSend(nodes.Get(0), nodes.Get(2), dst_port, 150000000, 1);
 
     pointToPoint.EnablePcap("out", link1.Get(0), bool(1));
 
-    Simulator::Stop (Seconds (1000));
+    //Simulator::Stop (Seconds (100000));
     Simulator::Run ();
     Simulator::Destroy ();
 

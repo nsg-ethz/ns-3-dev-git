@@ -152,7 +152,7 @@ InstallNormalBulkSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint
   srcHost->AddApplication(bulkSender);
 
   bulkSender->SetStartTime(Seconds(startTime));
-  bulkSender->SetStopTime(Seconds(1000));
+  //bulkSender->SetStopTime(Seconds(1000));
 
   return;
 //  return socket;

@@ -123,22 +123,26 @@ FlowErrorModel::DoCorrupt (Ptr<Packet> p)
         return false;
     }
 
-    /*Check if the flow was tagged to be failed in the past */
-    uint64_t flow_id = GetHeaderHash(p);
+    bool to_corrupt = false;
 
-    /* Check if flow_id is already known: */
-    if (IsRed(flow_id))
-    {
-        return true;
+    /* Not even execute this part if the error is 0*/
+    if (m_flowErrorRate > 0) {
+        /*Check if the flow was tagged to be failed in the past */
+        uint64_t flow_id = GetHeaderHash(p);
+
+        /* Check if flow_id is already known: */
+        if (IsRed(flow_id)) {
+            return true;
+        }
+
+        /* check if this flow was white listed*/
+        if (IsGreen(flow_id)) {
+            return m_normalErrorModel->IsCorrupt(p);
+        }
+
+        /* New Flow: check if it has to be corrupted */
+        to_corrupt =  DoCorruptFlow(flow_id);
     }
-
-    if (IsGreen(flow_id))
-    {
-        return m_normalErrorModel->IsCorrupt(p);
-    }
-
-    /* New Flow: check if it has to be corrupted */
-    bool to_corrupt =  DoCorruptFlow(flow_id);
 
     if (!to_corrupt) /* Apply normal Error Model*/
     {

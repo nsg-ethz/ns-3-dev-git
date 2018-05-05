@@ -228,7 +228,7 @@ RateErrorModel::AssignStreams (int64_t stream)
 
 bool 
 RateErrorModel::DoCorrupt (Ptr<Packet> p) 
-{ 
+{
   NS_LOG_FUNCTION (this << p);
   if (!IsEnabled ())
     {
