@@ -82,6 +82,9 @@ public:
      * \param stream first stream index to use
      * \return the number of stream indices assigned by this model
      */
+
+    void SetNormalErrorModel(Ptr<ErrorModel> error_model);
+    void SetNormalErrorModelAttribute (std::string name, const AttributeValue &value);
     int64_t AssignStreams (int64_t stream);
 
 private:

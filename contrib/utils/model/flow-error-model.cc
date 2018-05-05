@@ -238,6 +238,18 @@ FlowErrorModel::DoCorruptFlow (uint64_t flow_id)
 }
 
 void
+FlowErrorModel::SetNormalErrorModel(Ptr<ns3::ErrorModel> error_model)
+{
+    m_normalErrorModel = error_model;
+}
+
+void
+FlowErrorModel::SetNormalErrorModelAttribute (std::string name, const AttributeValue &value)
+{
+    m_normalErrorModel->SetAttribute(name, value);
+}
+
+void
 FlowErrorModel::DoReset (void)
 {
     NS_LOG_FUNCTION (this);

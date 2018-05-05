@@ -56,10 +56,15 @@ main (int argc, char *argv[])
     link2 = pointToPoint.Install (NodeContainer(nodes.Get(1), nodes.Get(2)));
 
     Ptr<FlowErrorModel> em = CreateObject<FlowErrorModel> ();
+
+
+    em->GetAttribute("NormalErrorModel");
+
     //Ptr<RateErrorModel> em1 = CreateObject<RateErrorModel>();
 //  em->SetAttribute ("ErrorRate", DoubleValue (0.00001));
-    em->Disable();
+    //em->Disable();
     DynamicCast<PointToPointNetDevice>(link2.Get (0))->SetReceiveErrorModel(em);
+
 
     InternetStackHelper stack;
     stack.Install (nodes);
