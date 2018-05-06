@@ -622,8 +622,6 @@ main(int argc, char *argv[]) {
 
     NS_LOG_DEBUG("Total Bytes Received By Servers: " << nodes_usage.GetTotalRx());
 
-
-
     //TODO: DO this better and cleaner
     //Schedule Prefixes to fail
 
