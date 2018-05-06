@@ -24,6 +24,9 @@ namespace ns3 {
 
     void
     TxDrop(std::string string, Ptr<const Packet> p);
+
+    void
+    PrintPacket(Ptr<const Packet> p);
 }
 
 #endif //TRACE_SINKS_H

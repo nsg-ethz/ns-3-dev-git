@@ -5,7 +5,6 @@
 #include <cmath>
 
 #include "flow-error-model.h"
-
 #include "ns3/packet.h"
 #include "ns3/assert.h"
 #include "ns3/log.h"
@@ -127,6 +126,7 @@ FlowErrorModel::DoCorrupt (Ptr<Packet> p)
 
     /* Not even execute this part if the error is 0*/
     if (m_flowErrorRate > 0) {
+        NS_LOG_DEBUG("Enters here");
         /*Check if the flow was tagged to be failed in the past */
         uint64_t flow_id = GetHeaderHash(p);
 
@@ -148,7 +148,7 @@ FlowErrorModel::DoCorrupt (Ptr<Packet> p)
     {
         to_corrupt = m_normalErrorModel->IsCorrupt(p);
     }
-
+    NS_LOG_DEBUG("Corrupt packet " << to_corrupt);
     return to_corrupt;
 }
 
@@ -203,6 +203,7 @@ FlowErrorModel::GetHeaderHash(Ptr<Packet> packet){
     buf[12] = dst_port & 0xff;
 
     uint64_t hash = Hash64((char*) buf, 13);
+    NS_LOG_UNCOND("Flow: " << ip_header.GetSource() << " " << ip_header.GetDestination() << " " << src_port << " " << dst_port);
     NS_LOG_DEBUG("Flow Error Model Packet Hash" << hash);
     return hash;
 }
@@ -225,9 +226,10 @@ bool
 FlowErrorModel::DoCorruptFlow (uint64_t flow_id)
 {
     NS_LOG_FUNCTION (this << flow_id);
-    bool to_corrupt = (m_ranvar->GetValue () < m_flowErrorRate);
+    bool to_corrupt = (m_ranvar->GetValue () <= m_flowErrorRate);
     if (to_corrupt)
     {
+        NS_LOG_UNCOND("Corrupted");
         m_redFlows.insert(flow_id);
     }
     else

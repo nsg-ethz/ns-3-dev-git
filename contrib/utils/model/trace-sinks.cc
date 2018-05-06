@@ -32,7 +32,6 @@ namespace ns3 {
         Ipv4Header ip_header;
         p->RemoveHeader(ip_header);
 
-
         std::ostringstream oss;
         oss << Simulator::Now().GetSeconds() << " "
             << ip_header.GetSource() << " "
@@ -63,6 +62,12 @@ namespace ns3 {
     TxDrop(std::string s, Ptr<const Packet> p) {
         static int counter = 0;
         NS_LOG_UNCOND (counter++ << " " << s << " at " << Simulator::Now().GetSeconds());
+    }
+
+    void
+    PrintPacket(Ptr<const Packet> p)
+    {
+        NS_LOG_UNCOND("Dropped packet " << p->ToString() << " " << Simulator::Now().GetSeconds());
     }
 
 }
