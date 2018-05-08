@@ -71,22 +71,8 @@ namespace ns3 {
             uint16_t dport = RandomFromVector<uint16_t>(availablePorts);
 
             startTime += interArrivalTime(gen);
-
-//            installBulkSend(src, dst, dport, flowSize, startTime);
-            InstallRateSend(src,dst,dport,flow.packets, flow.bytes, flow.duration, startTime);
+            InstallRateSend(src,dst,dport,flow.packets, flow.bytes, flow.duration, rtt, startTime);
             nodes_usage.Update(src, dst, flow.bytes);
-//            if (flow.duration == 0){
-//                flow.duration = 1;
-//            }
-
-//            bytes_per_sec = bytes_per_sec + ((double(flow.bytes) / flow.duration)
-//                                             * std::min(std::min(flow.duration,uint32_t(8)),uint32_t(8 - (startTime-1))));
-//
-//            if ((startTime -1) >= time_reference) {
-//                out_rates << (startTime - 1 ) << " " << bytes_per_sec << "\n";
-//                time_reference +=1;
-//            }
-
         }
 
         return nodes_usage;

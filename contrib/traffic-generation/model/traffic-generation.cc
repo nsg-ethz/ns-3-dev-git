@@ -81,7 +81,7 @@ InstallOnOffSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, DataRate 
 
 void
 InstallRateSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint32_t n_packets, uint64_t max_size,
-                double duration, double startTime) {
+                double duration, double rtt, double startTime) {
   if (duration <= 0) {
     NS_LOG_DEBUG("Install Rate Send: \t Bulk Send Instead!");
     InstallNormalBulkSend(srcHost, dstHost, dport, max_size, startTime);
@@ -98,36 +98,43 @@ InstallRateSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint32_t n
 
   double avg_size_per_packet;
   double interval_duration;
+  double bytes_per_sec;
 
-  max_size = max_size - (n_packets * 54);
+  int max_size_int = int(max_size);
+  max_size_int = max_size - (n_packets * 54);
+  NS_ASSERT_MSG(max_size_int > 0, "Too many packets: " << n_packets  << " for the flow size: " << max_size);
 
   //real number of packets to send
   //remove syn, ack, fin, ack
   if (n_packets > 4) {
     n_packets = n_packets - 4;
   }
+
+  //We will also consider 2 times RTT in order to take into account that for flow duration, since we can not get rid of it
+  if (duration > 2*rtt){
+    duration -= (2*rtt);
+  }
   else{
-    n_packets = 1;
+    //very small duration
+    duration = 0.001;
   }
 
-  double bytes_per_sec = double(max_size) / duration;
-
-  avg_size_per_packet = double(max_size) / n_packets;
-
+  bytes_per_sec = double(max_size_int) / duration;
+  avg_size_per_packet = double(max_size_int) / n_packets;
   interval_duration = avg_size_per_packet / bytes_per_sec;
-
   uint64_t bytes_per_period = uint64_t(avg_size_per_packet);
 
-  NS_LOG_DEBUG("Flow Features:    " << "\tNumber Packets: " << n_packets
+  NS_LOG_DEBUG("Flow Features:    " << "\tNumber Packets(no syn/fin): " << n_packets
                                     << "\t Bytes To send: " << max_size
+                                    << "\t Payload Bytes to Send" << max_size_int
                                     << "\t Duration: " << duration);
 
   NS_LOG_DEBUG("Install Rate Send: " << "\tBytes per sec: " << bytes_per_sec
-                                     << "\t Avg Pkt Size: " << avg_size_per_packet
+                                     << "\t Avg Payload Size: " << avg_size_per_packet
                                      << "\t Interval Duration: " << interval_duration
                                      << "\t Packets Per Second: " << 1 / interval_duration << "\n");
 
-  rate_send_app->SetAttribute("MaxBytes", UintegerValue(max_size));
+  rate_send_app->SetAttribute("MaxBytes", UintegerValue(max_size_int));
   rate_send_app->SetAttribute("BytesPerInterval", UintegerValue(bytes_per_period));
   rate_send_app->SetAttribute("IntervalDuration", DoubleValue(interval_duration));
 

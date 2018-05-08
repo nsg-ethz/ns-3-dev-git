@@ -72,7 +72,7 @@ main(int argc, char *argv[]) {
     Time::SetResolution(Time::NS);
 
     //Fat tree parameters
-    DataRate networkBandwidth("100Gbps");
+    DataRate networkBandwidth("10Gbps");
     DataRate sendersBandwidth("4Gbps");
     DataRate receiversBandwidth("4Gbps");
 
