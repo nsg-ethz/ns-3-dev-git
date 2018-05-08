@@ -106,6 +106,9 @@ InstallRateSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint32_t n
   if (n_packets > 4) {
     n_packets = n_packets - 4;
   }
+  else{
+    n_packets = 1;
+  }
 
   double bytes_per_sec = double(max_size) / duration;
 
