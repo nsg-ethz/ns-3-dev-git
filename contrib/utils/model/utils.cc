@@ -303,6 +303,8 @@ void ChangeFlowErrorDropRate(NetDeviceContainer link, double drop_rate)
 	PointerValue emp;
 	link.Get(1)->GetAttribute("ReceiveErrorModel", emp);
 	Ptr<FlowErrorModel> em = emp.Get<FlowErrorModel>();
+	em->SetAttribute("FlowErrorRate", DoubleValue(drop_rate));
+	em->Reset();
 }
 
 /* Misc */
