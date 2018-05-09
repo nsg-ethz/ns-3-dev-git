@@ -2,15 +2,13 @@
 
 #include <ns3/csma-module.h>
 #include "utils.h"
+#include "flow-error-model.h"
 
 NS_LOG_COMPONENT_DEFINE ("utils");
-
 
 namespace ns3 {
 
 /* ... */
-
-
 
 Ptr<UniformRandomVariable> random_variable = CreateObject<UniformRandomVariable> ();
 
@@ -241,8 +239,48 @@ void PrintQueueSize(Ptr<Queue<Packet>> q){
 	Simulator::Schedule(Seconds(0.001), &PrintQueueSize, q);
 }
 
-void ChangeLinkDropRate(NetDeviceContainer link_to_change, double drop_rate){
+Ptr<Queue<Packet>> GetPointToPointNetDeviceQueue(PointToPointNetDevice netDevice){
 
+	//DynamicCast<PointToPointNetDevice>(netDevice)
+	Ptr<PointToPointNetDevice> p2pNetDevice = netDevice.GetObject<PointToPointNetDevice>();
+	//alternative
+	//PointerValue tmp;
+	//p2pNetDevice->GetAttribute("TxQueue", tmp);
+	// return tmp.GetObject<Queue<Packet>>();
+	return p2pNetDevice->GetQueue();
+
+}
+
+/* Link failure utils  */
+
+/*Completely fails link and dropped packets are traced by TX traces*/
+
+void LinkUp(NetDeviceContainer link)
+{
+	NS_LOG_FUNCTION_NOARGS();
+	DynamicCast<PointToPointNetDevice>(link.Get(0))->LinkUp();
+	DynamicCast<PointToPointNetDevice>(link.Get(1))->LinkUp();
+}
+
+void LinkDown(NetDeviceContainer link)
+{
+	NS_LOG_FUNCTION_NOARGS();
+	DynamicCast<PointToPointNetDevice>(link.Get(0))->LinkDown();
+	DynamicCast<PointToPointNetDevice>(link.Get(1))->LinkDown();
+}
+
+void FailLink(NetDeviceContainer link_to_fail)
+{
+	LinkDown(link_to_fail);
+}
+
+void RecoverLink(NetDeviceContainer link_to_recover)
+{
+	LinkUp(link_to_recover);
+}
+
+void SetUniformDropRate(NetDeviceContainer link_to_change, double drop_rate)
+{
 	Ptr<RateErrorModel> em = CreateObject<RateErrorModel> ();
 	em->SetAttribute ("ErrorRate", DoubleValue (drop_rate));
 	em->SetAttribute ("ErrorUnit", EnumValue(RateErrorModel::ERROR_UNIT_PACKET));
@@ -250,25 +288,24 @@ void ChangeLinkDropRate(NetDeviceContainer link_to_change, double drop_rate){
 	link_to_change.Get(1)->SetAttribute ("ReceiveErrorModel", PointerValue (em));
 }
 
-void FailLink(NetDeviceContainer link_to_fail){
-
-    NS_LOG_DEBUG("Failing prefix ");
-	ChangeLinkDropRate(link_to_fail, 1);
+void SetFlowErrorModel(NetDeviceContainer link)
+{
+  Ptr<FlowErrorModel> em = CreateObject<FlowErrorModel>();
+  Ptr<FlowErrorModel> em1 = CreateObject<FlowErrorModel>();
+  link.Get(0)->SetAttribute("ReceiveErrorModel", PointerValue(em));
+  link.Get(1)->SetAttribute("ReceiveErrorModel", PointerValue(em1));
+  //Alternative way of setting
+	//DynamicCast<PointToPointNetDevice>(link2.Get (1))->SetReceiveErrorModel(em);
 }
 
-void RecoverLink(NetDeviceContainer link_to_recover){
-	ChangeLinkDropRate(link_to_recover, 0);
+void ChangeFlowErrorDropRate(NetDeviceContainer link, double drop_rate)
+{
+	PointerValue emp;
+	link.Get(1)->GetAttribute("ReceiveErrorModel", emp);
+	Ptr<FlowErrorModel> em = emp.Get<FlowErrorModel>();
 }
 
-void LinkUp(NetDeviceContainer link){
-	DynamicCast<PointToPointNetDevice>(link.Get(0))->LinkUp();
-	DynamicCast<PointToPointNetDevice>(link.Get(1))->LinkUp();
-}
-
-void LinkDown(NetDeviceContainer link){
-	DynamicCast<PointToPointNetDevice>(link.Get(0))->LinkDown();
-	DynamicCast<PointToPointNetDevice>(link.Get(1))->LinkDown();
-}
+/* Misc */
 
 uint64_t LeftMostPowerOfTen(uint64_t number){
 	uint64_t leftMost = 0;
@@ -309,17 +346,7 @@ double FindClosest(std::vector<double> vect, double value){
 	}
 }
 
-Ptr<Queue<Packet>> GetPointToPointNetDeviceQueue(PointToPointNetDevice netDevice){
 
-	//DynamicCast<PointToPointNetDevice>(netDevice)
-	Ptr<PointToPointNetDevice> p2pNetDevice = netDevice.GetObject<PointToPointNetDevice>();
-	//alternative
-	//PointerValue tmp;
-	//p2pNetDevice->GetAttribute("TxQueue", tmp);
-	// return tmp.GetObject<Queue<Packet>>();
-	return p2pNetDevice->GetQueue();
-
-}
 
 
 bool file_exists (const std::string& name){

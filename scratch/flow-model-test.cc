@@ -28,7 +28,7 @@ main(int argc, char *argv[]) {
 
   PointToPointHelper pointToPoint;
   pointToPoint.SetDeviceAttribute("DataRate", StringValue("5Gbps"));
-  pointToPoint.SetChannelAttribute("Delay", StringValue("50ms"));
+  pointToPoint.SetChannelAttribute("Delay", StringValue("500ms"));
 
   //Tcp Socket (general socket conf)
   Config::SetDefault("ns3::TcpSocket::SndBufSize", UintegerValue(4000000));
@@ -74,7 +74,7 @@ main(int argc, char *argv[]) {
   uint16_t dst_port = 80;
   InstallSink(nodes.Get(1), dst_port, 0, "TCP");
 
-  InstallRateSend(nodes.Get(0), nodes.Get(1), dst_port, 10, 3500, 5.2, 0.1, 1);
+  InstallRateSend(nodes.Get(0), nodes.Get(1), dst_port, 14, 5000, 2.3, 1, 1);
   //InstallNormalBulkSend(nodes.Get(0), nodes.Get(2), dst_port, 1500000, 1);
   //InstallNormalBulkSend(nodes.Get(0), nodes.Get(2), dst_port, 1500000, 1);
 

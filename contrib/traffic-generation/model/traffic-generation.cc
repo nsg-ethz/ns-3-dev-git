@@ -106,15 +106,18 @@ InstallRateSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint32_t n
 
   //real number of packets to send
   //remove syn, ack, fin, ack
-  if (n_packets > 4) {
+  if (n_packets > 4)
+  {
     n_packets = n_packets - 4;
   }
 
   //We will also consider 2 times RTT in order to take into account that for flow duration, since we can not get rid of it
-  if (duration > 2*rtt){
+  if (duration > 2*rtt)
+  {
     duration -= (2*rtt);
   }
-  else{
+  else
+    {
     //very small duration
     duration = 0.001;
   }

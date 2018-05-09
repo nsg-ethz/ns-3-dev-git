@@ -487,11 +487,11 @@ main(int argc, char *argv[]) {
         //Assign some failure rate if (enabled to the interface)
         if (enable_uniform_loss) {
             if (it->second.features.loss > 0){
-                ChangeLinkDropRate(links[GetNodeName(sw2) + "->" + host_name.str()], it->second.features.loss);
+                SetUniformDropRate(links[GetNodeName(sw2) + "->" + host_name.str()], it->second.features.loss);
             }
 
             else if (prefixes_loss > 0){
-                ChangeLinkDropRate(links[GetNodeName(sw2) + "->" + host_name.str()], prefixes_loss);
+                SetUniformDropRate(links[GetNodeName(sw2) + "->" + host_name.str()], prefixes_loss);
             }
         }
         dst_index++;
@@ -662,11 +662,11 @@ main(int argc, char *argv[]) {
 
             for (auto failure: prefix_to_fail.second){
                 if (failure.failure_time > 0 ){
-                    Simulator::Schedule(Seconds(failure.failure_time), &ChangeLinkDropRate, link, failure.failure_intensity);
+                    Simulator::Schedule(Seconds(failure.failure_time), &SetUniformDropRate, link, failure.failure_intensity);
                 }
                 if (failure.recovery_time > 0) {
                     //set back to loss level
-                    Simulator::Schedule(Seconds(failure.failure_time), &ChangeLinkDropRate, link,
+                    Simulator::Schedule(Seconds(failure.failure_time), &SetUniformDropRate, link,
                                         prefixes[prefix_to_fail.first].features.loss);
                 }
             }

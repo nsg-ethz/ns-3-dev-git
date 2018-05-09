@@ -23,73 +23,77 @@
 namespace ns3 {
 
 /* ... */
-    extern Ptr<UniformRandomVariable> random_variable;
+extern Ptr<UniformRandomVariable> random_variable;
 
-    struct IpMask {
-        std::string ip;
-        std::string mask;
-    };
+struct IpMask {
+  std::string ip;
+  std::string mask;
+};
 
 
-    Ipv4Address GetNodeIp(std::string node_name);
+Ipv4Address GetNodeIp(std::string node_name);
 
-    Ipv4Address GetNodeIp(Ptr<Node> node);
+Ipv4Address GetNodeIp(Ptr<Node> node);
 
-    Ptr<Node> GetNode(std::string name);
+Ptr<Node> GetNode(std::string name);
 
-    std::string GetNodeName(Ptr<Node> node);
+std::string GetNodeName(Ptr<Node> node);
 
-    std::string Ipv4AddressToString(Ipv4Address address);
+std::string Ipv4AddressToString(Ipv4Address address);
 
-    IpMask GetIpMask(std::string prefix);
+IpMask GetIpMask(std::string prefix);
 
-    uint64_t BytesFromRate(DataRate dataRate, double time);
+uint64_t BytesFromRate(DataRate dataRate, double time);
 
-    std::vector<std::pair<double, uint64_t>> GetDistribution(std::string distributionFile);
+std::vector<std::pair<double, uint64_t>> GetDistribution(std::string distributionFile);
 
-    uint64_t GetFlowSizeFromDistribution(std::vector<std::pair<double, uint64_t>> distribution, double uniformSample);
+uint64_t GetFlowSizeFromDistribution(std::vector<std::pair<double, uint64_t>> distribution, double uniformSample);
 
-    std::pair<uint16_t, uint16_t> GetHostPositionPair(std::string name);
+std::pair<uint16_t, uint16_t> GetHostPositionPair(std::string name);
 
-    void PrintNow(double delay);
+void PrintNow(double delay);
 
-    void PrintMemUsage(double delay);
+void PrintMemUsage(double delay);
 
-    void PrintNowMem(double delay, std::clock_t starting_time);
+void PrintNowMem(double delay, std::clock_t starting_time);
 
-    void SaveNow(double delay, Ptr<OutputStreamWrapper> file);
+void SaveNow(double delay, Ptr<OutputStreamWrapper> file);
 
-    uint64_t HashString(std::string message);
+uint64_t HashString(std::string message);
 
-    double MeasureInterfaceLoad(Ptr<Queue<Packet>> q, double next_schedule, std::string name, DataRate linkBandwidth);
+double MeasureInterfaceLoad(Ptr<Queue<Packet>> q, double next_schedule, std::string name, DataRate linkBandwidth);
 
-    void PrintQueueSize(Ptr<Queue<Packet>> q);
+void PrintQueueSize(Ptr<Queue<Packet>> q);
 
-    void ChangeLinkDropRate(NetDeviceContainer link_to_change, double drop_rate);
+void SetUniformDropRate(NetDeviceContainer link_to_change, double drop_rate);
 
-    void FailLink(NetDeviceContainer link_to_fail);
+void SetFlowErrorModel(NetDeviceContainer link);
 
-    void RecoverLink(NetDeviceContainer link_to_recover);
+void ChangeFlowErrorDropRate(NetDeviceContainer link, double drop_rate);
 
-    void LinkUp(NetDeviceContainer link);
+void FailLink(NetDeviceContainer link_to_fail);
 
-    void LinkDown(NetDeviceContainer link);
+void RecoverLink(NetDeviceContainer link_to_recover);
 
-    uint64_t LeftMostPowerOfTen(uint64_t number);
+void LinkUp(NetDeviceContainer link);
+
+void LinkDown(NetDeviceContainer link);
+
+uint64_t LeftMostPowerOfTen(uint64_t number);
 
 //gets a random element from a vector!
-    template<typename T>
-    T RandomFromVector(std::vector<T> &vect) {
-        return vect[random_variable->GetInteger(0, vect.size() - 1)];
-    }
+template<typename T>
+T RandomFromVector(std::vector<T> &vect) {
+  return vect[random_variable->GetInteger(0, vect.size() - 1)];
+}
 
-    double FindClosest(std::vector<double> vect, double value);
+double FindClosest(std::vector<double> vect, double value);
 
-    Ptr<Queue<Packet>> GetPointToPointNetDeviceQueue(PointToPointNetDevice netDevice);
+Ptr<Queue<Packet>> GetPointToPointNetDeviceQueue(PointToPointNetDevice netDevice);
 
-    bool file_exists (const std::string& name);
+bool file_exists(const std::string &name);
 
-    }
+}
 
 #endif /* UTILS_H */
 

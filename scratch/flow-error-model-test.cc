@@ -71,19 +71,21 @@ main (int argc, char *argv[])
     em2->SetAttribute ("ErrorRate", DoubleValue (0.01));
 
     //em->Disable();
-    Ptr<FlowErrorModel> em = CreateObject<FlowErrorModel> ();
-    Ptr<BurstErrorModel> rem = CreateObject<BurstErrorModel>();
-    em->SetNormalErrorModel(rem);
-    em->SetAttribute("FlowErrorRate", DoubleValue(0.5));
-    em->SetNormalErrorModelAttribute("ErrorRate", DoubleValue(0.01));
-    em->SetNormalErrorModelAttribute("BurstSize", StringValue ("ns3::UniformRandomVariable[Min=5|Max=5]"));
-    //em->SetNormalErrorModelAttribute("ErrorUnit", EnumValue(RateErrorModel::ERROR_UNIT_PACKET));
+//    Ptr<FlowErrorModel> em = CreateObject<FlowErrorModel> ();
+//    Ptr<BurstErrorModel> rem = CreateObject<BurstErrorModel>();
+//    em->SetNormalErrorModel(rem);
+//    em->SetAttribute("FlowErrorRate", DoubleValue(0.5));
+//    em->SetNormalErrorModelAttribute("ErrorRate", DoubleValue(0.01));
+//    em->SetNormalErrorModelAttribute("BurstSize", StringValue ("ns3::UniformRandomVariable[Min=5|Max=5]"));
+//    //em->SetNormalErrorModelAttribute("ErrorUnit", EnumValue(RateErrorModel::ERROR_UNIT_PACKET));
+//
+//    //Simulator::Schedule(Seconds(8), &ClearError, em);
+//    //Simulator::Schedule(Seconds(8), &ClearError, em);
+//
+//    DynamicCast<PointToPointNetDevice>(link2.Get (1))->SetReceiveErrorModel(em);
 
-    //Simulator::Schedule(Seconds(8), &ClearError, em);
-
-    //Simulator::Schedule(Seconds(8), &ClearError, em);
-
-    DynamicCast<PointToPointNetDevice>(link2.Get (1))->SetReceiveErrorModel(em);
+    SetFlowErrorModel(link2);
+    ChangeFlowErrorDropRate(link2, 0.5);
 
     InternetStackHelper stack;
     stack.Install (nodes);

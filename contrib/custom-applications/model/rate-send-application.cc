@@ -231,9 +231,6 @@ void RateSendApplication::RefillBucket(void){
 
   NS_LOG_FUNCTION (this);
 
-
-
-
   //Adds bytes into the bucket.
   m_bytesInBucket +=  std::min(m_bytesPerInterval, (m_maxBytes - m_totBytes));
 
