@@ -132,12 +132,14 @@ FlowErrorModel::DoCorrupt (Ptr<Packet> p)
 
         /* Check if flow_id is already known: */
         if (IsRed(flow_id)) {
+            NS_LOG_DEBUG("Corrupt packet " << true);
             return true;
         }
-
         /* check if this flow was white listed*/
-        if (IsGreen(flow_id)) {
-            return m_normalErrorModel->IsCorrupt(p);
+        else if (IsGreen(flow_id)) {
+            to_corrupt = m_normalErrorModel->IsCorrupt(p);
+            NS_LOG_DEBUG("Corrupt packet " << true);
+            return to_corrupt;
         }
 
         /* New Flow: check if it has to be corrupted */

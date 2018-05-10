@@ -55,11 +55,11 @@ main (int argc, char *argv[])
     pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
     pointToPoint.SetChannelAttribute ("Delay", StringValue ("2ms"));
 
-    Config::SetDefault("ns3::TcpSocket::DataRetries", UintegerValue(50)); //retranmissions
+    Config::SetDefault("ns3::TcpSocket::DataRetries", UintegerValue(10)); //retranmissions
     Config::SetDefault("ns3::TcpSocketBase::MinRto", TimeValue(MilliSeconds(200))); //min RTO value that can be set
     Config::SetDefault("ns3::TcpSocketBase::Sack", BooleanValue(true)); //enable sack
 
-    //LogComponentEnable("FlowErrorModel", LOG_ALL);
+    LogComponentEnable("FlowErrorModel", LOG_ALL);
     //LogComponentEnable("ErrorModel", LOG_ALL);
 
     NetDeviceContainer link1;
@@ -85,7 +85,15 @@ main (int argc, char *argv[])
 //    DynamicCast<PointToPointNetDevice>(link2.Get (1))->SetReceiveErrorModel(em);
 
     SetFlowErrorModel(link2);
-    ChangeFlowErrorDropRate(link2, 0.5);
+
+    ChangeFlowErrorDropRate(link2, 0);
+
+    Simulator::Schedule(Seconds(1), &ChangeFlowErrorDropRate, link2, 0);
+    Simulator::Schedule(Seconds(1.1), &SetFlowErrorNormalDropRate,link2, 0.1);
+    Simulator::Schedule(Seconds(1.1), &SetFlowErrorNormalBurstSize, link2, 1,5);
+    Simulator::Schedule(Seconds(1.8), &ClearFlowErrorModel, link2);
+
+    //Simulator::Schedule(Seconds(20), &SetFlowErrorModel, link2);
 
     InternetStackHelper stack;
     stack.Install (nodes);
@@ -102,8 +110,8 @@ main (int argc, char *argv[])
     uint16_t dst_port = 7001;
     InstallSink(nodes.Get(2), dst_port, 0, "TCP");
 
-    for (int i =0 ; i < 1000; i++) {
-        InstallNormalBulkSend(nodes.Get(0), nodes.Get(2), dst_port, 15000, 1);
+    for (int i =0 ; i < 10; i++) {
+        InstallNormalBulkSend(nodes.Get(0), nodes.Get(2), dst_port, 200000, 1);
     }
     //InstallNormalBulkSend(nodes.Get(0), nodes.Get(2), dst_port, 1500000, 1);
     //InstallNormalBulkSend(nodes.Get(0), nodes.Get(2), dst_port, 1500000, 1);

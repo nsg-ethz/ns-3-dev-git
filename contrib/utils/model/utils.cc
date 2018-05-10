@@ -298,6 +298,16 @@ void SetFlowErrorModel(NetDeviceContainer link)
   // DynamicCast<PointToPointNetDevice>(link2.Get (1))->SetReceiveErrorModel(em);
 }
 
+void ClearFlowErrorModel(NetDeviceContainer link)
+{
+	ChangeFlowErrorDropRate(link, 0);
+	SetFlowErrorNormalDropRate(link, 0);
+	PointerValue emp;
+	link.Get(1)->GetAttribute("ReceiveErrorModel", emp);
+	Ptr<FlowErrorModel> em = emp.Get<FlowErrorModel>();
+	em->Disable();
+}
+
 void ChangeFlowErrorDropRate(NetDeviceContainer link, double drop_rate)
 {
 	PointerValue emp;
@@ -326,6 +336,8 @@ void SetFlowErrorNormalBurstSize(NetDeviceContainer link, uint16_t min, uint16_t
 	rand->SetAttribute("Max", DoubleValue(max));
 	em->SetNormalErrorModelAttribute("BurstSize", PointerValue(rand));
 }
+
+
 
 /* Misc */
 
