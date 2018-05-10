@@ -291,7 +291,9 @@ void SetUniformDropRate(NetDeviceContainer link_to_change, double drop_rate)
 void SetFlowErrorModel(NetDeviceContainer link)
 {
   Ptr<FlowErrorModel> em = CreateObject<FlowErrorModel>();
+  em->Disable();
   Ptr<FlowErrorModel> em1 = CreateObject<FlowErrorModel>();
+  em->Disable();
   link.Get(0)->SetAttribute("ReceiveErrorModel", PointerValue(em));
   link.Get(1)->SetAttribute("ReceiveErrorModel", PointerValue(em1));
   //Alternative way of setting
@@ -315,6 +317,7 @@ void ChangeFlowErrorDropRate(NetDeviceContainer link, double drop_rate)
 	Ptr<FlowErrorModel> em = emp.Get<FlowErrorModel>();
 	em->SetAttribute("FlowErrorRate", DoubleValue(drop_rate));
 	em->Reset();
+	em->Enable();
 }
 
 void SetFlowErrorNormalDropRate(NetDeviceContainer link, double drop_rate)
@@ -323,6 +326,7 @@ void SetFlowErrorNormalDropRate(NetDeviceContainer link, double drop_rate)
 	link.Get(1)->GetAttribute("ReceiveErrorModel", emp);
 	Ptr<FlowErrorModel> em = emp.Get<FlowErrorModel>();
 	em->SetNormalErrorModelAttribute("ErrorRate", DoubleValue(drop_rate));
+	em->Enable();
 }
 
 void SetFlowErrorNormalBurstSize(NetDeviceContainer link, uint16_t min, uint16_t max)
@@ -330,7 +334,6 @@ void SetFlowErrorNormalBurstSize(NetDeviceContainer link, uint16_t min, uint16_t
 	PointerValue emp;
 	link.Get(1)->GetAttribute("ReceiveErrorModel", emp);
 	Ptr<FlowErrorModel> em = emp.Get<FlowErrorModel>();
-
 	Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
 	rand->SetAttribute("Min", DoubleValue(min));
 	rand->SetAttribute("Max", DoubleValue(max));

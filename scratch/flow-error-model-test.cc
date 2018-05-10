@@ -92,6 +92,8 @@ main (int argc, char *argv[])
     Simulator::Schedule(Seconds(1.1), &SetFlowErrorNormalDropRate,link2, 0.1);
     Simulator::Schedule(Seconds(1.1), &SetFlowErrorNormalBurstSize, link2, 1,5);
     Simulator::Schedule(Seconds(1.8), &ClearFlowErrorModel, link2);
+    Simulator::Schedule(Seconds(2), &SetFlowErrorNormalDropRate,link2, 1);
+
 
     //Simulator::Schedule(Seconds(20), &SetFlowErrorModel, link2);
 
@@ -111,7 +113,7 @@ main (int argc, char *argv[])
     InstallSink(nodes.Get(2), dst_port, 0, "TCP");
 
     for (int i =0 ; i < 10; i++) {
-        InstallNormalBulkSend(nodes.Get(0), nodes.Get(2), dst_port, 200000, 1);
+        InstallNormalBulkSend(nodes.Get(0), nodes.Get(2), dst_port, 500000, 1);
     }
     //InstallNormalBulkSend(nodes.Get(0), nodes.Get(2), dst_port, 1500000, 1);
     //InstallNormalBulkSend(nodes.Get(0), nodes.Get(2), dst_port, 1500000, 1);
