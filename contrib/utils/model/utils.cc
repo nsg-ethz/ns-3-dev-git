@@ -295,7 +295,7 @@ void SetFlowErrorModel(NetDeviceContainer link)
   link.Get(0)->SetAttribute("ReceiveErrorModel", PointerValue(em));
   link.Get(1)->SetAttribute("ReceiveErrorModel", PointerValue(em1));
   //Alternative way of setting
-	//DynamicCast<PointToPointNetDevice>(link2.Get (1))->SetReceiveErrorModel(em);
+  // DynamicCast<PointToPointNetDevice>(link2.Get (1))->SetReceiveErrorModel(em);
 }
 
 void ChangeFlowErrorDropRate(NetDeviceContainer link, double drop_rate)
@@ -305,6 +305,26 @@ void ChangeFlowErrorDropRate(NetDeviceContainer link, double drop_rate)
 	Ptr<FlowErrorModel> em = emp.Get<FlowErrorModel>();
 	em->SetAttribute("FlowErrorRate", DoubleValue(drop_rate));
 	em->Reset();
+}
+
+void SetFlowErrorNormalDropRate(NetDeviceContainer link, double drop_rate)
+{
+	PointerValue emp;
+	link.Get(1)->GetAttribute("ReceiveErrorModel", emp);
+	Ptr<FlowErrorModel> em = emp.Get<FlowErrorModel>();
+	em->SetNormalErrorModelAttribute("ErrorRate", DoubleValue(drop_rate));
+}
+
+void SetFlowErrorNormalBurstSize(NetDeviceContainer link, uint16_t min, uint16_t max)
+{
+	PointerValue emp;
+	link.Get(1)->GetAttribute("ReceiveErrorModel", emp);
+	Ptr<FlowErrorModel> em = emp.Get<FlowErrorModel>();
+
+	Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
+	rand->SetAttribute("Min", DoubleValue(min));
+	rand->SetAttribute("Max", DoubleValue(max));
+	em->SetNormalErrorModelAttribute("BurstSize", PointerValue(rand));
 }
 
 /* Misc */
@@ -347,8 +367,6 @@ double FindClosest(std::vector<double> vect, double value){
 		}
 	}
 }
-
-
 
 
 bool file_exists (const std::string& name){

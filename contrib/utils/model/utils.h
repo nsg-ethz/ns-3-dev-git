@@ -71,6 +71,10 @@ void SetFlowErrorModel(NetDeviceContainer link);
 
 void ChangeFlowErrorDropRate(NetDeviceContainer link, double drop_rate);
 
+void SetFlowErrorNormalDropRate(NetDeviceContainer link, double drop_rate);
+
+void SetFlowErrorNormalBurstSize(NetDeviceContainer link, uint16_t min, uint16_t max);
+
 void FailLink(NetDeviceContainer link_to_fail);
 
 void RecoverLink(NetDeviceContainer link_to_recover);
