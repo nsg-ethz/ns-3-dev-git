@@ -357,6 +357,13 @@ main(int argc, char *argv[]) {
     }
 
 
+
+    //traces
+//    link2.Get (1)->TraceConnectWithoutContext ("PhyRxDrop", MakeBoundCallback (&TracePcap, pcap_file));
+//    link2.Get (1)->TraceConnectWithoutContext ("PhyTxDrop", MakeBoundCallback (&TracePcap, pcap_file));
+//    link2.Get (1)->TraceConnectWithoutContext ("MacTxDrop", MakeBoundCallback (&TracePcap, pcap_file));
+
+
     //Simulation Starts
     Simulator::Stop(Seconds(10000));
     Simulator::Run();

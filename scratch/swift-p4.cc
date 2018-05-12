@@ -341,6 +341,7 @@ main(int argc, char *argv[]) {
     links[GetNodeName(sw1) + "->" + GetNodeName(sw2)].Get(0)->GetChannel()->SetAttribute("Delay", TimeValue(
             NanoSeconds(network_delay)));
     links[GetNodeName(sw1) + "->" + GetNodeName(sw2)].Get(0)->SetAttribute("DataRate", DataRateValue(networkBandwidth));
+    links[GetNodeName(sw1) + "->" + GetNodeName(sw2)].Get(1)->SetAttribute("DataRate", DataRateValue(networkBandwidth));
 
     NS_LOG_DEBUG("Link Add: " << GetNodeName(sw1)
                               << " -> "
@@ -386,6 +387,8 @@ main(int argc, char *argv[]) {
 
         //Set delay from rtt_cdf /2
         links[host_name.str() + "->" + GetNodeName(sw1)].Get(0)->SetAttribute("DataRate",
+                                                                              DataRateValue(sendersBandwidth));
+        links[host_name.str() + "->" + GetNodeName(sw1)].Get(1)->SetAttribute("DataRate",
                                                                               DataRateValue(sendersBandwidth));
 
         links[host_name.str() + "->" + GetNodeName(sw1)].Get(0)->GetChannel()->SetAttribute("Delay", TimeValue(
@@ -439,6 +442,8 @@ main(int argc, char *argv[]) {
         links[GetNodeName(sw2) + "->" + host_name.str()] = p2p.Install(NodeContainer(sw2, receivers.Get(dst_index)));
 
         links[GetNodeName(sw2) + "->" + host_name.str()].Get(0)->SetAttribute("DataRate",
+                                                                              DataRateValue(receiversBandwidth));
+        links[GetNodeName(sw2) + "->" + host_name.str()].Get(1)->SetAttribute("DataRate",
                                                                               DataRateValue(receiversBandwidth));
 
         links[GetNodeName(sw2) + "->" + host_name.str()].Get(0)->GetChannel()->SetAttribute("Delay", TimeValue(

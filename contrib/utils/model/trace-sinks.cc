@@ -10,9 +10,15 @@ NS_LOG_COMPONENT_DEFINE ("trace-sinks");
 namespace ns3 {
 
     void
-    CwndChange(Ptr<OutputStreamWrapper> stream, uint32_t oldCwnd, uint32_t newCwnd) {
+    CwndChangeStream(Ptr<OutputStreamWrapper> stream, uint32_t oldCwnd, uint32_t newCwnd) {
         //  NS_LOG_UNCOND (Simulator::Now ().GetSeconds () << "\t" << newCwnd);
         *stream->GetStream() << Simulator::Now().GetSeconds() << " " << newCwnd << std::endl;
+    }
+
+    void
+    CwndChange(std::string header, uint32_t oldCwnd, uint32_t newCwnd)
+    {
+        NS_LOG_UNCOND (header << " " << Simulator::Now ().GetSeconds () << " " << newCwnd);
     }
 
     void

@@ -13,20 +13,23 @@
 
 namespace ns3 {
 
-    void
-    CwndChange(Ptr<OutputStreamWrapper> stream, uint32_t oldCwnd, uint32_t newCwnd);
+void
+CwndChangeStream(Ptr<OutputStreamWrapper> stream, uint32_t oldCwnd, uint32_t newCwnd);
 
-    void
-    TracePcap(Ptr<PcapFileWrapper> file, Ptr<const Packet> packet);
+void
+CwndChange(std::string header, uint32_t oldCwnd, uint32_t newCwnd);
 
-    void
-    RxDropAscii(Ptr<OutputStreamWrapper> file, Ptr<const Packet> packet);
+void
+TracePcap(Ptr<PcapFileWrapper> file, Ptr<const Packet> packet);
 
-    void
-    TxDrop(std::string string, Ptr<const Packet> p);
+void
+RxDropAscii(Ptr<OutputStreamWrapper> file, Ptr<const Packet> packet);
 
-    void
-    PrintPacket(Ptr<const Packet> p);
+void
+TxDrop(std::string string, Ptr<const Packet> p);
+
+void
+PrintPacket(Ptr<const Packet> p);
 }
 
 #endif //TRACE_SINKS_H

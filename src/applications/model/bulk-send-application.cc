@@ -211,7 +211,6 @@ void BulkSendApplication::SendData (void)
   // Check if time to close (all sent)
   if (m_totBytes == m_maxBytes && m_connected)
     {
-      NS_LOG_UNCOND("FLOW FINISHED");
       m_socket->Close ();
       m_connected = false;
     }
@@ -240,7 +239,5 @@ void BulkSendApplication::DataSend (Ptr<Socket>, uint32_t)
       SendData ();
     }
 }
-
-
 
 } // Namespace ns3

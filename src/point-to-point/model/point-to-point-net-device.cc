@@ -590,6 +590,7 @@ PointToPointNetDevice::Send (
   //
   // We should enqueue and dequeue the packet to hit the tracing hooks.
   //
+  NS_LOG_UNCOND("Queue Size " << m_queue->GetNPackets() << " " << this->GetNode()->GetId() <<"d");
   if (m_queue->Enqueue (packet))
     {
       //
@@ -607,7 +608,7 @@ PointToPointNetDevice::Send (
     }
 
   // Enqueue may fail (overflow)
-
+  NS_LOG_UNCOND("dropping");
   m_macTxDropTrace (packet);
   return false;
 }
