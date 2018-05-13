@@ -194,8 +194,8 @@ main(int argc, char *argv[]) {
     Config::SetDefault("ns3::Ipv4GlobalRouting::RespondToInterfaceEvents", BooleanValue(true));
 
     //Tcp Socket (general socket conf)
-    Config::SetDefault("ns3::TcpSocket::SndBufSize", UintegerValue(4000000));
-    Config::SetDefault("ns3::TcpSocket::RcvBufSize", UintegerValue(4000000));
+    Config::SetDefault("ns3::TcpSocket::SndBufSize", UintegerValue(10000000));
+    Config::SetDefault("ns3::TcpSocket::RcvBufSize", UintegerValue(10000000));
     Config::SetDefault("ns3::TcpSocket::SegmentSize", UintegerValue(1446)); //MTU 1446
     Config::SetDefault("ns3::TcpSocket::InitialSlowStartThreshold", UintegerValue(4294967295));
     Config::SetDefault("ns3::TcpSocket::InitialCwnd", UintegerValue(1));

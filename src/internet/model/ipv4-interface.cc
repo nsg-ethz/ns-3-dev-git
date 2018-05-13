@@ -227,7 +227,7 @@ Ipv4Interface::Send (Ptr<Packet> p, const Ipv4Header & hdr, Ipv4Address dest)
       p->AddHeader (hdr);
       m_device->Send (p, m_device->GetBroadcast (), Ipv4L3Protocol::PROT_NUMBER);
       return;
-    } 
+    }
 
   NS_ASSERT (m_tc != 0);
 

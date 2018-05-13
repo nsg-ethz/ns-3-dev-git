@@ -11,6 +11,7 @@
 #include "ns3/traffic-generation-module.h"
 #include "ns3/custom-applications-module.h"
 #include "ns3/traffic-control-module.h"
+#include "ns3/flow-monitor-module.h"
 
 using namespace ns3;
 
@@ -60,16 +61,16 @@ main(int argc, char *argv[]) {
   LogComponentEnable("traffic-generation", LOG_DEBUG);
 
   PointToPointHelper pointToPoint;
-  pointToPoint.SetDeviceAttribute("DataRate", StringValue("1Gbps"));
+  pointToPoint.SetDeviceAttribute("DataRate", StringValue("10Gbps"));
   pointToPoint.SetChannelAttribute("Delay", StringValue("1ms"));
-  pointToPoint.SetQueue("ns3::DropTailQueue", "MaxSize", QueueSizeValue(QueueSize("100p")));
+  pointToPoint.SetQueue("ns3::DropTailQueue", "MaxSize", QueueSizeValue(QueueSize("1000p")));
 
   //Tcp Socket (general socket conf)
-  Config::SetDefault("ns3::TcpSocket::SndBufSize", UintegerValue(4000000));
-  Config::SetDefault("ns3::TcpSocket::RcvBufSize", UintegerValue(4000000));
+  Config::SetDefault("ns3::TcpSocket::SndBufSize", UintegerValue(6400000));
+  Config::SetDefault("ns3::TcpSocket::RcvBufSize", UintegerValue(6400000));
   Config::SetDefault("ns3::TcpSocket::SegmentSize", UintegerValue(1446)); //MTU 1446
   Config::SetDefault("ns3::TcpSocket::InitialSlowStartThreshold", UintegerValue(4294967295));
-  Config::SetDefault("ns3::TcpSocket::InitialCwnd", UintegerValue(500));
+  Config::SetDefault("ns3::TcpSocket::InitialCwnd", UintegerValue(1));
 
   //Can be much slower than my rtt because packet size of syn is 60bytes
   Config::SetDefault("ns3::TcpSocket::ConnCount", UintegerValue(5)); //retrnamissions during connection
@@ -94,21 +95,22 @@ main(int argc, char *argv[]) {
   NetDeviceContainer link2;
   link1 = pointToPoint.Install(NodeContainer(nodes.Get(0), nodes.Get(1)));
   link2 = pointToPoint.Install(NodeContainer(nodes.Get(1), nodes.Get(2)));
+//
+//  link2.Get(0)->GetChannel()->SetAttribute("Delay", StringValue("5ms"));
+//  link2.Get(0)->SetAttribute("DataRate", StringValue("1Mbps"));
+//  link2.Get(1)->SetAttribute("DataRate", StringValue("1Mbps"));
+//  link2.Get(0)->GetObject<PointToPointNetDevice>()->GetQueue()->SetAttribute("MaxSize", QueueSizeValue(QueueSize("5p")));
+//  link2.Get(1)->GetObject<PointToPointNetDevice>()->GetQueue()->SetAttribute("MaxSize", QueueSizeValue(QueueSize("5p")));
 
-  link2.Get(0)->GetChannel()->SetAttribute("Delay", StringValue("5ms"));
-  link2.Get(0)->SetAttribute("DataRate", StringValue("1Mbps"));
-  link2.Get(0)->GetObject<PointToPointNetDevice>()->GetQueue()->SetAttribute("MaxSize", QueueSizeValue(QueueSize("10p")));
-
-  TimeValue time;
-  link2.Get(0)->GetChannel()->GetAttribute("Delay", time);
-  DataRateValue rate;
-  link2.Get(0)->GetAttribute("DataRate", rate);
-  NS_LOG_UNCOND("delay " << time.Get() << " Datarate " << rate.Get());
-
-  link2.Get(1)->GetChannel()->GetAttribute("Delay", time);
-  link2.Get(1)->GetAttribute("DataRate", rate);
-  NS_LOG_UNCOND("delay " << time.Get() << " Datarate " << rate.Get());
-  return 0;
+//  TimeValue time;
+//  link2.Get(0)->GetChannel()->GetAttribute("Delay", time);
+//  DataRateValue rate;
+//  link2.Get(0)->GetAttribute("DataRate", rate);
+//  NS_LOG_UNCOND("delay " << time.Get() << " Datarate " << rate.Get());
+//
+//  link2.Get(1)->GetChannel()->GetAttribute("Delay", time);
+//  link2.Get(1)->GetAttribute("DataRate", rate);
+//  NS_LOG_UNCOND("delay " << time.Get() << " Datarate " << rate.Get());
 
   InternetStackHelper stack;
   stack.Install(nodes);
@@ -116,56 +118,84 @@ main(int argc, char *argv[]) {
   Ipv4AddressHelper address;
   address.SetBase("10.1.1.0", "255.255.255.252");
   Ipv4InterfaceContainer interfaces = address.Assign(link1);
+  address.NewNetwork();
+  interfaces = address.Assign(link2);
 
   Ipv4GlobalRoutingHelper::PopulateRoutingTables();
 
   TrafficControlHelper tch;
   tch.Uninstall(link1);
+  tch.Uninstall(link2);
+
+//  tch.SetRootQueueDisc ("ns3::FifoQueueDisc", "MaxSize", QueueSizeValue (QueueSize ("5p")));
+//  QueueDiscContainer qdiscs = tch.Install (link1);
+//  QueueDiscContainer qdiscs1 = tch.Install (link2);
 
   Packet::EnablePrinting();
 
   //traffic
   uint16_t dst_port = 80;
-  InstallSink(nodes.Get(1), dst_port, 0, "TCP");
+  InstallSink(nodes.Get(2), dst_port, 0, "TCP");
 
   //InstallRateSend(nodes.Get(0), nodes.Get(1), dst_port, 14, 5000, 2.3, 1, 1);
-  Ptr<BulkSendApplication> app = _InstallNormalBulkSend(nodes.Get(0), nodes.Get(1), dst_port, 150000, 1);
+  Ptr<BulkSendApplication> app = _InstallNormalBulkSend(nodes.Get(0), nodes.Get(2), dst_port, 100000000, 1);
   //Simulator::Schedule(Seconds(1.01), &SetSocketTraces, app);
 
   //InstallNormalBulkSend(nodes.Get(0), nodes.Get(2), dst_port, 1500000, 1);
 
-  pointToPoint.EnablePcap("../../test_congestion/out", link1.Get(0), bool(1));
+  //pointToPoint.EnablePcap("../../test_congestion/out", link1.Get(0), bool(1));
 
   PcapHelper pcapHelper;
   Ptr<PcapFileWrapper> pcap_file0 = pcapHelper.CreateFile("../../test_congestion/drops0.pcap", std::ios::out, PcapHelper::DLT_PPP);
   Ptr<PcapFileWrapper> pcap_file1 = pcapHelper.CreateFile("../../test_congestion/drops1.pcap", std::ios::out, PcapHelper::DLT_PPP);
 
-  link1.Get (0)->TraceConnectWithoutContext ("PhyRxDrop", MakeBoundCallback (&TracePcap, pcap_file0));
-  link1.Get (0)->TraceConnectWithoutContext ("PhyTxDrop", MakeBoundCallback (&TracePcap, pcap_file0));
-  link1.Get (0)->TraceConnectWithoutContext ("MacTxDrop", MakeBoundCallback (&TracePcap, pcap_file0));
+  link2.Get (0)->TraceConnectWithoutContext ("PhyRxDrop", MakeBoundCallback (&TracePcap, pcap_file0));
+  link2.Get (0)->TraceConnectWithoutContext ("PhyTxDrop", MakeBoundCallback (&TracePcap, pcap_file0));
+  link2.Get (0)->TraceConnectWithoutContext ("MacTxDrop", MakeBoundCallback (&TracePcap, pcap_file0));
 
-  link1.Get (1)->TraceConnectWithoutContext ("PhyRxDrop", MakeBoundCallback (&TracePcap, pcap_file1));
-  link1.Get (1)->TraceConnectWithoutContext ("PhyTxDrop", MakeBoundCallback (&TracePcap, pcap_file1));
-  link1.Get (1)->TraceConnectWithoutContext ("MacTxDrop", MakeBoundCallback (&TracePcap, pcap_file1));
+  link2.Get (1)->TraceConnectWithoutContext ("PhyRxDrop", MakeBoundCallback (&TracePcap, pcap_file1));
+  link2.Get (1)->TraceConnectWithoutContext ("PhyTxDrop", MakeBoundCallback (&TracePcap, pcap_file1));
+  link2.Get (1)->TraceConnectWithoutContext ("MacTxDrop", MakeBoundCallback (&TracePcap, pcap_file1));
 
 
   Ptr<DropTailQueue<Packet>> queue = CreateObject<DropTailQueue<Packet>>();
   queue->SetMaxSize(QueueSize("10p"));
   Ptr<Packet> p = Create<Packet> (1000);
 
-  for (int i = 0; i < 15; i++)
-  {
-    Ptr<Packet> pp = p->Copy();
-    if (queue->Enqueue(pp)){
-      queue->Dequeue();
-      NS_LOG_UNCOND(i);
-    }
+//  for (int i = 0; i < 15; i++)
+//  {
+//    Ptr<Packet> pp = p->Copy();
+//    if (queue->Enqueue(pp)){
+//      queue->Dequeue();
+//      NS_LOG_UNCOND(i);
+//    }
+//  }
+
+  FlowMonitorHelper flowmon;
+  Ptr<FlowMonitor> monitor = flowmon.Install(nodes.Get(0));
+
+  Simulator::Stop (Seconds (100));
+  Simulator::Run();
+
+  monitor->CheckForLostPackets();
+  Ptr<Ipv4FlowClassifier> classifier = DynamicCast<Ipv4FlowClassifier> (flowmon.GetClassifier ());
+  std::map<FlowId, FlowMonitor::FlowStats> stats = monitor->GetFlowStats ();
+
+  std::cout << std::endl << "*** Flow monitor statistics ***" << std::endl;
+  std::cout << "  Tx Packets:   " << stats[1].txPackets << std::endl;
+  std::cout << "  Tx Bytes:   " << stats[1].txBytes << std::endl;
+  std::cout << "  Offered Load: " << stats[1].txBytes * 8.0 / (stats[1].timeLastTxPacket.GetSeconds () - stats[1].timeFirstTxPacket.GetSeconds ()) / 1000000 << " Mbps" << std::endl;
+  std::cout << "  Rx Packets:   " << stats[1].rxPackets << std::endl;
+  std::cout << "  Rx Bytes:   " << stats[1].rxBytes << std::endl;
+  std::cout << "  Flow duration: " <<  stats[1].timeLastTxPacket.GetSeconds () - stats[1].timeFirstTxPacket.GetSeconds () << std::endl;
+  std::cout << "  LostPackets:   " << stats[1].lostPackets << std::endl;
+
+
+  for (const auto &e : stats[1].packetsDropped) {
+    std::cout << e << std::endl;
   }
 
-
-
-  //Simulator::Stop (Seconds (100000));
-  Simulator::Run();
+  monitor->SerializeToXmlFile("flows-mon.txt", true, true);
   Simulator::Destroy();
 
   return 0;
