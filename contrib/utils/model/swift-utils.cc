@@ -109,7 +109,7 @@ namespace ns3 {
         std::ifstream prefix_features_file(prefixFeaturesFile);
 
         if (!prefix_features_file) {
-            NS_LOG_WARN("The features file file was not found, if not specified later any prefix will be failed");
+            NS_LOG_WARN("!!! The features file file was not found !!!");
             return trace_prefix_features;
         }
 
@@ -133,7 +133,7 @@ namespace ns3 {
         std::ifstream infile(prefix_failure_file);
 
         if (!infile) {
-            NS_LOG_WARN("The prefix Failure file was not found, if not specified later any prefix will be failed");
+            NS_LOG_WARN("!!! The prefix Failure file was not found !!!");
             return prefix_to_events;
         }
 

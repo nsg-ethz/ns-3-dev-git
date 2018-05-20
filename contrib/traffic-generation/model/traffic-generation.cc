@@ -82,6 +82,10 @@ InstallOnOffSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, DataRate 
 void
 InstallRateSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint32_t n_packets, uint64_t max_size,
                 double duration, double rtt, double startTime) {
+
+
+  NS_LOG_DEBUG("test: " << n_packets <<" " << max_size<< " " << duration<< " " << rtt);
+
   if (duration <= 0) {
     NS_LOG_DEBUG("Install Rate Send: \t Bulk Send Instead!");
     InstallNormalBulkSend(srcHost, dstHost, dport, max_size, startTime);
@@ -129,7 +133,7 @@ InstallRateSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint32_t n
 
   NS_LOG_DEBUG("Flow Features:    " << "\tNumber Packets(no syn/fin): " << n_packets
                                     << "\t Bytes To send: " << max_size
-                                    << "\t Payload Bytes to Send" << max_size_int
+                                    << "\t Payload Bytes to Send: " << max_size_int
                                     << "\t Duration: " << duration);
 
   NS_LOG_DEBUG("Install Rate Send: " << "\tBytes per sec: " << bytes_per_sec
