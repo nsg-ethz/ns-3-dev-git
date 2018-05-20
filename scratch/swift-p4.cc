@@ -302,8 +302,6 @@ main(int argc, char *argv[]) {
   }
   NS_LOG_DEBUG("Prefixes failure length: " << prefix_failures.size());
 
-  return 0;
-
   //Populate Prefixes Object
   std::unordered_map<std::string, PrefixMetadata> prefixes = LoadPrefixesMetadata(prefixes_mappings,
                                                                                   trace_prefixes_features);
@@ -674,13 +672,21 @@ main(int argc, char *argv[]) {
         Simulator::Schedule(Seconds(failure_time), &FailLink, link);
         continue;
       }
-
+      //TODO add more debugging messages
       for (auto failure: prefix_to_fail.second) {
         if (failure.failure_time > 0) {
-          Simulator::Schedule(Seconds(failure.failure_time), &SetUniformDropRate, link, failure.failure_intensity);
+          if (failure.failure_intensity == 1)
+          {
+            Simulator::Schedule(Seconds(failure.failure_time), &FailLink, link);
+          }
+          else
+          {
+            Simulator::Schedule(Seconds(failure.failure_time), &SetUniformDropRate, link, failure.failure_intensity);
+          }
         }
         if (failure.recovery_time > 0) {
           //set back to loss level
+          //TODO this will fail if there is no features
           Simulator::Schedule(Seconds(failure.failure_time), &SetUniformDropRate, link,
                               prefixes[prefix_to_fail.first].features.loss);
         }
@@ -705,4 +711,5 @@ main(int argc, char *argv[]) {
   Simulator::Destroy();
 
   return 0;
+
 }
