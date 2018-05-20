@@ -703,7 +703,6 @@ main(int argc, char *argv[]) {
     PrintNowMem(1, simulation_execution_time);
     Simulator::Stop(Seconds(stop_time));
   }
-  return 0;
   Simulator::Run();
 
   *(metadata_file->GetStream()) << "real_time_duration "
