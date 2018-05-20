@@ -104,9 +104,9 @@ InstallRateSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint32_t n
   double interval_duration;
   double bytes_per_sec;
 
-  int max_size_int = int(max_size);
-  max_size_int = max_size - (n_packets * 54);
-  NS_ASSERT_MSG(max_size_int > 0, "Too many packets: " << n_packets  << " for the flow size: " << max_size);
+  long int max_size_int = (long int)(max_size);
+  max_size_int = max_size_int - (n_packets * 54);
+  NS_ASSERT_MSG(max_size_int > 0, "Too many packets: " << n_packets  << " for the flow size: " << max_size << " bytes left" << max_size_int);
 
   //real number of packets to send
   //remove syn, ack, fin, ack
@@ -243,10 +243,12 @@ void InstallBulkSend(Ptr<Node> srcHost, Ptr<Node> dstHost, uint16_t dport, uint6
 void
 SendBindTest(Ptr<Node> src, NodeContainer receivers,
              std::unordered_map<std::string, std::vector<uint16_t>> hostsToPorts, uint32_t flows) {
+
+  Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
   for (uint32_t i = 0; i < flows; i++) {
     Ptr<Node> dst = receivers.Get(random_variable->GetInteger(0, receivers.GetN() - 1));
     std::vector<uint16_t> availablePorts = hostsToPorts[GetNodeName(dst)];
-    uint16_t dport = RandomFromVector<uint16_t>(availablePorts);
+    uint16_t dport = RandomFromVector<uint16_t>(availablePorts, rand);
     InstallNormalBulkSend(src, dst, dport, 50000, random_variable->GetValue(1, 10));
   }
 }

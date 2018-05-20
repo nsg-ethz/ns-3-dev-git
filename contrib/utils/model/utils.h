@@ -89,8 +89,8 @@ uint64_t LeftMostPowerOfTen(uint64_t number);
 
 //gets a random element from a vector!
 template<typename T>
-T RandomFromVector(std::vector<T> &vect) {
-  return vect[random_variable->GetInteger(0, vect.size() - 1)];
+T RandomFromVector(std::vector<T> &vect, Ptr<UniformRandomVariable> rand) {
+  return vect[rand->GetInteger(0, vect.size() - 1)];
 }
 
 double FindClosest(std::vector<double> vect, double value);

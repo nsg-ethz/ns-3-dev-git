@@ -305,13 +305,15 @@ main(int argc, char *argv[]) {
     std::unordered_map<std::string, std::vector<uint16_t>> hostsToPorts = InstallSinks(receivers, 10, 0, "TCP");
     NS_LOG_DEBUG("Starting Traffic Scheduling");
 
+    Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
+
     for (NodeContainer::Iterator host = senders.Begin(); host != senders.End(); host++){
 
         for (int l =0 ; l < 2; l++) {
 
             Ptr<Node> dst = receivers.Get(random_variable->GetInteger(0, receivers.GetN() - 1));
             std::vector<uint16_t> availablePorts = hostsToPorts[GetNodeName(dst)];
-            uint16_t dport = RandomFromVector<uint16_t>(availablePorts);
+            uint16_t dport = RandomFromVector<uint16_t>(availablePorts, rand);
             InstallNormalBulkSend(*host, dst, dport, 80000000, random_variable->GetInteger(1, 3));
             break;
         }

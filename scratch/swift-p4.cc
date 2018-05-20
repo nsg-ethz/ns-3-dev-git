@@ -140,6 +140,7 @@ main(int argc, char *argv[]) {
 
   //Change that if i want to get different random values each run otherwise i will always get the same.
   RngSeedManager::SetRun(runStep);   // Changes run number from default of 1 to 7
+  RngSeedManager::SetSeed(runStep);
 
   if (debug) {
 //		LogComponentEnable("Ipv4GlobalRouting", LOG_DEBUG);
@@ -702,7 +703,7 @@ main(int argc, char *argv[]) {
     PrintNowMem(1, simulation_execution_time);
     Simulator::Stop(Seconds(stop_time));
   }
-
+  return 0;
   Simulator::Run();
 
   *(metadata_file->GetStream()) << "real_time_duration "

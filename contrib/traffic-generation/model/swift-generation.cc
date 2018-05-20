@@ -43,10 +43,12 @@ NodesUsage SendSwiftTraffic(std::unordered_map<double, std::vector<Ptr<Node>>> r
 //        double time_reference = 1;
 //        std::ofstream out_rates("bytes_per_sec.txt");
 
+  Ptr<UniformRandomVariable> random_variable = CreateObject<UniformRandomVariable>();
+
   while ((startTime - 1) < simulationTime) {
 
     //get a flow
-    FlowMetadata flow = RandomFromVector<FlowMetadata>(flowDist);
+    FlowMetadata flow = RandomFromVector<FlowMetadata>(flowDist, random_variable);
 
     //ugly temporal fix
     if (flow.duration == 0) {
@@ -59,7 +61,7 @@ NodesUsage SendSwiftTraffic(std::unordered_map<double, std::vector<Ptr<Node>>> r
 
     NS_ASSERT_MSG(rtt_to_senders[rtt].size() >= 1, "There are no source hosts for rtt: " << rtt);
 
-    Ptr<Node> src = RandomFromVector<Ptr<Node>>(rtt_to_senders[rtt]);
+    Ptr<Node> src = RandomFromVector<Ptr<Node>>(rtt_to_senders[rtt], random_variable);
 
     //Get Destination
     Ptr<Node> dst = prefixes[flow.prefix].server;
@@ -72,7 +74,7 @@ NodesUsage SendSwiftTraffic(std::unordered_map<double, std::vector<Ptr<Node>>> r
 
     //Destination port
     std::vector<uint16_t> availablePorts = hostsToPorts[GetNodeName(dst)];
-    uint16_t dport = RandomFromVector<uint16_t>(availablePorts);
+    uint16_t dport = RandomFromVector<uint16_t>(availablePorts, random_variable);
 
     startTime += interArrivalTime(gen);
     InstallRateSend(src, dst, dport, flow.packets, flow.bytes, flow.duration, rtt, startTime);
