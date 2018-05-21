@@ -1,5 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
+#include <ns3/swift-utils.h>
 #include "swift-utils.h"
 #include "utils.h"
 
@@ -117,7 +118,7 @@ namespace ns3 {
 
         PrefixFeatures features;
 
-        while (prefix_features_file >> prefix >> features.loss){
+        while (prefix_features_file >> prefix >> features.loss >> features.minBurst >> features.maxBurst){
             if (subnetwork_trace_prefixes.find(prefix) != subnetwork_trace_prefixes.end()){
                 trace_prefix_features[prefix] = features;
             }

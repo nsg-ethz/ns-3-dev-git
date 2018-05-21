@@ -340,8 +340,6 @@ void SetFlowErrorNormalBurstSize(NetDeviceContainer link, uint16_t min, uint16_t
 	em->SetNormalErrorModelAttribute("BurstSize", PointerValue(rand));
 }
 
-
-
 /* Misc */
 
 uint64_t LeftMostPowerOfTen(uint64_t number){
