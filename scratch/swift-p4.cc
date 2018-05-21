@@ -509,8 +509,13 @@ main(int argc, char *argv[]) {
         SetFlowErrorModelFromFeatures(it->second.link, 0, it->second.features.loss, it->second.features.minBurst, it->second.features.maxBurst);
 
       } else if (prefixes_loss > 0) {
-        SetFlowErrorModelFromFeatures(it->second.link, 0, prefix_loss, 1, 1);
+        SetFlowErrorModelFromFeatures(it->second.link, 0, prefixes_loss, 1, 1);
       }
+    }
+    //still install model, since its needed for the partial failures
+    else
+    {
+      SetFlowErrorModelFromFeatures(it->second.link, 0, 0, 1, 1);
     }
     dst_index++;
   }
@@ -672,6 +677,11 @@ main(int argc, char *argv[]) {
 
        //TODO add more debugging messages
       for (auto failure: prefix_to_fail.second) {
+
+        NS_LOG_DEBUG("Failure features: " << failure.failure_time << " "
+                                                                     << failure.failure_intensity << " "
+                                                                     << failure.recovery_time);
+
         if (failure.failure_time > 0) {
           if (failure.failure_intensity == 1)
           {
@@ -693,9 +703,8 @@ main(int argc, char *argv[]) {
           //set flow error model to 0
           else
           {
-            Simulator::Schedule(Seconds(failure.recovery_time), &ChangeFlowDropRate, link ,0);
+            Simulator::Schedule(Seconds(failure.recovery_time), &ChangeFlowErrorDropRate, link ,0);
           }
-
         }
       }
     }

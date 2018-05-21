@@ -77,7 +77,7 @@ main (int argc, char *argv[])
 //    em->SetAttribute("FlowErrorRate", DoubleValue(0.5));
 //    em->SetNormalErrorModelAttribute("ErrorRate", DoubleValue(0.01));
 //    em->SetNormalErrorModelAttribute("BurstSize", StringValue ("ns3::UniformRandomVariable[Min=5|Max=5]"));
-//    //em->SetNormalErrorModelAttribute("ErrorUnit", EnumValue(RateErrorModel::ERROR_UNIT_PACKET));
+//    //em->SetNormalErrorModelAttribute("ErrorUnit", EnumValue(RateErrorModel::ERROR_UNIT_PACKET) );
 //
 //    //Simulator::Schedule(Seconds(8), &ClearError, em);
 //    //Simulator::Schedule(Seconds(8), &ClearError, em);

@@ -19,8 +19,10 @@ namespace ns3 {
     };
 
     struct PrefixFeatures {
-        double loss = 0;
-        double out_of_order = 0;
+      double loss = 0;
+      uint16_t minBurst = 1;
+      uint16_t maxBurst = 1;
+      double out_of_order = 0;
     };
 
     struct PrefixMetadata {

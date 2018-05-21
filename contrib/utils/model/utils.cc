@@ -271,6 +271,7 @@ void LinkDown(NetDeviceContainer link)
 
 void FailLink(NetDeviceContainer link_to_fail)
 {
+	NS_LOG_DEBUG("HI");
 	LinkDown(link_to_fail);
 }
 
@@ -346,15 +347,28 @@ void SetFlowErrorModelFromFeatures(NetDeviceContainer link, double flow_drop_rat
 	//only for one direction
 	em->SetAttribute("FlowErrorRate", DoubleValue(flow_drop_rate));
 	Ptr<FlowErrorModel> em1 = CreateObject<FlowErrorModel>();
+
+	if (flow_drop_rate == 0 and normal_drop_rate == 0)
+	{
+		em->Disable();
+		em1->Disable();
+	}
+
 	link.Get(0)->SetAttribute("ReceiveErrorModel", PointerValue(em));
 	link.Get(1)->SetAttribute("ReceiveErrorModel", PointerValue(em1));
+
 
 	//uniform loss
 	if (minBurst == 1 and maxBurst == 1)
 	{
-		em->SetNormalErrorModelAttribute("ErrorRate", DoubleValue(normal_drop_rate));
-		em1->SetNormalErrorModelAttribute("ErrorRate", DoubleValue(normal_drop_rate));
+		Ptr<RateErrorModel> rem = CreateObject<RateErrorModel>();
+		rem->SetAttribute ("ErrorRate", DoubleValue (normal_drop_rate));
+		rem->SetAttribute ("ErrorUnit", EnumValue(RateErrorModel::ERROR_UNIT_PACKET));
+
+		em->SetNormalErrorModel(rem);
+		em1->SetNormalErrorModel(rem);
 	}
+	//default normal model is a Burst
 	else if (minBurst >= 1 and maxBurst > 1){
 		em->SetNormalErrorModelAttribute("ErrorRate", DoubleValue(normal_drop_rate));
 		em1->SetNormalErrorModelAttribute("ErrorRate", DoubleValue(normal_drop_rate));
