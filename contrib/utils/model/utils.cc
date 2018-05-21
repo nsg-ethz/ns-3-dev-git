@@ -341,7 +341,8 @@ void SetFlowErrorNormalBurstSize(NetDeviceContainer link, uint16_t min, uint16_t
 	em->SetNormalErrorModelAttribute("BurstSize", PointerValue(rand));
 }
 
-void SetFlowErrorModelFromFeatures(NetDeviceContainer link, double flow_drop_rate, double normal_drop_rate, uint16_t minBurst, uint16_t maxBurst)
+void SetFlowErrorModelFromFeatures(NetDeviceContainer link, double flow_drop_rate, double normal_drop_rate,
+																	 uint16_t minBurst, uint16_t maxBurst)
 {
 	Ptr<FlowErrorModel> em = CreateObject<FlowErrorModel>();
 	//only for one direction

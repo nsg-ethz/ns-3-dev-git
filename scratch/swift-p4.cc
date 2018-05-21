@@ -504,12 +504,17 @@ main(int argc, char *argv[]) {
 
     //Assign some failure rate if (enabled to the interface)
     if (enable_loss) {
-      if (it->second.features.loss > 0) {
+      NS_LOG_DEBUG("Setting prefix loss: " << it->first << " " << it->second.features.loss << " "
+                                           << it->second.features.minBurst << " " << it->second.features.maxBurst);
 
-        SetFlowErrorModelFromFeatures(it->second.link, 0, it->second.features.loss, it->second.features.minBurst, it->second.features.maxBurst);
-
-      } else if (prefixes_loss > 0) {
+      if (prefixes_loss > 0)
+      {
         SetFlowErrorModelFromFeatures(it->second.link, 0, prefixes_loss, 1, 1);
+      }
+      else
+      {
+        SetFlowErrorModelFromFeatures(it->second.link, 0, it->second.features.loss, it->second.features.minBurst,
+                                      it->second.features.maxBurst);
       }
     }
     //still install model, since its needed for the partial failures

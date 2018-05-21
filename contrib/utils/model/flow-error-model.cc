@@ -27,6 +27,42 @@ namespace ns3 {
 // FlowErrorModel
 //
 
+
+void
+PrintFiveTuple(Ptr<Packet> packet){
+
+    Ptr<Packet> p = packet->Copy();
+
+    /* Assumes that the packet is a ppp */
+    PppHeader ppp_header;
+    p->RemoveHeader(ppp_header);
+
+    /* Assumes IPv4 header */
+    Ipv4Header ip_header;
+    p->RemoveHeader(ip_header);
+
+    uint8_t ip_protocol = ip_header.GetProtocol();
+    uint16_t src_port = 0;
+    uint16_t dst_port = 0;
+
+    if (ip_protocol == uint8_t(17)){//udp
+        UdpHeader udp_header;
+        p->RemoveHeader(udp_header);
+        src_port = udp_header.GetSourcePort();
+        dst_port = udp_header.GetDestinationPort();
+    }
+    else if (ip_protocol ==  uint8_t(6)) {//tcp
+        TcpHeader tcp_header;
+        p->RemoveHeader(tcp_header);
+        src_port = tcp_header.GetSourcePort();
+        dst_port = tcp_header.GetDestinationPort();
+    }
+
+    std::cout << ip_header.GetSource() << ":" << src_port << " " << ip_header.GetDestination() <<
+              ":" << dst_port << "\n";
+}
+
+
 NS_LOG_COMPONENT_DEFINE("FlowErrorModel");
 
 NS_OBJECT_ENSURE_REGISTERED (FlowErrorModel);
@@ -150,9 +186,15 @@ FlowErrorModel::DoCorrupt (Ptr<Packet> p)
     {
         to_corrupt = m_normalErrorModel->IsCorrupt(p);
     }
-    NS_LOG_UNCOND("Corrupt packet " << to_corrupt);
+
+    if (to_corrupt){
+        NS_LOG_UNCOND("Corrupt packet " << to_corrupt);
+        PrintFiveTuple(p);
+    }
+
     return to_corrupt;
 }
+
 
 uint64_t
 FlowErrorModel::GetHeaderHash(Ptr<Packet> packet){
