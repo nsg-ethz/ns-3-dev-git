@@ -132,25 +132,25 @@ FlowErrorModel::DoCorrupt (Ptr<Packet> p)
 
         /* Check if flow_id is already known: */
         if (IsRed(flow_id)) {
-            NS_LOG_DEBUG("Corrupt packet " << true);
-            return true;
+            to_corrupt = true;
         }
         /* check if this flow was white listed*/
         else if (IsGreen(flow_id)) {
             to_corrupt = m_normalErrorModel->IsCorrupt(p);
-            NS_LOG_DEBUG("Corrupt packet " << true);
-            return to_corrupt;
-        }
 
+        }
         /* New Flow: check if it has to be corrupted */
-        to_corrupt =  DoCorruptFlow(flow_id);
+        else
+        {
+            to_corrupt =  DoCorruptFlow(flow_id);
+        }
     }
 
     if (!to_corrupt) /* Apply normal Error Model*/
     {
         to_corrupt = m_normalErrorModel->IsCorrupt(p);
     }
-    NS_LOG_DEBUG("Corrupt packet " << to_corrupt);
+    NS_LOG_UNCOND("Corrupt packet " << to_corrupt);
     return to_corrupt;
 }
 
@@ -205,7 +205,6 @@ FlowErrorModel::GetHeaderHash(Ptr<Packet> packet){
     buf[12] = dst_port & 0xff;
 
     uint64_t hash = Hash64((char*) buf, 13);
-    NS_LOG_UNCOND("Flow: " << ip_header.GetSource() << " " << ip_header.GetDestination() << " " << src_port << " " << dst_port);
     NS_LOG_DEBUG("Flow Error Model Packet Hash" << hash);
     return hash;
 }
@@ -231,7 +230,6 @@ FlowErrorModel::DoCorruptFlow (uint64_t flow_id)
     bool to_corrupt = (m_ranvar->GetValue () <= m_flowErrorRate);
     if (to_corrupt)
     {
-        NS_LOG_UNCOND("Corrupted");
         m_redFlows.insert(flow_id);
     }
     else
