@@ -88,7 +88,7 @@ main(int argc, char *argv[]) {
   uint64_t runStep = 1;
   double rtt_shift = 1;
 
-  bool enable_uniform_loss = false;
+  bool enable_loss = false;
   double prefixes_loss = 0;
   uint64_t network_delay = 1; //ns?
   uint16_t num_hosts_per_rtt = 1;
@@ -118,7 +118,7 @@ main(int argc, char *argv[]) {
   //Links properties
   cmd.AddValue("LinkBandwidth", "Bandwidth of link, used in multiple experiments", networkBandwidth);
   cmd.AddValue("NetworkDelay", "Added delay between nodes", network_delay);
-  cmd.AddValue("EnableUniformLoss", "Enable Error Per Prefix", enable_uniform_loss);
+  cmd.AddValue("EnableLoss", "Enable Error Per Prefix", enable_loss);
   cmd.AddValue("PrefixesLoss", "Sets the same loss for all prefixes", prefixes_loss);
   cmd.AddValue("EnablePcap", "Save traffic in a pcap file", save_pcap);
   cmd.AddValue("FailAll", "If enabled all prefixes will be failed ignoring what the prefixes_to_fail file says",
@@ -503,11 +503,13 @@ main(int argc, char *argv[]) {
     address.Assign(links[GetNodeName(sw2) + "->" + host_name.str()]);
 
     //Assign some failure rate if (enabled to the interface)
-    if (enable_uniform_loss) {
+    if (enable_loss) {
       if (it->second.features.loss > 0) {
-        SetUniformDropRate(links[GetNodeName(sw2) + "->" + host_name.str()], it->second.features.loss);
+
+        SetFlowErrorModelFromFeatures(it->second.link, 0, it->second.features.loss, it->second.features.minBurst, it->second.features.maxBurst);
+
       } else if (prefixes_loss > 0) {
-        SetUniformDropRate(links[GetNodeName(sw2) + "->" + host_name.str()], prefixes_loss);
+        SetFlowErrorModelFromFeatures(it->second.link, 0, prefix_loss, 1, 1);
       }
     }
     dst_index++;
@@ -552,7 +554,7 @@ main(int argc, char *argv[]) {
   *(metadata_file->GetStream()) << "network_bw " << networkBandwidth << "\n";
   *(metadata_file->GetStream()) << "senders_bw " << sendersBandwidth << "\n";
   *(metadata_file->GetStream()) << "receivers_bw " << receiversBandwidth << "\n";
-  *(metadata_file->GetStream()) << "emulated_congestion_on " << enable_uniform_loss << "\n";
+  *(metadata_file->GetStream()) << "emulated_congestion_on " << enable_loss << "\n";
   *(metadata_file->GetStream()) << "prefixes_loss " << prefixes_loss << "\n";
   *(metadata_file->GetStream()) << "rtt_cdf_size " << src_rtts.size() << "\n";
   *(metadata_file->GetStream()) << "num_senders " << num_senders << "\n";
@@ -668,12 +670,7 @@ main(int argc, char *argv[]) {
       *(prefixes_failed_file->GetStream()) << prefix_to_fail.first << "\n";
       prefixes_failed_file->GetStream()->flush();
 
-      //IF there is no events and the default duration was provided we use that
-      if (prefix_to_fail.second.size() == 0 and failure_time > 0) {
-        Simulator::Schedule(Seconds(failure_time), &FailLink, link);
-        continue;
-      }
-      //TODO add more debugging messages
+       //TODO add more debugging messages
       for (auto failure: prefix_to_fail.second) {
         if (failure.failure_time > 0) {
           if (failure.failure_intensity == 1)
@@ -682,14 +679,23 @@ main(int argc, char *argv[]) {
           }
           else
           {
-            Simulator::Schedule(Seconds(failure.failure_time), &SetUniformDropRate, link, failure.failure_intensity);
+            //partial failure, only interface 0
+            Simulator::Schedule(Seconds(failure.failure_time), &ChangeFlowErrorDropRate, link, failure.failure_intensity);
           }
         }
         if (failure.recovery_time > 0) {
-          //set back to loss level
-          //TODO this will fail if there is no features
-          Simulator::Schedule(Seconds(failure.failure_time), &SetUniformDropRate, link,
-                              prefixes[prefix_to_fail.first].features.loss);
+
+          //If it was a total failure we only recover the interface
+          if (failure.failure_intensity == 1){
+            Simulator::Schedule(Seconds(failure.recovery_time), &RecoverLink, link);
+          }
+
+          //set flow error model to 0
+          else
+          {
+            Simulator::Schedule(Seconds(failure.recovery_time), &ChangeFlowDropRate, link ,0);
+          }
+
         }
       }
     }

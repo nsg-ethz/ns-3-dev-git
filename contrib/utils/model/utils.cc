@@ -313,7 +313,7 @@ void ClearFlowErrorModel(NetDeviceContainer link)
 void ChangeFlowErrorDropRate(NetDeviceContainer link, double drop_rate)
 {
 	PointerValue emp;
-	link.Get(1)->GetAttribute("ReceiveErrorModel", emp);
+	link.Get(0)->GetAttribute("ReceiveErrorModel", emp);
 	Ptr<FlowErrorModel> em = emp.Get<FlowErrorModel>();
 	em->SetAttribute("FlowErrorRate", DoubleValue(drop_rate));
 	em->Reset();
@@ -323,7 +323,7 @@ void ChangeFlowErrorDropRate(NetDeviceContainer link, double drop_rate)
 void SetFlowErrorNormalDropRate(NetDeviceContainer link, double drop_rate)
 {
 	PointerValue emp;
-	link.Get(1)->GetAttribute("ReceiveErrorModel", emp);
+	link.Get(0)->GetAttribute("ReceiveErrorModel", emp);
 	Ptr<FlowErrorModel> em = emp.Get<FlowErrorModel>();
 	em->SetNormalErrorModelAttribute("ErrorRate", DoubleValue(drop_rate));
 	em->Enable();
@@ -332,12 +332,39 @@ void SetFlowErrorNormalDropRate(NetDeviceContainer link, double drop_rate)
 void SetFlowErrorNormalBurstSize(NetDeviceContainer link, uint16_t min, uint16_t max)
 {
 	PointerValue emp;
-	link.Get(1)->GetAttribute("ReceiveErrorModel", emp);
+	link.Get(0)->GetAttribute("ReceiveErrorModel", emp);
 	Ptr<FlowErrorModel> em = emp.Get<FlowErrorModel>();
 	Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
 	rand->SetAttribute("Min", DoubleValue(min));
 	rand->SetAttribute("Max", DoubleValue(max));
 	em->SetNormalErrorModelAttribute("BurstSize", PointerValue(rand));
+}
+
+void SetFlowErrorModelFromFeatures(NetDeviceContainer link, double flow_drop_rate, double normal_drop_rate, uint16_t minBurst, uint16_t maxBurst)
+{
+	Ptr<FlowErrorModel> em = CreateObject<FlowErrorModel>();
+	//only for one direction
+	em->SetAttribute("FlowErrorRate", DoubleValue(flow_drop_rate));
+	Ptr<FlowErrorModel> em1 = CreateObject<FlowErrorModel>();
+	link.Get(0)->SetAttribute("ReceiveErrorModel", PointerValue(em));
+	link.Get(1)->SetAttribute("ReceiveErrorModel", PointerValue(em1));
+
+	//uniform loss
+	if (minBurst == 1 and maxBurst == 1)
+	{
+		em->SetNormalErrorModelAttribute("ErrorRate", DoubleValue(normal_drop_rate));
+		em1->SetNormalErrorModelAttribute("ErrorRate", DoubleValue(normal_drop_rate));
+	}
+	else if (minBurst >= 1 and maxBurst > 1){
+		em->SetNormalErrorModelAttribute("ErrorRate", DoubleValue(normal_drop_rate));
+		em1->SetNormalErrorModelAttribute("ErrorRate", DoubleValue(normal_drop_rate));
+
+		Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
+		rand->SetAttribute("Min", DoubleValue(minBurst));
+		rand->SetAttribute("Max", DoubleValue(maxBurst));
+		em->SetNormalErrorModelAttribute("BurstSize", PointerValue(rand));
+		em1->SetNormalErrorModelAttribute("BurstSize", PointerValue(rand));
+	}
 }
 
 /* Misc */

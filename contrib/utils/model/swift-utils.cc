@@ -119,6 +119,7 @@ namespace ns3 {
         PrefixFeatures features;
 
         while (prefix_features_file >> prefix >> features.loss >> features.minBurst >> features.maxBurst){
+            //checks that the prefix is found in this sub network
             if (subnetwork_trace_prefixes.find(prefix) != subnetwork_trace_prefixes.end()){
                 trace_prefix_features[prefix] = features;
             }
