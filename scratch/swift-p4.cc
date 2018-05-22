@@ -208,7 +208,7 @@ main(int argc, char *argv[]) {
   Config::SetDefault("ns3::TcpSocket::ConnTimeout",
                      TimeValue(MilliSeconds(initial_rto))); // connection retransmission timeout
   Config::SetDefault("ns3::TcpSocket::ConnCount", UintegerValue(5)); //retrnamissions during connection
-  Config::SetDefault("ns3::TcpSocket::DataRetries", UintegerValue(15)); //retranmissions
+  Config::SetDefault("ns3::TcpSocket::DataRetries", UintegerValue(10)); //retranmissions
   Config::SetDefault("ns3::TcpSocket::DelAckTimeout", TimeValue(MilliSeconds(rtt / 50)));
 // 	Config::SetDefault ("ns3::TcpSocket::DelAckCount", UintegerValue(2));
   Config::SetDefault("ns3::TcpSocket::TcpNoDelay", BooleanValue(true)); //disable nagle's algorithm
@@ -637,7 +637,7 @@ main(int argc, char *argv[]) {
 //  //Only save TX traffic
   if (save_pcap) {
 
-    //p2p.EnablePcap(outputNameRoot + "tx_rx.pcap", links[GetNodeName(sw1) + "->" + GetNodeName(sw2)].Get(0), bool(1));
+    p2p.EnablePcap(outputNameRoot + "tx_rx.pcap", links[GetNodeName(sw1) + "->" + GetNodeName(sw2)].Get(0), bool(1));
 
     PcapHelper pcapHelper;
     Ptr<PcapFileWrapper> pcap_file = pcapHelper.CreateFile(
@@ -646,6 +646,7 @@ main(int argc, char *argv[]) {
     links[GetNodeName(sw1) + "->" + GetNodeName(sw2)].Get(0)->TraceConnectWithoutContext("PhyTxBegin",
                                                                                          MakeBoundCallback(&TracePcap,
                                                                                                            pcap_file));
+
   }
 
   NS_LOG_DEBUG("Total Bytes Received By Servers: " << nodes_usage.GetTotalRx());

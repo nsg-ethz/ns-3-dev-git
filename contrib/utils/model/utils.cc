@@ -271,7 +271,7 @@ void LinkDown(NetDeviceContainer link)
 
 void FailLink(NetDeviceContainer link_to_fail)
 {
-	NS_LOG_DEBUG("HI");
+
 	LinkDown(link_to_fail);
 }
 
@@ -311,16 +311,6 @@ void ClearFlowErrorModel(NetDeviceContainer link)
 	em->Disable();
 }
 
-void ChangeFlowErrorDropRate(NetDeviceContainer link, double drop_rate)
-{
-	PointerValue emp;
-	link.Get(0)->GetAttribute("ReceiveErrorModel", emp);
-	Ptr<FlowErrorModel> em = emp.Get<FlowErrorModel>();
-	em->SetAttribute("FlowErrorRate", DoubleValue(drop_rate));
-	em->Reset();
-	em->Enable();
-}
-
 void SetFlowErrorNormalDropRate(NetDeviceContainer link, double drop_rate)
 {
 	PointerValue emp;
@@ -339,6 +329,16 @@ void SetFlowErrorNormalBurstSize(NetDeviceContainer link, uint16_t min, uint16_t
 	rand->SetAttribute("Min", DoubleValue(min));
 	rand->SetAttribute("Max", DoubleValue(max));
 	em->SetNormalErrorModelAttribute("BurstSize", PointerValue(rand));
+}
+
+void ChangeFlowErrorDropRate(NetDeviceContainer link, double drop_rate)
+{
+	PointerValue emp;
+	link.Get(1)->GetAttribute("ReceiveErrorModel", emp);
+	Ptr<FlowErrorModel> em = emp.Get<FlowErrorModel>();
+	em->SetAttribute("FlowErrorRate", DoubleValue(drop_rate));
+	em->Reset();
+	em->Enable();
 }
 
 void SetFlowErrorModelFromFeatures(NetDeviceContainer link, double flow_drop_rate, double normal_drop_rate,
@@ -366,18 +366,18 @@ void SetFlowErrorModelFromFeatures(NetDeviceContainer link, double flow_drop_rat
 		rem->SetAttribute ("ErrorRate", DoubleValue (normal_drop_rate));
 		rem->SetAttribute ("ErrorUnit", EnumValue(RateErrorModel::ERROR_UNIT_PACKET));
 
-		em->SetNormalErrorModel(rem);
+		//em->SetNormalErrorModel(rem);
 		em1->SetNormalErrorModel(rem);
 	}
 	//default normal model is a Burst
 	else if (minBurst >= 1 and maxBurst > 1){
-		em->SetNormalErrorModelAttribute("ErrorRate", DoubleValue(normal_drop_rate));
+		//em->SetNormalErrorModelAttribute("ErrorRate", DoubleValue(normal_drop_rate));
 		em1->SetNormalErrorModelAttribute("ErrorRate", DoubleValue(normal_drop_rate));
 
 		Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();
 		rand->SetAttribute("Min", DoubleValue(minBurst));
 		rand->SetAttribute("Max", DoubleValue(maxBurst));
-		em->SetNormalErrorModelAttribute("BurstSize", PointerValue(rand));
+		//em->SetNormalErrorModelAttribute("BurstSize", PointerValue(rand));
 		em1->SetNormalErrorModelAttribute("BurstSize", PointerValue(rand));
 	}
 }
