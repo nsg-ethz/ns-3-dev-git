@@ -40,6 +40,43 @@ NS_LOG_COMPONENT_DEFINE ("rate-send-app");
 
 NS_OBJECT_ENSURE_REGISTERED (RateSendApplication);
 
+char *TCPCongestionStateTypes[] =
+    {
+        "CA_OPEN",      /**< Normal state, no dubious events */
+        "CA_DISORDER",  /**< In all the respects it is "Open",
+                    *  but requires a bit more attention. It is entered when
+                    *  we see some SACKs or dupacks. It is split of "Open" */
+        "CA_CWR",       /**< cWnd was reduced due to some Congestion Notification event.
+                    *  It can be ECN, ICMP source quench, local device congestion.
+                    *  Not used in NS-3 right now. */
+        "CA_RECOVERY",  /**< CWND was reduced, we are fast-retransmitting. */
+        "CA_LOSS",      /**< CWND was reduced due to RTO timeout or SACK reneging. */
+        "CA_LAST_STATE" /**< Used only in debug messages */
+    };
+
+void TimeTracer(std::string name, Time oldValue, Time newValue)
+{
+  NS_LOG_UNCOND(name << " " << Simulator::Now().GetSeconds() << " " << newValue.GetSeconds());
+}
+
+void TCPStateTracer(const TcpSocket::TcpStates_t oldValue, const TcpSocket::TcpStates_t newValue)
+{
+  NS_LOG_UNCOND("TCP STATE: " << Simulator::Now().GetSeconds() << " " << newValue);
+}
+
+void TCPCongStateTracer(const TcpSocketState::TcpCongState_t oldValue, const TcpSocketState::TcpCongState_t newValue)
+{
+  NS_LOG_UNCOND("TCP CONGESTION STATE: " << Simulator::Now().GetSeconds() << " " << TCPCongestionStateTypes[newValue]);
+}
+
+void
+TCPCwndTracer(uint32_t oldCwnd, uint32_t newCwnd)
+{
+  NS_LOG_UNCOND ("TCP CONGESTION WINDOW: " << Simulator::Now().GetSeconds() << " " << newCwnd);
+}
+
+
+
 TypeId
 RateSendApplication::GetTypeId (void)
 {
@@ -148,6 +185,12 @@ void RateSendApplication::StartApplication (void) // Called at time specified by
     {
   		//  		m_started=true;
       m_socket = Socket::CreateSocket (GetNode (), m_tid);
+
+//      m_socket->TraceConnectWithoutContext ("RTO", MakeBoundCallback (&TimeTracer, "RTO"));
+//      m_socket->TraceConnectWithoutContext ("RTT", MakeBoundCallback (&TimeTracer, "RTT"));
+//      m_socket->TraceConnectWithoutContext ("STATE", MakeCallback (&TCPStateTracer));
+//      m_socket->TraceConnectWithoutContext ("CongState", MakeCallback (&TCPCongStateTracer));
+//      m_socket->TraceConnectWithoutContext ("CongestionWindow", MakeCallback (&TCPCwndTracer));
 
       // Fatal error if socket type is not NS3_SOCK_STREAM or NS3_SOCK_SEQPACKET
       if (m_socket->GetSocketType () != Socket::NS3_SOCK_STREAM &&

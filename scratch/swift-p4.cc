@@ -211,7 +211,7 @@ main(int argc, char *argv[]) {
   Config::SetDefault("ns3::TcpSocket::DataRetries", UintegerValue(10)); //retranmissions
   Config::SetDefault("ns3::TcpSocket::DelAckTimeout", TimeValue(MilliSeconds(rtt / 50)));
 // 	Config::SetDefault ("ns3::TcpSocket::DelAckCount", UintegerValue(2));
-  Config::SetDefault("ns3::TcpSocket::TcpNoDelay", BooleanValue(true)); //disable nagle's algorithm
+  Config::SetDefault("ns3::TcpSocket::TcpNoDelay", BooleanValue(false)); //disable nagle's algorithm
   Config::SetDefault("ns3::TcpSocket::PersistTimeout",
                      TimeValue(NanoSeconds(6000000000))); //persist timeout to porbe for rx window
 
@@ -228,6 +228,7 @@ main(int argc, char *argv[]) {
   //TCP L4
   //TcpNewReno
   Config::SetDefault("ns3::TcpL4Protocol::SocketType", TypeIdValue(TcpNewReno::GetTypeId()));
+  //Config::SetDefault("ns3::TcpL4Protocol::SocketType", TypeIdValue(TcpVeno::GetTypeId()));
   Config::SetDefault("ns3::RttEstimator::InitialEstimation", TimeValue(MicroSeconds(initial_rto)));//defautlt 1sec
 
   //QUEUES
@@ -612,6 +613,7 @@ main(int argc, char *argv[]) {
                                  prefixes_mappings,
                                  hostToPort,
                                  inputDir + "flows_per_prefix.txt",
+                                 outputNameRoot + "flows.log",
                                  runStep,
                                  flowsPersec,
                                  duration,
@@ -637,7 +639,7 @@ main(int argc, char *argv[]) {
 //  //Only save TX traffic
   if (save_pcap) {
 
-    p2p.EnablePcap(outputNameRoot + "tx_rx.pcap", links[GetNodeName(sw1) + "->" + GetNodeName(sw2)].Get(0), bool(1));
+//    p2p.EnablePcap(outputNameRoot + "tx_rx.pcap", links[GetNodeName(sw1) + "->" + GetNodeName(sw2)].Get(0), bool(1));
 
     PcapHelper pcapHelper;
     Ptr<PcapFileWrapper> pcap_file = pcapHelper.CreateFile(

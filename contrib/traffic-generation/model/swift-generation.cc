@@ -18,10 +18,20 @@ NodesUsage SendSwiftTraffic(std::unordered_map<double, std::vector<Ptr<Node>>> r
                             PrefixMappings mapping,
                             std::unordered_map<std::string, std::vector<uint16_t>> hostsToPorts,
                             std::string flowDistFile,
+                            std::string logOutput,
                             uint32_t seed,
                             uint32_t interArrivalFlow,
-                            double duration, double rtt_shift) {
+                            double duration, double rtt_shift)
 
+{
+
+  //Log output file
+  AsciiTraceHelper asciiTraceHelper;
+  Ptr<OutputStreamWrapper> sent_flows_file;
+  if (logOutput != "")
+  {
+    sent_flows_file = asciiTraceHelper.CreateFileStream(logOutput);
+  }
 
   //Load flow distribution
   std::vector<FlowMetadata> flowDist = GetFlowsPerPrefix(flowDistFile, mapping.trace_to_sim);
@@ -77,10 +87,17 @@ NodesUsage SendSwiftTraffic(std::unordered_map<double, std::vector<Ptr<Node>>> r
     uint16_t dport = RandomFromVector<uint16_t>(availablePorts, random_variable);
 
     startTime += interArrivalTime(gen);
-    InstallRateSend(src, dst, dport, flow.packets, flow.bytes, flow.duration, rtt, startTime);
+    InstallRateSend(src, dst, dport, flow.packets, flow.bytes, flow.duration, rtt, 1.942550-0.178879);
+    //Save log into a file
+    if (logOutput != "")
+    {
+      *(sent_flows_file->GetStream()) << GetNodeIp(src) << " " << GetNodeIp(dst) << " " << dport
+                                      << " " << flow.packets << " " << flow.bytes << " " << flow.duration << " " << rtt
+                                      << "\n";
+    }
+
     num_flows_started++;
     nodes_usage.Update(src, dst, flow.bytes);
-
   }
 
   NS_LOG_DEBUG("Number of flows Started: " << num_flows_started);

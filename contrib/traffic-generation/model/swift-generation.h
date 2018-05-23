@@ -17,6 +17,7 @@ namespace ns3 {
                                  PrefixMappings mapping,
                                  std::unordered_map<std::string, std::vector<uint16_t>> hostsToPorts,
                                  std::string flowDistFile,
+                                 std::string logOutFile,
                                  uint32_t seed = 1,
                                  uint32_t interArrivalFlow = 1000,
                                  double duration = 5, double rtt_shift=1);

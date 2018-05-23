@@ -187,10 +187,10 @@ FlowErrorModel::DoCorrupt (Ptr<Packet> p)
         to_corrupt = m_normalErrorModel->IsCorrupt(p);
     }
 
-    if (to_corrupt){
-        NS_LOG_UNCOND("Corrupt packet " << to_corrupt);
-        PrintFiveTuple(p);
-    }
+//    if (to_corrupt){
+//        NS_LOG_DEBUG("Corrupt packet " << to_corrupt);
+//        PrintFiveTuple(p);
+//    }
 
     return to_corrupt;
 }
