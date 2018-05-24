@@ -93,7 +93,7 @@ NodesUsage SendSwiftTraffic(std::unordered_map<double, std::vector<Ptr<Node>>> r
     {
       *(sent_flows_file->GetStream()) << GetNodeIp(src) << " " << GetNodeIp(dst)
                                       << " " << dport << " " << flow.packets << " "
-                                      << flow.bytes << " " << flow.duration << "" << startTime
+                                      << flow.bytes << " " << flow.duration << " " << startTime
                                       << " " << rtt << "\n";
     }
 
