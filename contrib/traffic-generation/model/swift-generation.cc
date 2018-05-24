@@ -87,13 +87,14 @@ NodesUsage SendSwiftTraffic(std::unordered_map<double, std::vector<Ptr<Node>>> r
     uint16_t dport = RandomFromVector<uint16_t>(availablePorts, random_variable);
 
     startTime += interArrivalTime(gen);
-    InstallRateSend(src, dst, dport, flow.packets, flow.bytes, flow.duration, rtt, 1.942550-0.178879);
+    InstallRateSend(src, dst, dport, flow.packets, flow.bytes, flow.duration, rtt, startTime);
     //Save log into a file
     if (logOutput != "")
     {
-      *(sent_flows_file->GetStream()) << GetNodeIp(src) << " " << GetNodeIp(dst) << " " << dport
-                                      << " " << flow.packets << " " << flow.bytes << " " << flow.duration << " " << rtt
-                                      << "\n";
+      *(sent_flows_file->GetStream()) << GetNodeIp(src) << " " << GetNodeIp(dst)
+                                      << " " << dport << " " << flow.packets << " "
+                                      << flow.bytes << " " << flow.duration << "" << startTime
+                                      << " " << rtt << "\n";
     }
 
     num_flows_started++;
