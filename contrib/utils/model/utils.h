@@ -57,6 +57,8 @@ void PrintMemUsage(double delay);
 
 void PrintNowMem(double delay, std::clock_t starting_time);
 
+void PrintNowMemStop(double delay, std::clock_t starting_time, double stop_after);
+
 void SaveNow(double delay, Ptr<OutputStreamWrapper> file);
 
 uint64_t HashString(std::string message);

@@ -223,6 +223,20 @@ void PrintNowMem(double delay, std::clock_t starting_time){
 	Simulator::Schedule (Seconds(delay), &PrintNowMem, delay, starting_time);
 }
 
+void PrintNowMemStop(double delay, std::clock_t starting_time, double stop_after){
+
+	std::cout  <<"Simulation Time: " << Simulator::Now().GetSeconds() << "(" << (float(clock() - starting_time) / CLOCKS_PER_SEC) << ")"
+						 << "\t Memory Used: " << GetMemoryUsed() <<"\n";
+
+	if ((float(clock() - starting_time) / CLOCKS_PER_SEC) > stop_after){
+		std::cout << "Forcing Simulation to Stop Since it exceeded the running time of " << stop_after << " Seconds\n";
+		Simulator::Stop(Seconds(0));
+	}
+	else {
+		Simulator::Schedule(Seconds(delay), &PrintNowMemStop, delay, starting_time, stop_after);
+	}
+}
+
 void SaveNow(double delay, Ptr<OutputStreamWrapper> file){
 
 	*(file->GetStream()) << Simulator::Now().GetSeconds() << "\n";

@@ -97,6 +97,7 @@ main(int argc, char *argv[]) {
   double duration = 5;
   double failure_time = 0;
   double stop_time = 0;
+  double forced_stop_time = 0;
   bool debug = false;
   bool save_pcap = false;
   bool fail_all_prefixes = false;
@@ -133,6 +134,7 @@ main(int argc, char *argv[]) {
   cmd.AddValue("Duration", "", duration);
   cmd.AddValue("FailureTime", "Time when all prefixes will be lost", failure_time);
   cmd.AddValue("StopTime", "Time when the simulation finishes", stop_time);
+  cmd.AddValue("ForcedStopTime", "Time when we force the simulation to stop, this time is from the real world", forced_stop_time);
   cmd.AddValue("RttShift", "Paramater to shift the used RTT distribution. It will shift senders and flows rtts",
                rtt_shift);
 
@@ -723,10 +725,37 @@ main(int argc, char *argv[]) {
   if (stop_time != 0) {
     //We schedule it here otherwise simulations never finish
     std::cout << "\n";
-    PrintNowMem(1, simulation_execution_time);
+    //TODO PUT A CHECKER IF THE THIUNG IS 0 call the normal function
+    //we reset the variable so the previous time does not count
+    if (forced_stop_time > 0)
+    {
+      simulation_execution_time = std::clock();
+      PrintNowMemStop(1, simulation_execution_time, forced_stop_time);
+    }
+    else{
+      PrintNowMem(1, simulation_execution_time);
+    }
+
     Simulator::Stop(Seconds(stop_time));
+
+    *(metadata_file->GetStream()) << "stop_time "
+                                  << stop_time << "\n";
+
   }
   Simulator::Run();
+
+  //This will run after a stop
+
+  //if we force stoped the simulation then we trite that down
+  if (forced_stop_time > 0 and  (float(clock() - simulation_execution_time) / CLOCKS_PER_SEC) > forced_stop_time)
+  {
+    *(metadata_file->GetStream()) << "forced_stop: 1\n";
+
+  }
+  else
+  {
+    *(metadata_file->GetStream()) << "forced_stop: 0\n";
+  }
 
   *(metadata_file->GetStream()) << "real_time_duration "
                                 << (float(clock() - simulation_execution_time) / CLOCKS_PER_SEC) << "\n";
