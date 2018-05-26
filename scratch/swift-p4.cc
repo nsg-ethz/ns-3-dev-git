@@ -211,7 +211,7 @@ main(int argc, char *argv[]) {
   Config::SetDefault("ns3::TcpSocket::DataRetries", UintegerValue(10)); //retranmissions
   Config::SetDefault("ns3::TcpSocket::DelAckTimeout", TimeValue(MilliSeconds(rtt / 50)));
 // 	Config::SetDefault ("ns3::TcpSocket::DelAckCount", UintegerValue(2));
-  Config::SetDefault("ns3::TcpSocket::TcpNoDelay", BooleanValue(false)); //disable nagle's algorithm
+  Config::SetDefault("ns3::TcpSocket::TcpNoDelay", BooleanValue(true)); //disable nagle's algorithm
   Config::SetDefault("ns3::TcpSocket::PersistTimeout",
                      TimeValue(NanoSeconds(6000000000))); //persist timeout to porbe for rx window
 
