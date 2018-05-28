@@ -594,8 +594,9 @@ TcpTxBuffer::MergeItems (TcpTxItem *t1, TcpTxItem *t2) const
 
   NS_ASSERT_MSG (AreEquals (t1->m_sacked, t2->m_sacked),
                  "Merging one sacked and another not sacked. Impossible");
-  NS_ASSERT_MSG (AreEquals (t1->m_lost, t2->m_lost),
-                 "Merging one lost and another not lost. Impossible");
+
+//  NS_ASSERT_MSG (AreEquals (t1->m_lost, t2->m_lost),
+//                 "Merging one lost and another not lost. Impossible");
 
   // If one is retrans and the other is not, cancel the retransmitted flag.
   // We are merging this segment for the retransmit, so the count will
