@@ -292,10 +292,14 @@ main(int argc, char *argv[]) {
 
   //Load Trace Prefix Features
   std::unordered_map<std::string, PrefixFeatures> trace_prefixes_features;
+
+  NS_LOG_DEBUG("Features file:" << prefixes_features_file);
+
   if (prefixes_features_file != "") {
     trace_prefixes_features = GetPrefixFeatures(inputDir + prefixes_features_file, prefixes_mappings.trace_set);
   }
-  NS_LOG_DEBUG("Trace prefixes features length: : " << trace_prefixes_features.size());
+
+  NS_LOG_DEBUG("Trace prefixes features length: " << trace_prefixes_features.size());
 
   //Load prefix failures
   std::unordered_map<std::string, std::vector<FailureEvent>> prefix_failures;
